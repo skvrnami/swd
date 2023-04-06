@@ -1,0 +1,67 @@
+---
+title: "Satisfaction with democracy"
+author: "Michael Škvrňák"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+library(targets)
+library(sjPlot)
+
+```
+
+Hypotheses from pre-analysis plan:  
+
+- Hypothesis 1: Pre-Election satisfaction does not matter for participation when socio-demographic controls and other attitudinal drivers of participation are controlled for.  
+- Hypothesis 2: Voter Turnout is more strongly associated with post-election satisfaction than pre-election satisfaction.  
+- Hypothesis 3: Elections increase satisfaction with democracy among voters, but exert no effect on abstainers.  
+- Hypothesis 4: The strongest increase is among those, whose preferred candidates qualified for the 2nd round (1st round of voting) or won the second round (2nd round of voting).  
+- Hypothesis 5: The effect of winning is stronger for respondents with stable preferences.  
+
+
+# Czech Republic, parliamentary election 1996
+
+```{r}
+tar_load(cz_96_merged)
+```
+
+## H1
+```{r}
+
+```
+
+
+## H2
+```{r}
+lm2_1 <- lm(voted ~ swd_w1, data = cz_96_merged %>% filter(both_waves))
+lm2_2 <- lm(voted ~ swd_w2, data = cz_96_merged %>% filter(both_waves))
+lm2_3 <- lm(voted ~ swd_w1 + swd_w2, data = cz_96_merged %>% filter(both_waves))
+
+tab_model(list(lm2_1, lm2_2, lm2_3))
+```
+
+## H3
+```{r}
+lm3_1 <- lm(swd_diff ~ voted, data = cz_96_merged %>% filter(both_waves))
+lm3_2 <- lm(swd_diff ~ voted + swd_w1, data = cz_96_merged %>% filter(both_waves))
+
+tab_model(list(lm3_1, lm3_2))
+```
+
+## H4
+Applicable only to presidential election.
+
+## H5
+```{r}
+lm5_0 <- lm(swd_diff ~ winner_government + stable_voter + swd_w1, 
+            data = cz_96_merged %>% filter(both_waves))
+lm5_1 <- lm(swd_diff ~ winner_government * stable_voter + swd_w1, 
+            data = cz_96_merged %>% filter(both_waves))
+
+tab_model(list(lm5_0, lm5_1))
+```
+
