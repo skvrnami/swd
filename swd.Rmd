@@ -31,15 +31,17 @@ tar_load(cz_96_merged)
 
 ## H1
 ```{r}
+lm1_1 <- glm(voted ~ swd_w1 + age + age^2 + gender + r_education, data = cz_96_merged)
 
+tab_model(list(lm1_1))
 ```
 
 
 ## H2
 ```{r}
-lm2_1 <- lm(voted ~ swd_w1, data = cz_96_merged %>% filter(both_waves))
-lm2_2 <- lm(voted ~ swd_w2, data = cz_96_merged %>% filter(both_waves))
-lm2_3 <- lm(voted ~ swd_w1 + swd_w2, data = cz_96_merged %>% filter(both_waves))
+lm2_1 <- glm(voted ~ swd_w1, data = cz_96_merged %>% filter(both_waves))
+lm2_2 <- glm(voted ~ swd_w2, data = cz_96_merged %>% filter(both_waves))
+lm2_3 <- glm(voted ~ swd_w1 + swd_w2, data = cz_96_merged %>% filter(both_waves))
 
 tab_model(list(lm2_1, lm2_2, lm2_3))
 ```
@@ -65,3 +67,94 @@ lm5_1 <- lm(swd_diff ~ winner_government * stable_voter + swd_w1,
 tab_model(list(lm5_0, lm5_1))
 ```
 
+# Poland 2019
+EP Election
+
+```{r}
+tar_load(pl_2019)
+```
+
+
+## H1
+```{r}
+# lm1_1 <- glm(voted ~ swd_w1 + age + age^2 + gender + r_education, data = cz_96_merged)
+# 
+# tab_model(list(lm1_1))
+```
+
+
+## H2
+```{r}
+pl_lm2_1 <- glm(voted ~ as.numeric(swd_w1), data = pl_2019)
+pl_lm2_2 <- glm(voted ~ as.numeric(swd_w2), data = pl_2019)
+pl_lm2_3 <- glm(voted ~ as.numeric(swd_w1) + as.numeric(swd_w2), data = pl_2019)
+
+tab_model(list(pl_lm2_1, pl_lm2_2, pl_lm2_3))
+```
+
+## H3
+```{r}
+pl_lm3_1 <- lm(swd_diff ~ voted, data = pl_2019)
+pl_lm3_2 <- lm(swd_diff ~ voted + as.numeric(swd_w1), data = pl_2019)
+
+tab_model(list(pl_lm3_1, pl_lm3_2))
+```
+
+## H4
+Applicable only to presidential election.
+
+## H5
+```{r}
+# lm5_0 <- lm(swd_diff ~ winner_government + stable_voter + swd_w1, 
+#             data = cz_96_merged %>% filter(both_waves))
+# lm5_1 <- lm(swd_diff ~ winner_government * stable_voter + swd_w1, 
+#             data = cz_96_merged %>% filter(both_waves))
+# 
+# tab_model(list(lm5_0, lm5_1))
+```
+
+# Hungary 2019
+EP Election
+
+```{r}
+tar_load(hu_2019)
+```
+
+
+## H1
+```{r}
+# lm1_1 <- glm(voted ~ swd_w1 + age + age^2 + gender + r_education, data = cz_96_merged)
+# 
+# tab_model(list(lm1_1))
+```
+
+
+## H2
+```{r}
+hu_lm2_1 <- glm(voted ~ as.numeric(swd_w1), data = hu_2019)
+hu_lm2_2 <- glm(voted ~ as.numeric(swd_w2), data = hu_2019)
+hu_lm2_3 <- glm(voted ~ as.numeric(swd_w1) + as.numeric(swd_w2), data = hu_2019)
+
+tab_model(list(hu_lm2_1, hu_lm2_2, hu_lm2_3))
+```
+
+## H3
+```{r}
+hu_lm3_1 <- lm(swd_diff ~ voted, data = hu_2019)
+hu_lm3_2 <- lm(swd_diff ~ voted + as.numeric(swd_w1), data = hu_2019)
+
+tab_model(list(hu_lm3_1, hu_lm3_2))
+```
+
+## H4
+Applicable only to presidential election.
+
+## H5
+```{r}
+# lm5_0 <- lm(swd_diff ~ winner_government + stable_voter + swd_w1, 
+#             data = cz_96_merged %>% filter(both_waves))
+# lm5_1 <- lm(swd_diff ~ winner_government * stable_voter + swd_w1, 
+#             data = cz_96_merged %>% filter(both_waves))
+# 
+# tab_model(list(lm5_0, lm5_1))
+```

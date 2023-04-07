@@ -17,6 +17,7 @@ tar_source()
 
 # Replace the target list below with your own:
 list(
+  # CZ 1996 -----------------------------------------------
   # pre-election wave CZ 1996
   tar_target(
     cz_96_pre, 
@@ -93,10 +94,74 @@ list(
         stable_voter = if_else(is.na(stable_voter), FALSE, stable_voter),
         w1 = if_else(is.na(w1), 0, w1), 
         w2 = if_else(is.na(w2), 0, w2), 
-        both_waves = w1 == 1 & w2 == 1) %>% 
+        both_waves = w1 == 1 & w2 == 1, 
+        gender = haven::as_factor(V46_w1),
+        birth_year = 1900 + V45_w1, 
+        age = 1996 - birth_year, 
+        lrself = V44_w1, 
+        education = haven::as_factor(V49_w1), 
+        r_education = case_when(
+          education %in% c("less than primary", "primary") ~ "primary", 
+          TRUE ~ education
+        )) %>% 
       set_variable_labels(.,
                           swd_w1 = "Satisfaction with democracy (pre-election wave)", 
                           swd_w2 = "Satisfaction with democracy (post-election wave)")
+  ), 
+  
+  # EU 2019 -----------------------------------------------
+  tar_target(
+    eu_2019, 
+    read_sav(here("data", "EU_2019", "10080_da_en_v1_0.zsav"),
+             encoding = "latin1") %>% 
+      as_factor()
+  ),
+  
+
+  # PL 2019 -----------------------------------------------------------------
+  tar_target(
+    pl_2019, 
+    eu_2019 %>% 
+      filter(W1_S0 == "Poland") %>% 
+      select(where(function(x) any(!is.na(x)))) %>% 
+      rename(
+        swd_w1 = W1_Q9, 
+        swd_w2 = W2_Q9, 
+        lrself = W1_Q16,
+      ) %>% 
+      mutate(
+        swd_diff = as.numeric(swd_w2) - as.numeric(swd_w1), 
+        voted = case_when(
+          W2_Q59a == "I am sure that I voted on May 26 2019" ~ 1L,
+          W2_Q59a %in% c("Refuse") | grepl("know", W2_Q59a) ~ NA_integer_,
+          is.na(W2_Q59a) ~ NA_integer_,
+          TRUE ~ 0
+        )
+      )
+  ), 
+
+  # HU 2019 -----------------------------------------------------------------
+  tar_target(
+    hu_2019, 
+    eu_2019 %>% 
+      filter(W1_S0 == "Hungary") %>% 
+      select(where(function(x) any(!is.na(x)))) %>% 
+      rename(
+        swd_w1 = W1_Q9, 
+        swd_w2 = W2_Q9, 
+        lrself = W1_Q16,
+        pid = W1_Q17
+      ) %>% 
+      mutate(
+        swd_diff = as.numeric(swd_w2) - as.numeric(swd_w1),
+        voted = case_when(
+          W2_Q59a == "I am sure that I voted on May 26 2019" ~ 1L,
+          W2_Q59a %in% c("Refuse") | grepl("know", W2_Q59a) ~ NA_integer_,
+          is.na(W2_Q59a) ~ NA_integer_,
+          TRUE ~ 0
+        )
+      )
+      
   ), 
   
   tar_render(
