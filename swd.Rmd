@@ -158,3 +158,161 @@ Applicable only to presidential election.
 # 
 # tab_model(list(lm5_0, lm5_1))
 ```
+
+# Romanian presidential election, 2009
+```{r}
+tar_load(ro_2009_final)
+```
+
+## H1
+```{r}
+ro_lm1_1 <- glm(voted_2r ~ swd_w1 + varcat + sex + studii, data = ro_2009_final)
+
+tab_model(list(ro_lm1_1))
+```
+
+## H2
+```{r}
+
+ro_lm2_1 <- glm(voted_2r ~ swd_w1, data = ro_2009_final)
+ro_lm2_2 <- glm(voted_2r ~ swd_w3, data = ro_2009_final)
+ro_lm2_3 <- glm(voted_2r ~ swd_w1 + swd_w3, data = ro_2009_final)
+
+tab_model(list(ro_lm2_1, ro_lm2_2, ro_lm2_3))
+
+```
+
+## H3
+```{r}
+ro_lm3_1 <- lm(swd_diff ~ voted_2r, data = ro_2009_final)
+ro_lm3_2 <- lm(swd_diff ~ voted_2r + swd_w1, data = ro_2009_final)
+
+tab_model(list(ro_lm3_1, ro_lm3_2))
+```
+
+## H4
+```{r}
+ro_lm4_1 <- lm(swd_diff ~ candidate_qualified_2nd + swd_w1, data = ro_2009_final)
+ro_lm4_2 <- lm(swd_diff ~ candidate_qualified_2nd + winner + swd_w1, data = ro_2009_final)
+
+tab_model(list(ro_lm4_1, ro_lm4_2))
+```
+
+## H5
+```{r}
+# same_candidate_in_2r
+ro_lm5_0 <- lm(swd_diff ~ winner + same_candidate_in_2r + swd_w1,
+            data = ro_2009_final)
+ro_lm5_1 <- lm(swd_diff ~ winner * same_candidate_in_2r + swd_w1,
+            data = ro_2009_final)
+
+tab_model(list(ro_lm5_0, ro_lm5_1))
+```
+
+# Romanian parliamentary elections, 2012
+```{r}
+tar_load(ro_2012_p1_final)
+tar_load(ro_2012_all)
+```
+
+## H1
+```{r}
+ro2_lm1_1 <- glm(voted ~ swd_w1 + r_age + r_age^2 + GEN + r_EDUC, data = ro_2012_p1_final)
+ro2_lm1_1b <- glm(voted ~ swd_w2 + r_age + r_age^2 + GEN + r_EDUC, data = ro_2012_all)
+
+tab_model(list(ro2_lm1_1, ro2_lm1_1b))
+```
+
+## H2
+```{r}
+
+ro2_lm2_1 <- glm(voted ~ swd_w1, data = ro_2012_p1_final)
+ro2_lm2_2 <- glm(voted ~ swd_w3, data = ro_2012_p1_final)
+ro2_lm2_3 <- glm(voted ~ swd_w1 + swd_w3, data = ro_2012_p1_final)
+
+tab_model(list(ro2_lm2_1, ro2_lm2_2, ro2_lm2_3))
+
+ro2_lm2_1b <- glm(voted ~ swd_w2, data = ro_2012_all)
+ro2_lm2_2b <- glm(voted ~ swd_w3, data = ro_2012_all)
+ro2_lm2_3b <- glm(voted ~ swd_w2 + swd_w3, data = ro_2012_all)
+
+tab_model(list(ro2_lm2_1b, ro2_lm2_2b, ro2_lm2_3b))
+
+```
+
+## H3
+```{r}
+ro2_lm3_1 <- lm(swd_diff ~ voted, data = ro_2012_p1_final)
+ro2_lm3_2 <- lm(swd_diff ~ voted + swd_w1, data = ro_2012_p1_final)
+
+tab_model(list(ro2_lm3_1, ro2_lm3_2))
+
+ro2_lm3_1b <- lm(swd_diff_w2 ~ voted, data = ro_2012_all)
+ro2_lm3_2b <- lm(swd_diff_w2 ~ voted + swd_w2, data = ro_2012_all)
+
+tab_model(list(ro2_lm3_1b, ro2_lm3_2b))
+
+```
+
+## H4
+Applicable only for presidential elections.
+
+## H5
+```{r}
+# same_candidate_in_2r
+ro2_lm5_0 <- lm(swd_diff ~ winner + stable_voter + swd_w1,
+            data = ro_2012_p1_final)
+ro2_lm5_1 <- lm(swd_diff ~ winner * stable_voter + swd_w1,
+            data = ro_2012_p1_final)
+
+tab_model(list(ro2_lm5_0, ro2_lm5_1))
+
+ro2_lm5_0b <- lm(swd_diff_w2 ~ winner + stable_voter + swd_w2,
+            data = ro_2012_all)
+ro2_lm5_1b <- lm(swd_diff_w2 ~ winner * stable_voter + swd_w2,
+            data = ro_2012_all)
+
+tab_model(list(ro2_lm5_0b, ro2_lm5_1b))
+
+```
+
+# German Federal election 2021
+
+```{r}
+tar_load(de_2021_final)
+```
+
+## H1
+```{r}
+
+```
+
+## H2
+```{r}
+de_lm2_1 <- glm(voted ~ swd_w18, data = de_2021_final)
+de_lm2_2 <- glm(voted ~ swd_w20, data = de_2021_final)
+de_lm2_3 <- glm(voted ~ swd_w18 + swd_w20, data = de_2021_final)
+
+tab_model(list(de_lm2_1, de_lm2_2, de_lm2_3))
+
+```
+
+## H3
+```{r}
+de_lm3_1 <- lm(swd_diff ~ voted, data = de_2021_final)
+de_lm3_2 <- lm(swd_diff ~ voted + swd_w18, data = de_2021_final)
+
+tab_model(list(de_lm3_1, de_lm3_2))
+
+de_lm3_1b <- lm(swd_diff ~ voted, data = de_2021_final %>% filter(kp20_2601 != "Berlin"))
+de_lm3_2b <- lm(swd_diff ~ voted + swd_w18, data = de_2021_final %>% filter(kp20_2601 != "Berlin"))
+
+tab_model(list(de_lm3_1b, de_lm3_2b))
+
+```
+
+## H5
+```{r}
+
+```
+

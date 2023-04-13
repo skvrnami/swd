@@ -1,9 +1,42 @@
+get_var_label <- function(x){
+    tmp <- attr(x, "label")
+    if(is.null(tmp)) stop("label is null")
+    tmp
+}
+
+possibly_get_var_label <- purrr::possibly(get_var_label, NA_character_)
+
 get_codebook <- function(df){
     purrr::map_df(colnames(df), function(x) {
         data.frame(
             var_name = x, 
-            var_label = attr(df[[x]], "label")
+            var_label = as.character(possibly_get_var_label(df[[x]]))
         )
+    })
+}
+
+get_value_label <- function(x){
+    labels <- attr(x, "labels")
+    data.frame(
+        value = as.character(unname(labels)), 
+        label = names(labels)
+    ) %>% tidyr::pivot_wider(
+        ., names_from = value, 
+        values_from = label, 
+        names_glue = "value_{value}"
+    )
+}
+
+possibly_get_value_label <- purrr::possibly(get_value_label)
+
+get_value_labels_df <- function(df){
+    purrr::map_dfr(colnames(df), function(x) {
+        tmp <- possibly_get_value_label(df[[x]])
+        if(!is.null(tmp)){
+            tmp %>% 
+                mutate(var_name = x) %>% 
+                relocate(var_name, .before = everything())
+        }
     })
 }
 
