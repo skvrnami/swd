@@ -128,6 +128,14 @@ list(
         swd_w1 = W1_Q9, 
         swd_w2 = W2_Q9, 
         lrself = W1_Q16,
+        pid = W1_Q17, 
+        age = W1_Q1b, 
+        age_cat = W1_Q1c, 
+        gender = W1_Q2, 
+        edu = W1_Q_edu, 
+        vote_previous_nat_election = W1_Q58, 
+        vote_intention = W1_Q60,
+        vote_choice = W2_Q60a
       ) %>% 
       mutate(
         swd_diff = as.numeric(swd_w2) - as.numeric(swd_w1), 
@@ -136,6 +144,20 @@ list(
           W2_Q59a %in% c("Refuse") | grepl("know", W2_Q59a) ~ NA_integer_,
           is.na(W2_Q59a) ~ NA_integer_,
           TRUE ~ 0
+        ), 
+        swd_w1 = as.numeric(swd_w1), 
+        stable_voter = case_when(
+          vote_intention %in% c("Don't know", "Refuse", "Other party", 
+                                "Would spoil the ballot") | 
+            vote_choice %in% c("Don't know", "Refuse", "Other party", 
+                               "Spoilt the ballot") ~ NA_integer_,
+          as.character(vote_intention) == as.character(vote_choice) ~ 1,
+          as.character(vote_intention) != as.character(vote_choice) ~ 0
+        ), 
+        winner_country = case_when(
+          vote_choice == "PiS/Zjednoczsona Prawica" ~ 1,
+          vote_choice %in% c("Don't know", "Refuse") ~ NA_integer_, 
+          !is.na(vote_choice) ~ 0 
         )
       )
   ), 
@@ -150,7 +172,14 @@ list(
         swd_w1 = W1_Q9, 
         swd_w2 = W2_Q9, 
         lrself = W1_Q16,
-        pid = W1_Q17
+        pid = W1_Q17, 
+        age = W1_Q1b, 
+        age_cat = W1_Q1c, 
+        gender = W1_Q2, 
+        edu = W1_Q_edu, 
+        vote_previous_nat_election = W1_Q58, 
+        vote_intention = W1_Q60, 
+        vote_choice = W2_Q60a
       ) %>% 
       mutate(
         swd_diff = as.numeric(swd_w2) - as.numeric(swd_w1),
@@ -159,9 +188,22 @@ list(
           W2_Q59a %in% c("Refuse") | grepl("know", W2_Q59a) ~ NA_integer_,
           is.na(W2_Q59a) ~ NA_integer_,
           TRUE ~ 0
+        ), 
+        swd_w1 = as.numeric(swd_w1), 
+        stable_voter = case_when(
+          vote_intention %in% c("Don't know", "Refuse", "Other party", 
+                                "Would spoil the ballot") | 
+            vote_choice %in% c("Don't know", "Refuse", "Other party", 
+                               "Spoilt the ballot") ~ NA_integer_,
+          as.character(vote_intention) == as.character(vote_choice) ~ 1,
+          as.character(vote_intention) != as.character(vote_choice) ~ 0
+        ), 
+        winner_country = case_when(
+          vote_choice == "FIDESZ-KNDP" ~ 1,
+          vote_choice %in% c("Don't know", "Refuse") ~ NA_integer_, 
+          !is.na(vote_choice) ~ 0 
         )
       )
-      
   ), 
   
 
@@ -480,6 +522,16 @@ list(
           kp20_2280 == "maennlich" ~ "male", 
           kp20_2280 == "weiblich" ~ "female", 
           TRUE ~ NA_character_
+        ), 
+        vote_intention_w18 = as_factor(kp18_190ba),
+        vote_choice_w20 = as_factor(kp20_200ba), 
+        stable_voter = case_when(
+          vote_choice_w20 %in% c("keine Angabe", "trifft nicht zu", 
+                                 "Interview abgebrochen", "andere Partei") | 
+            vote_intention_w18 %in% c("keine Angabe", "trifft nicht zu", 
+                                   "Interview abgebrochen", "andere Partei") ~ NA_integer_,
+          as.character(vote_choice_w20) == as.character(vote_intention_w18) ~ 1,
+          TRUE ~ 0
         )
       )
   ),
