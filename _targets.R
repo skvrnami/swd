@@ -52,7 +52,7 @@ list(
   
   # merged waves CZ 1996
   tar_target(
-    cz_96_merged, 
+    cz_96_final, 
     full_join(
       cz_96_pre %>% 
         rename_with(., ~add_suffix(.x, "_w1"), .cols = -c("V2")) %>% 
@@ -89,9 +89,23 @@ list(
           vote_intention_w1 == "Other'" ~ "Other", 
           TRUE ~ as.character(vote_intention_w1)
         ), 
+        vote_choice_last_election = as_factor(V9_w1),
+        vote_choice_last_election = case_when(
+            vote_choice_last_election %in% c("No answer", "Do not know", "Refused to answer") ~
+                NA_character_,
+            vote_choice_last_election == "ODS (joint list with KDS)" ~ "ODS",
+            vote_choice_last_election == "KDS (joint list with ODS)" ~ "ODS",
+            TRUE ~ as.character(vote_choice_last_election)
+        ),
         vote_choice_w2 = as_factor(V10_w2),
-        stable_voter = (vote_intention_w1 == vote_choice_w2), 
-        stable_voter = if_else(is.na(stable_voter), FALSE, stable_voter),
+        stable_voter = case_when(
+            vote_choice_last_election == "Did not vote" |
+                vote_choice_w2 == "Did not vote" ~ 0,
+            as.character(vote_choice_last_election) == as.character(vote_choice_w2) ~ 1,
+            TRUE ~ 0
+        ),
+        stable_intention = (vote_intention_w1 == vote_choice_w2), 
+        stable_intention = if_else(is.na(stable_intention), FALSE, stable_intention),
         w1 = if_else(is.na(w1), 0, w1), 
         w2 = if_else(is.na(w2), 0, w2), 
         both_waves = w1 == 1 & w2 == 1, 
@@ -100,10 +114,35 @@ list(
         age = 1996 - birth_year, 
         lrself = V44_w1, 
         education = haven::as_factor(V49_w1), 
+        education_w2 = haven::as_factor(V149_w2),
         r_education = case_when(
           education %in% c("less than primary", "primary") ~ "primary", 
+          education %in% c("vocational", "secondary") ~ "secondary",
+          education == "higher" ~ "post-secondary",
           TRUE ~ education
-        )) %>% 
+        ) %>% factor(., levels = c("primary", "secondary", "post-secondary")), 
+        r_education_w2 = case_when(
+          education_w2 %in% c("incomplete primary", "primary") ~ "primary", 
+          education_w2 %in% c("vocational, no exam", "vocational with exams", 
+                              "some secondary", "secondary with specialization") ~ "secondary", 
+          education_w2 == "university degree" ~ "post-secondary"
+        ) %>% factor(., levels = c("primary", "secondary", "post-secondary")), 
+        postsecondary_edu = case_when(
+          !is.na(r_education) & !is.na(r_education_w2) ~ as.numeric(r_education == "post-secondary" | 
+                                                         r_education_w2 == "post-secondary"), 
+          !is.na(r_education) ~ as.numeric(r_education == "post-secondary"), 
+          !is.na(r_education_w2) ~ as.numeric(r_education_w2 == "post-secondary")
+        ),
+        female = as.numeric(gender == "female"), 
+        # correct answers to political knowledge questions
+        pol_knowledge1 = as.numeric(V144_w2 == 5),
+        pol_knowledge2 = as.numeric(V145_w2 == 1), 
+        pol_knowledge3 = as.numeric(V146_w2 == 200), 
+        pol_knowledge = rowSums(across(matches("pol_knowledge[1-3]{1}"))), 
+        pol_knowledge_pct = (pol_knowledge / 3) * 100,
+        party_close = as.numeric((V73_w2 == 1) | 
+          as.numeric(V78_w2 == 1))
+        ) %>% 
       set_variable_labels(.,
                           swd_w1 = "Satisfaction with democracy (pre-election wave)", 
                           swd_w2 = "Satisfaction with democracy (post-election wave)")
@@ -128,7 +167,7 @@ list(
         swd_w1 = W1_Q9, 
         swd_w2 = W2_Q9, 
         lrself = W1_Q16,
-        pid = W1_Q17, 
+        # pid = W1_Q17, 
         age = W1_Q1b, 
         age_cat = W1_Q1c, 
         gender = W1_Q2, 
@@ -158,7 +197,16 @@ list(
           vote_choice == "PiS/Zjednoczsona Prawica" ~ 1,
           vote_choice %in% c("Don't know", "Refuse") ~ NA_integer_, 
           !is.na(vote_choice) ~ 0 
-        )
+        ), 
+        female = as.numeric(gender == "Female"), 
+        postsecondary_edu = as.numeric(edu == "High"), 
+        party_close = as.numeric(
+          W1_Q17 == "Yes" | W1_Q18 == "Yes"
+        ), 
+        pol_interest_cat = factor(W1_Q5, levels = rev(c(
+          "Very interested", "Fairly interested", "A little interested", 
+          "Not at all interested"))), 
+          pol_interest_num = as.numeric(pol_interest_cat)
       )
   ), 
 
@@ -172,7 +220,7 @@ list(
         swd_w1 = W1_Q9, 
         swd_w2 = W2_Q9, 
         lrself = W1_Q16,
-        pid = W1_Q17, 
+        # pid = W1_Q17, 
         age = W1_Q1b, 
         age_cat = W1_Q1c, 
         gender = W1_Q2, 
@@ -202,9 +250,18 @@ list(
           vote_choice == "FIDESZ-KNDP" ~ 1,
           vote_choice %in% c("Don't know", "Refuse") ~ NA_integer_, 
           !is.na(vote_choice) ~ 0 
-        )
-      )
-  ), 
+        ), 
+        female = as.numeric(gender == "Female"), 
+        postsecondary_edu = as.numeric(edu == "High"), 
+        party_close = as.numeric(
+          W1_Q17 == "Yes" | W1_Q18 == "Yes"
+        ), 
+        pol_interest_cat = factor(W1_Q5, levels = rev(c(
+          "Very interested", "Fairly interested", "A little interested", 
+          "Not at all interested"))), 
+        pol_interest_num = as.numeric(pol_interest_cat)
+      
+  )), 
   
 
   # RO 2009 -----------------------------------------------------------------
@@ -270,8 +327,31 @@ list(
           Q24B %in% c("NS", "NR", "Am anulat votul") | Q21B %in% c("Nu stiu", "Nu raspund", "Am anulat votul") ~ NA_integer_, 
           as.character(Q24B) == as.character(Q21B) ~ 1, 
           as.character(Q24B) != as.character(Q21B) ~ 0
-        )
-      )
+        ), 
+        female = as.numeric(GEN == "Femeie"), 
+        age = as.numeric(as.character(VARSTA)), 
+        
+        postsecondary_edu = case_when(
+          EDUC %in% c("scoala postliceala", "facultate neterminata", 
+                      "facultate - subingineri sau colegiu", "facultate complet", 
+                      "masterat", "doctorat") ~ 1, 
+          EDUC %in% c("NS", "NR") ~ NA_integer_, 
+          TRUE ~ 0
+        ), 
+        pol_interest_cat = case_when(
+          c1_a %in% c("NS", "NR") ~ NA_character_, 
+          c1_a == "deloc interesat" ~ "not at all interested", 			
+          c1_a == "putin interesat" ~ "little interested", 
+          c1_a == "destul de interesat" ~ "quite interested", 
+          c1_a == "foarte interesat" ~ "very interested"
+       ) %>% factor(., levels = c(
+         "not at all interested", "little interested", "quite interested", 
+         "very interested"), ordered = TRUE), 
+       pol_interest_num = as.numeric(pol_interest_cat), 
+       pol_knowledge = cun_pol1,
+       pol_knowledge_pct = (pol_knowledge / 8) * 100, 
+       party_close = as.numeric(Q4 == "Da" | Q4A == "Da")
+       )
   ),
   
   # RO 2012 -----------------------------------------------------------------
@@ -344,7 +424,6 @@ list(
                       "masterat", "doctorat") ~ "Higher education",
           EDUC %in% c("Nu stiu", "Nu raspund") ~ NA_character_
         ), 
-        r_age = if_else(age == 0, NA_integer_, as.numeric(age)), 
         winner = case_when(
           Q5LH_CS_w3 == "Uniunea Social-Liberala (USL: PSD+PNL+PC+UNPR)" | 
             Q5LH_CD_w3 == "Uniunea Social-Liberala (USL: PSD+PNL+PC+UNPR)" ~ 1, 
@@ -352,7 +431,21 @@ list(
             Q5LH_CD_w3 %in% c("Refuz", "Nu stiu") ~ NA_integer_, 
           !is.na(Q5LH_CS_w3) ~ 0
           ), 
-        stable_voter = as.numeric(as.character(P12V) == as.character(Q5LH_CS_w3))
+        stable_voter = as.numeric(as.character(P12V) == as.character(Q5LH_CS_w3)), 
+        female = as.numeric(GEN == "Femeie"), 
+        age = varsta, 
+        postsecondary_edu = as.numeric(r_EDUC == "Higher education"), 
+        pol_interest_cat = case_when(
+          IP1_1 %in% c("Nu stiu", "Nu raspund") ~ NA_character_,
+          IP1_1 == "Deloc interesat" ~ "not at all interested", 			
+          IP1_1 == "Putin interesat" ~ "little interested", 
+          IP1_1 == "Destul de interesat" ~ "quite interested", 
+          IP1_1 == "Foarte interesat" ~ "very interested"
+        ) %>% factor(., levels = c("not at all interested", "little interested", "quite interested", 
+                                   "very interested"), 
+                     ordered = TRUE), 
+        pol_interest_num = as.numeric(pol_interest_cat),
+        party_close = as.numeric(Q4 == "Da" | Q4a == "Da")
       )
   ),
   
@@ -427,7 +520,7 @@ list(
                       "masterat", "doctorat") ~ "Higher education",
           EDUC_w2 %in% c("Nu stiu", "Nu raspund") ~ NA_character_
         ), 
-        r_age = if_else(age_w2 == 0, NA_integer_, as.numeric(age_w2)), 
+        # r_age = if_else(age_w2 == 0, NA_integer_, as.numeric(age_w2)), 
         winner = case_when(
           Q5LH_CS_w3 == "Uniunea Social-Liberala (USL: PSD+PNL+PC+UNPR)" | 
             Q5LH_CD_w3 == "Uniunea Social-Liberala (USL: PSD+PNL+PC+UNPR)" ~ 1, 
@@ -436,14 +529,27 @@ list(
           !is.na(Q5LH_CS_w3) ~ 0
         ), 
         stable_voter = as.numeric(as.character(P12V_w2) == as.character(Q5LH_CS_w3)), 
-        GEN = GEN_w2
+        GEN = GEN_w2, 
+        female = as.numeric(GEN == "Femeie"), 
+        age = as.numeric(as.character(age_w2)), 
+        postsecondary_edu = as.numeric(r_EDUC == "Higher education"), 
+        pol_interest = case_when(
+          IP1_a_w2 %in% c("Nu stiu", "Nu raspund") ~ NA_character_,
+          IP1_a_w2 == "Deloc interesat" ~ "not at all interested", 			
+          IP1_a_w2 == "Putin interesat" ~ "little interested", 
+          IP1_a_w2 == "Destul de interesat" ~ "quite interested", 
+          IP1_a_w2 == "Foarte interesat" ~ "very interested"
+        ) %>% factor(., levels = c("not at all interested", "little interested", "quite interested", 
+                                   "very interested"), 
+                     ordered = TRUE), 
+        party_close = as.numeric(Q4_w2 == "Da" | Q4a_w2 == "Da")
       )
   ),
   
   tar_target(
     ro_2012_all, {
-      COMMON_VARS <- c("ID", "r_EDUC", "r_age", "GEN", "swd_w2", "swd_w3", "swd_diff_w2", 
-                       "winner", "stable_voter", "voted")
+      COMMON_VARS <- c("ID", "r_EDUC", "age", "swd_w2", "swd_w3", "swd_diff_w2", 
+                       "winner", "stable_voter", "voted", "female")
       bind_rows(
         ro_2012_p1_final %>% select(any_of(COMMON_VARS)), 
         ro_2012_p2_final %>% select(any_of(COMMON_VARS))  
@@ -451,8 +557,94 @@ list(
     }
   ),
   
-  # DE 2021 -----------------------------------------------
+  # DE 2017 -----------------------------------------------
   
+  tar_target(
+    de_2017_final, 
+    read_sav(here("data", "DE_2021", "ZA6838_w1to9_sA_v5-0-0.sav"), user_na = TRUE) %>% 
+        haven::as_factor() %>% 
+        rename(birth_year = kpx_2290s) %>% 
+        filter(kp9_2601 %in% c("Mecklenburg-Vorpommern", "Sachsen", 
+                               "Sachsen-Anhalt", "Thueringen", 
+                               "Brandenburg", "Berlin")) %>% 
+        mutate(
+            birth_year = case_when(
+                birth_year == "1955 und frueher" ~ 1955, 
+                TRUE ~ as.numeric(birth_year)
+            ), 
+            age = 2017 - birth_year, 
+            female = as.numeric(kpx_2280 == "weiblich"),
+            postsecondary_edu = as.numeric(
+                kp1_2330 %in% c("Fachhochschulabschluss", "Hochschulabschluss") 
+            ),
+            swd_post = case_when(
+                kp8_020 == "sehr zufrieden" ~ 2, 
+                kp8_020 == "zufrieden" ~ 1, 
+                kp8_020 == "teils/teils" ~ 0,
+                kp8_020 == "unzufrieden" ~ -1,
+                kp8_020 == "sehr unzufrieden" ~ -2, 
+                TRUE ~ NA_integer_
+            ), 
+            swd_pre = case_when(
+                kp5_020 == "sehr zufrieden" ~ 2, 
+                kp5_020 == "zufrieden" ~ 1, 
+                kp5_020 == "teils/teils" ~ 0,
+                kp5_020 == "unzufrieden" ~ -1,
+                kp5_020 == "sehr unzufrieden" ~ -2, 
+                TRUE ~ NA_integer_
+            ), 
+            swd_diff = swd_post - swd_pre, 
+            voted_post = rowSums(across(ends_with("_170"), ~.x == "habe bereits Briefwahl gemacht"), na.rm = TRUE), 
+            voted = case_when(
+                kp8_180 %in% c(
+                    "gewaehlt", 
+                    "hatte bereits Briefwahl gemacht") ~ 1,
+                voted_post == 1 ~ 1,
+                # hlasování poštou
+                kp8_180 == "habe nicht gewaehlt" ~ 0, 
+                TRUE ~ NA_integer_
+            ), 
+            winner_party = case_when(
+                kp8_200ba == "CDU/CSU" | kp8_200bb == "CDU/CSU" ~ 1,
+                TRUE ~ 0
+            ), 
+            vote_intention = as_factor(kp7_190ba),
+            previous_vote_choice = as_factor(kp1_350ba),
+            vote_choice = as_factor(kp8_200ba), 
+            stable_voter = case_when(
+                vote_choice %in% c("keine Angabe", "trifft nicht zu", 
+                                       "Interview abgebrochen", "andere Partei") | 
+                    previous_vote_choice %in% c("keine Angabe", "weiss nicht", 
+                                                "andere Partei", "nicht teilgenommen") ~ NA_integer_,
+                as.character(vote_choice) == as.character(previous_vote_choice) ~ 1,
+                TRUE ~ 0
+            ), 
+            vote_duty = case_when(
+                kp8_050l %in% c("keine Angabe", "Interview abgebrochen", 
+                                "nicht teilgenommen") ~ NA_character_, 
+                TRUE ~ as.character(kp8_050l)
+            ) %>% factor(., levels = c(
+                "stimme ueberhaupt nicht zu", "stimme eher nicht zu", 
+                "teils/teils", "stimme eher zu", "stimme voll und ganz zu"
+            ), ordered = TRUE), 
+            party_close = case_when(
+                kp8_2090a %in% c("keine Angabe", "Interview abgebrochen", 
+                                 "nicht teilgenommen") ~ NA_integer_, 
+                kp8_2090a != "keine Partei" ~ 1, 
+                kp8_2090a == "keine Partei" ~ 0 
+            ),
+            pol_interest_cat = case_when(
+                kp7_010 %in% c("keine Angabe", "nicht teilgenommen") ~ NA_character_, 
+                TRUE ~ kp7_010
+            ) %>% factor(., levels = rev(c(
+                "sehr stark", "stark", "mittelmaessig", 
+                "weniger stark", "ueberhaupt nicht")), 
+                ordered = TRUE), 
+            pol_interest_num = as.numeric(pol_interest_cat), 
+        )
+  ),
+  
+  # DE 2021 -----------------------------------------------
   # a month before election
   tar_target(
     de_2021_w18, 
@@ -532,7 +724,28 @@ list(
                                    "Interview abgebrochen", "andere Partei") ~ NA_integer_,
           as.character(vote_choice_w20) == as.character(vote_intention_w18) ~ 1,
           TRUE ~ 0
-        )
+        ), 
+        female = as.numeric(sex == "female"), 
+        party_close = case_when(
+          kp18_2090a %in% c("keine Angabe", "Interview abgebrochen") ~ NA_integer_, 
+          kp18_2090a != "keiner Partei" ~ 1, 
+          kp18_2090a == "keiner Partei" ~ 0 
+        ), 
+        party_interest_cat = case_when(
+          kp18_010 %in% c("keine Angabe") ~ NA_character_, 
+          TRUE ~ kp18_010
+        ) %>% factor(., levels = c(
+          "sehr stark", "stark", "mittelmaessig", 
+          "weniger stark", "ueberhaupt nicht"), 
+          ordered = TRUE), 
+        party_interest_num = as.numeric(party_interest_cat), 
+        vote_duty = case_when(
+          kp18_050l %in% c("keine Angabe", "Interview abgebrochen") ~ NA_character_, 
+          TRUE ~ kp18_050l
+        ) %>% factor(., levels = c(
+          "stimme ueberhaupt nicht zu", "stimme eher nicht zu", 
+          "teils/teils", "stimme eher zu", "stimme voll und ganz zu"
+        ), ordered = TRUE)
       )
   ),
   
