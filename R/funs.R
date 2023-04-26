@@ -60,3 +60,10 @@ recode_winners <- function(x, winners){
         TRUE ~ 0L
     )
 }
+
+normalize_scale <- function(x, base_multiplier = 10){
+    minimum <- min(x, na.rm = TRUE)
+    maximum <- max(x, na.rm = TRUE)
+    
+    ((x - minimum) / (maximum - minimum)) * base_multiplier
+}

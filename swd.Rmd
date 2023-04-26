@@ -18,42 +18,84 @@ library(sjPlot)
 
 ```
 
-## Variables
-### Satisfaction with democracy
+# Variables
+## Satisfaction with democracy
 - CZ 1996, 4-point scale: "Generally speaking, are you very satisfied, rather satisfied, rather dissatisfied or very dissatisfied with the way democracy functions in the Czech Republic?"  
 - RO 2009, 4-point scale: "In general, how satisfied are you in the way democracy works in Romania?" (Very satisfied, rather satisfied, rather dissatisfied, very dissatisfied)
 - RO 2012, 4-point scale: "In general, how satisfied are you in the way democracy works in Romania?"
 - PL + HU 2019, 11-point scale: "On the whole, how satisfied are you with the way democracy works in [COUNTRY NAME], where 0 means “not at all satisfied” and 10 means “completely satisfied”?"
 - DE 2017, 5-point scale: "On the whole, how satisfied or dissatisfied are you with the way democracy works in Germany?" (very satisfied, fairly satisfied, neither satisfied nor dissatisfied, not very satisfied, not at all satisfied)
 
-### Voter turnout
+## Voter turnout
 - dummy variable, 1 = voted in the election, 0 = did not vote
 - DE 2017 - a combination of a variable from post-election survey (wave 8, question: "At the federal election on 24 September a lot of people did not manage to vote or did not participate in the election for other reasons. How about you?") and a option "I have already cast a postal vote" from question on vote intention from previous waves ("When elections are held a lot of people vote, others do not manage to vote or do not participate in elections for other reasons. How likely is it that you will vote in the federal election on 24 September 2017?"). People who answered that they casted a postal ballot were not asked the question on voter turnout in wave 8
 
-### Stable voter
+## Stable voter
 - dummy variable, the respondent voted the same party as in previous national election
 - CZ 1996: 1 = voted the same party in 1996 election as in 1992 election ("National Council vote in 1992 election", reported in the pre-election wave); 0 = otherwise
+- RO 2009: 1 = voted the same candidate in the 2nd round as in the 1st round of 2009 presidential election
+- RO 2012: 1 = voted the same party (or a coalition composed of a party that the respondent voted in 2008) in 2012 as in 2008 election (reported in the post-election wave) - voting to Chamber of Deputies counts
+- PL 2019: 1 = voted the same party (or a coalition) in 2019 EP election as in the 2015 national election
+- HU 2019: 1 = voted the same party in 2019 EP election as in the 2018 national election
+- DE 2017: 1 = voted the same party in 2017 national election as in the 2013 national election (second/party vote counts)
 
-### Stable intention
+## Stable intention
 - dummy variable, the vote intention in the pre-election wave was the same as the vote choice in the election
+- CZ 1996: 1 = the vote intention in pre-election wave is the same as vote choice in the election
+- RO 2009: N/A
+- RO 2012: 1 = the vote intention in pre-election wave is the same as vote choice in the election
+- DE 2017: 1 = vote choice in wave 8 equals to vote intention in wave 7
+- PL & HU 2019: 1 = the vote intention in pre-election wave is the same as vote choice in the election
 
-### Political interest
+## Political interest
+- CZ 1996: 4-point scale (Would you say that you are interested in politics?: "Very interested", "Fairly interested", "A little interested", "Not at all interested")
+- RO 2009: 4-point scale (How interested are you in politics in general?: "Very interested", "Fairly interested", "A little interested", "Not at all interested")
+- RO 2012: 4-point scale (How interested are you in politics in general?: "Very interested", "Fairly interested", "A little interested", "Not at all interested")
+- PL 2019: 4-point scale (Generally speaking, how interested are you in politics?: "Very interested", "Fairly interested", "A little interested", "Not at all interested")
+- HU 2019: 4-point scale (Generally speaking, how interested are you in politics?: "Very interested", "Fairly interested", "A little interested", "Not at all interested")
+- DE 2017: 5-point scale ("Quite generally, how interested are you in politics?": very interested, somewhat interested, in between, not very interested, not interested at all)
 
-### Political knowledge
+## Political knowledge
+- CZ 1996: 3 questions
+    - Can you tell me how many percent of votes has to gain a political party in our country in the elections in order to get into the Parliament? (open-ended)
+    - Who was the last minister of transportation before the elections? (open-ended)
+    - How many members has our Parliament? (open-ended)
+- RO 2009: 8 questions (true/false)
+    - The President of Romania is elected for a period of 4 years.
+    - A person can only be president of Romania only for two terms.
+    - According to the Constitution, the ministers of a Government are elected by the President
+    - One of the roles of the president is to represent Romania in external relations.
+    - In certain conditions, the president has the right to dissolve the Parliament.
+    - In Romania, the polling stations are closed at new hour? in the evening.
+    - According to the law, the election campaigns in Romania start 30 days before the elections.
+    - The states of the European Union have the same number of parliamentarians in the European Parliament.
+- PL & HU 2019: 5 questions
+    - The members of which of the following EU institutions are directly elected by European citizens? (The European Commission, The European Parliament, The Council of the European Union, None of the above)
+    - Jean-Claude Juncker is the current President of the European Commission. How did he become President? (He was directly elected by EU citizens, He was selected on the basis of an internal vote within the European Commission, He was approved by a majority of the members of the European Parliament, He was appointed without a vote taking place)
+    - Which of the following EU institutions formally proposes new laws at the EU level? (The European Commission, The European Parliament, The Council of the European Union, All of the above)
+    - Which of the following statements is not true? (All EU citizens have the right to work in another EU country, Mobile phone roaming charges have decreased within the EU, Expenditure on the salaries of the EU officials is the largest item in the EU budget, Individual EU countries cannot conclude their own trade agreements )
+    - In which of the following EU institutions are the ministers of national governments represented? (The European Commission, The European Parliament, The Council of the European Union, None of the Above)
 
-### Voting as a civic duty
+## Voting as a civic duty
+- DE 2017: 5-point scale: "Please state to what extent you agree or disagree with each statement: l)  In a democracy, it is the duty of all citizens to vote regularly in elections." (strongly disagree, disagree, neither agree nor disagree, agree, strongly agree)
 
-### Winner
+## Winner
+- a respondent voted the party/candidate who won the election (the party with the largest vote share)
+- CZ 1996: 1 = voted ODS, 0 = did not vote ODS
+- RO 2009: 1 = voted Traian Basescu
+- RO 2012: 1 = voted USL
+- PL 2019: 1 = voted PiS
+- HU 2019: 1 = voted FIDESZ
+- DE 2017: 1 = voted CDU/CSU (in either first or second vote)
 
-### Education
+## Education
 - dummy variable - 1 = post-secondary education, 0 = other education
 
-### Age
+## Age
 - all data sets - numeric variable
 - in German data derived from year of birth, year of birth was capped at "1955 and before", in that case the year of birth was taken as 1955.
 
-
-## Hypotheses from pre-analysis plan:  
+# Hypotheses from pre-analysis plan
 
 - Hypothesis 1: Pre-Election satisfaction does not matter for participation when socio-demographic controls and other attitudinal drivers of participation are controlled for.  
 - Hypothesis 2: Voter Turnout is more strongly associated with post-election satisfaction than pre-election satisfaction.  
@@ -61,38 +103,154 @@ library(sjPlot)
 - Hypothesis 4: The strongest increase is among those, whose preferred candidates qualified for the 2nd round (1st round of voting) or won the second round (2nd round of voting).  
 - Hypothesis 5: The effect of winning is stronger for respondents with stable preferences.  
 
-# Czech Republic, parliamentary election 1996
-
+# All panels
 ```{r}
-tar_load(cz_96_final)
+tar_load(all_panels)
 ```
 
 ## H1
 ```{r}
-lm1_1 <- glm(voted ~ swd_w1 + age + I(age^2) + female + postsecondary_edu, 
-             data = cz_96_final)
-lm1_2 <- glm(voted ~ swd_w1 + age + I(age^2) + female + postsecondary_edu +
-                 pol_knowledge + party_close, data = cz_96_final)
+lm1_1 <- glm(voted ~ swd_pre + age + I(age^2) + female +
+                 postsecondary_edu + factor(election), 
+             data = all_panels)
 
-tab_model(list(lm1_1, lm1_2))
+lm1_2 <- glm(voted ~ swd_pre + age + I(age^2) + female + 
+                 postsecondary_edu +
+                 party_close + 
+                 factor(election), data = all_panels)
+
+lm1_3 <- glm(voted ~ swd_pre + age + I(age^2) + female + 
+                 postsecondary_edu +
+                 pol_knowledge_pct + 
+                 party_close + 
+                 factor(election), data = all_panels)
+
+lm1_4 <- glm(voted ~ swd_pre + age + I(age^2) + female + 
+                 postsecondary_edu +
+                 pol_interest_num + 
+                 party_close + 
+                 factor(election), data = all_panels)
+
+tab_model(list(lm1_1, lm1_2, lm1_3, lm1_4))
 ```
-
 
 ## H2
 ```{r}
-lm2_1 <- glm(voted ~ swd_w1, data = cz_96_final %>% filter(both_waves))
-lm2_2 <- glm(voted ~ swd_w2, data = cz_96_final %>% filter(both_waves))
-lm2_3 <- glm(voted ~ swd_w1 + swd_w2, data = cz_96_final %>% filter(both_waves))
+lm2_1 <- glm(voted ~ swd_pre + age + I(age^2) + female +
+                 postsecondary_edu + factor(election), 
+             data = all_panels)
+
+lm2_2 <- glm(voted ~ swd_post + age + I(age^2) + female + 
+                 postsecondary_edu +
+                 party_close + 
+                 factor(election), data = all_panels)
+
+lm2_3 <- glm(voted ~ swd_post + swd_pre + age + I(age^2) + female + 
+                 postsecondary_edu +
+                 pol_knowledge_pct + 
+                 party_close + 
+                 factor(election), data = all_panels)
 
 tab_model(list(lm2_1, lm2_2, lm2_3))
 ```
 
 ## H3
 ```{r}
-lm3_1 <- lm(swd_diff ~ voted, data = cz_96_final %>% filter(both_waves))
-lm3_2 <- lm(swd_diff ~ voted + swd_w1, data = cz_96_final %>% filter(both_waves))
+lm3_1 <- lm(swd_diff ~ voted + swd_pre + age + I(age^2) + female + 
+                 postsecondary_edu +
+                 party_close + 
+                 factor(election), data = all_panels)
 
-tab_model(list(lm3_1, lm3_2))
+lm3_2 <- lm(swd_diff ~ voted + swd_pre + age + I(age^2) + female + 
+                 postsecondary_edu +
+                 party_close + 
+                 pol_interest_num + 
+                 factor(election), data = all_panels)
+
+lm3_3 <- lm(swd_diff ~ voted + swd_pre + age + I(age^2) + female + 
+                 postsecondary_edu +
+                 party_close + 
+                 pol_knowledge_pct + 
+                 factor(election), data = all_panels)
+
+
+tab_model(list(lm3_1, lm3_2, lm3_3))
+```
+
+## H4
+```{r}
+lm4_1 <- lm(swd_diff ~ candidate_qualified_2nd + swd_pre + 
+                age + I(age^2) + female + 
+                postsecondary_edu +
+                party_close, 
+               data = all_panels)
+lm4_2 <- lm(swd_diff ~ candidate_qualified_2nd + winner + swd_pre + 
+                age + I(age^2) + female + 
+                postsecondary_edu +
+                party_close, 
+               data = all_panels)
+
+tab_model(list(lm4_1, lm4_2))
+```
+
+## H5
+```{r}
+lm5_0 <- lm(swd_diff ~ winner + stable_voter + swd_pre +
+                age + I(age^2) + female + 
+                postsecondary_edu +
+                party_close + 
+                factor(election), 
+            data = all_panels)
+lm5_1 <- lm(swd_diff ~ winner * stable_voter + swd_pre + 
+                age + I(age^2) + female + 
+                postsecondary_edu +
+                party_close + 
+                factor(election), 
+            data = all_panels)
+lm5_2 <- lm(swd_diff ~ winner * stable_intention + swd_pre + 
+                age + I(age^2) + female + 
+                postsecondary_edu +
+                party_close + 
+                factor(election), 
+            data = all_panels)
+
+tab_model(list(lm5_0, lm5_1, lm5_2))
+```
+
+# Czech Republic, parliamentary election 1996
+
+```{r}
+tar_load(cz_1996)
+```
+
+## H1
+```{r}
+cz_lm1_1 <- glm(voted ~ swd_pre + age + I(age^2) + female +
+                 postsecondary_edu, 
+             data = cz_1996)
+cz_lm1_2 <- glm(voted ~ swd_pre + age + I(age^2) + female + 
+                 postsecondary_edu +
+                 pol_knowledge + party_close, data = cz_1996)
+
+tab_model(list(cz_lm1_1, cz_lm1_2))
+```
+
+
+## H2
+```{r}
+cz_lm2_1 <- glm(voted ~ swd_pre, data = cz_1996 %>% filter(both_waves))
+cz_lm2_2 <- glm(voted ~ swd_post, data = cz_1996 %>% filter(both_waves))
+cz_lm2_3 <- glm(voted ~ swd_pre + swd_post, data = cz_1996 %>% filter(both_waves))
+
+tab_model(list(cz_lm2_1, cz_lm2_2, cz_lm2_3))
+```
+
+## H3
+```{r}
+cz_lm3_1 <- lm(swd_diff ~ voted, data = cz_1996 %>% filter(both_waves))
+cz_lm3_2 <- lm(swd_diff ~ voted + swd_pre, data = cz_1996 %>% filter(both_waves))
+
+tab_model(list(cz_lm3_1, cz_lm3_2))
 ```
 
 ## H4
@@ -100,14 +258,23 @@ Applicable only to presidential election.
 
 ## H5
 ```{r}
-lm5_0 <- lm(swd_diff ~ winner_government + stable_voter + swd_w1, 
-            data = cz_96_final %>% filter(both_waves))
-lm5_1 <- lm(swd_diff ~ winner_government * stable_voter + swd_w1, 
-            data = cz_96_final %>% filter(both_waves))
-lm5_2 <- lm(swd_diff ~ winner_government * stable_intention + swd_w1, 
-            data = cz_96_final %>% filter(both_waves))
+cz_lm5_0 <- lm(swd_diff ~ winner_party + stable_voter + swd_pre, 
+            data = cz_1996 %>% filter(both_waves))
+cz_lm5_1 <- lm(swd_diff ~ winner_party * stable_voter + swd_pre, 
+            data = cz_1996 %>% filter(both_waves))
+cz_lm5_2 <- lm(swd_diff ~ winner_party * stable_intention + swd_pre, 
+            data = cz_1996 %>% filter(both_waves))
 
-tab_model(list(lm5_0, lm5_1, lm5_2))
+tab_model(list(cz_lm5_0, cz_lm5_1, cz_lm5_2))
+
+cz_lm5_0b <- lm(swd_diff ~ winner_government + stable_voter + swd_pre, 
+            data = cz_1996 %>% filter(both_waves))
+cz_lm5_1b <- lm(swd_diff ~ winner_government * stable_voter + swd_pre, 
+            data = cz_1996 %>% filter(both_waves))
+cz_lm5_2b <- lm(swd_diff ~ winner_government * stable_intention + swd_pre, 
+            data = cz_1996 %>% filter(both_waves))
+
+tab_model(list(cz_lm5_0b, cz_lm5_1b, cz_lm5_2b))
 ```
 
 # Romanian presidential election, 2009
@@ -147,8 +314,10 @@ tab_model(list(ro_lm3_1, ro_lm3_2))
 
 ## H4
 ```{r}
-ro_lm4_1 <- lm(swd_diff ~ candidate_qualified_2nd + swd_w1, data = ro_2009_final)
-ro_lm4_2 <- lm(swd_diff ~ candidate_qualified_2nd + winner + swd_w1, data = ro_2009_final)
+ro_lm4_1 <- lm(swd_diff ~ candidate_qualified_2nd + swd_w1, 
+               data = ro_2009_final)
+ro_lm4_2 <- lm(swd_diff ~ candidate_qualified_2nd + winner + swd_w1, 
+               data = ro_2009_final)
 
 tab_model(list(ro_lm4_1, ro_lm4_2))
 ```
@@ -156,9 +325,9 @@ tab_model(list(ro_lm4_1, ro_lm4_2))
 ## H5
 ```{r}
 # same_candidate_in_2r
-ro_lm5_0 <- lm(swd_diff ~ winner + same_candidate_in_2r + swd_w1,
+ro_lm5_0 <- lm(swd_diff ~ winner + stable_voter + swd_w1,
             data = ro_2009_final)
-ro_lm5_1 <- lm(swd_diff ~ winner * same_candidate_in_2r + swd_w1,
+ro_lm5_1 <- lm(swd_diff ~ winner * stable_voter + swd_w1,
             data = ro_2009_final)
 
 tab_model(list(ro_lm5_0, ro_lm5_1))
@@ -219,21 +388,24 @@ tab_model(list(ro2_lm3_1b, ro2_lm3_2b))
 Applicable only for presidential elections.
 
 ## H5
+
 ```{r}
 # same_candidate_in_2r
-ro2_lm5_0 <- lm(swd_diff ~ winner + stable_voter + swd_w1,
+ro2_lm5_0c <- lm(swd_diff_w2 ~ winner + stable_voter + swd_w2,
+            data = ro_2012_all)
+ro2_lm5_1c <- lm(swd_diff_w2 ~ winner * stable_voter + swd_w2,
+            data = ro_2012_all)
+
+tab_model(list(ro2_lm5_0c, ro2_lm5_1c))
+```
+
+```{r}
+ro2_lm5_0 <- lm(swd_diff ~ winner + stable_intention + swd_w1,
             data = ro_2012_p1_final)
-ro2_lm5_1 <- lm(swd_diff ~ winner * stable_voter + swd_w1,
+ro2_lm5_1 <- lm(swd_diff ~ winner * stable_intention + swd_w1,
             data = ro_2012_p1_final)
 
 tab_model(list(ro2_lm5_0, ro2_lm5_1))
-
-ro2_lm5_0b <- lm(swd_diff_w2 ~ winner + stable_voter + swd_w2,
-            data = ro_2012_all)
-ro2_lm5_1b <- lm(swd_diff_w2 ~ winner * stable_voter + swd_w2,
-            data = ro_2012_all)
-
-tab_model(list(ro2_lm5_0b, ro2_lm5_1b))
 
 ```
 
@@ -246,9 +418,9 @@ tar_load(pl_2019)
 
 ## H1
 ```{r}
-pl_lm1_1 <- glm(voted ~ swd_w1 + age + I(age^2) + female + postsecondary_edu, 
+pl_lm1_1 <- glm(voted ~ swd_pre + age + I(age^2) + female + postsecondary_edu, 
                 data = pl_2019)
-pl_lm1_2 <- glm(voted ~ swd_w1 + age + I(age^2) + female + postsecondary_edu + 
+pl_lm1_2 <- glm(voted ~ swd_pre + age + I(age^2) + female + postsecondary_edu + 
                     pol_interest_num + party_close, 
                 data = pl_2019)
 
@@ -258,9 +430,9 @@ tab_model(list(pl_lm1_1, pl_lm1_2))
 
 ## H2
 ```{r}
-pl_lm2_1 <- glm(voted ~ as.numeric(swd_w1), data = pl_2019)
-pl_lm2_2 <- glm(voted ~ as.numeric(swd_w2), data = pl_2019)
-pl_lm2_3 <- glm(voted ~ as.numeric(swd_w1) + as.numeric(swd_w2), data = pl_2019)
+pl_lm2_1 <- glm(voted ~ swd_pre, data = pl_2019)
+pl_lm2_2 <- glm(voted ~ swd_post, data = pl_2019)
+pl_lm2_3 <- glm(voted ~ swd_pre + swd_post, data = pl_2019)
 
 tab_model(list(pl_lm2_1, pl_lm2_2, pl_lm2_3))
 ```
@@ -268,7 +440,7 @@ tab_model(list(pl_lm2_1, pl_lm2_2, pl_lm2_3))
 ## H3
 ```{r}
 pl_lm3_1 <- lm(swd_diff ~ voted, data = pl_2019)
-pl_lm3_2 <- lm(swd_diff ~ voted + as.numeric(swd_w1), data = pl_2019)
+pl_lm3_2 <- lm(swd_diff ~ voted + swd_pre, data = pl_2019)
 
 tab_model(list(pl_lm3_1, pl_lm3_2))
 ```
@@ -278,12 +450,21 @@ Applicable only to presidential election.
 
 ## H5
 ```{r}
-pl_lm5_0 <- lm(swd_diff ~ winner_country + stable_voter + swd_w1,
+pl_lm5_0 <- lm(swd_diff ~ winner_party + stable_voter + swd_pre,
                data = pl_2019)
-pl_lm5_1 <- lm(swd_diff ~ winner_country * stable_voter + swd_w1,
+pl_lm5_1 <- lm(swd_diff ~ winner_party * stable_voter + swd_pre,
                data = pl_2019)
 
 tab_model(list(pl_lm5_0, pl_lm5_1))
+```
+
+```{r}
+pl_lm5_0b <- lm(swd_diff ~ winner_party + stable_intention + swd_pre,
+               data = pl_2019)
+pl_lm5_1b <- lm(swd_diff ~ winner_party * stable_intention + swd_pre,
+               data = pl_2019)
+
+tab_model(list(pl_lm5_0b, pl_lm5_1b))
 ```
 
 # Hungary, EP election 2019
@@ -295,9 +476,9 @@ tar_load(hu_2019)
 
 ## H1
 ```{r}
-hu_lm1_1 <- glm(voted ~ swd_w1 + age + I(age^2) + female + postsecondary_edu, 
+hu_lm1_1 <- glm(voted ~ swd_pre + age + I(age^2) + female + postsecondary_edu, 
                 data = hu_2019)
-hu_lm1_2 <- glm(voted ~ swd_w1 + age + I(age^2) + female + postsecondary_edu + 
+hu_lm1_2 <- glm(voted ~ swd_pre + age + I(age^2) + female + postsecondary_edu + 
                     pol_interest_num + party_close, 
                 data = hu_2019)
 
@@ -307,9 +488,9 @@ tab_model(list(hu_lm1_1, hu_lm1_2))
 
 ## H2
 ```{r}
-hu_lm2_1 <- glm(voted ~ as.numeric(swd_w1), data = hu_2019)
-hu_lm2_2 <- glm(voted ~ as.numeric(swd_w2), data = hu_2019)
-hu_lm2_3 <- glm(voted ~ as.numeric(swd_w1) + as.numeric(swd_w2), data = hu_2019)
+hu_lm2_1 <- glm(voted ~ swd_pre, data = hu_2019)
+hu_lm2_2 <- glm(voted ~ swd_post, data = hu_2019)
+hu_lm2_3 <- glm(voted ~ swd_pre + swd_post, data = hu_2019)
 
 tab_model(list(hu_lm2_1, hu_lm2_2, hu_lm2_3))
 ```
@@ -317,7 +498,7 @@ tab_model(list(hu_lm2_1, hu_lm2_2, hu_lm2_3))
 ## H3
 ```{r}
 hu_lm3_1 <- lm(swd_diff ~ voted, data = hu_2019)
-hu_lm3_2 <- lm(swd_diff ~ voted + as.numeric(swd_w1), data = hu_2019)
+hu_lm3_2 <- lm(swd_diff ~ voted + swd_pre, data = hu_2019)
 
 tab_model(list(hu_lm3_1, hu_lm3_2))
 ```
@@ -327,14 +508,22 @@ Applicable only to presidential election.
 
 ## H5
 ```{r}
-hu_lm5_0 <- lm(swd_diff ~ winner_country + stable_voter + swd_w1,
+hu_lm5_0 <- lm(swd_diff ~ winner_party + stable_voter + swd_pre,
                data = hu_2019)
-hu_lm5_1 <- lm(swd_diff ~ winner_country * stable_voter + swd_w1,
+hu_lm5_1 <- lm(swd_diff ~ winner_party * stable_voter + swd_pre,
                data = hu_2019)
 
 tab_model(list(hu_lm5_0, hu_lm5_1))
 ```
 
+```{r}
+hu_lm5_0b <- lm(swd_diff ~ winner_party + stable_intention + swd_pre,
+               data = hu_2019)
+hu_lm5_1b <- lm(swd_diff ~ winner_party * stable_intention + swd_pre,
+               data = hu_2019)
+
+tab_model(list(hu_lm5_0b, hu_lm5_1b))
+```
 
 # German Federal election 2017
 
@@ -391,5 +580,37 @@ de_lm5_1b <- lm(swd_diff ~ winner_party * stable_voter + swd_pre,
                    filter(!(kp9_2601 == "Berlin" | kp1_2601 == "Berlin")))
 
 tab_model(list(de_lm5_0, de_lm5_1, de_lm5_0b, de_lm5_1b))
+```
+
+# Checks
+
+```{r}
+cz_1996 %>% 
+    count(vote_previous_nat_election, vote_choice, stable_voter, 
+          sort = TRUE) %>% 
+    DT::datatable()
+
+ro_2012_all %>% 
+    count(vote_previous_nat_election, vote_choice, stable_voter, 
+          sort = TRUE) %>% 
+    DT::datatable()
+
+pl_2019 %>% 
+    filter(!is.na(swd_diff)) %>% 
+    count(vote_previous_nat_election, vote_choice, stable_voter, 
+          sort = TRUE) %>% 
+    DT::datatable()
+
+hu_2019 %>% 
+    filter(!is.na(swd_diff)) %>% 
+    count(vote_previous_nat_election, vote_choice, stable_voter, 
+          sort = TRUE) %>% 
+    DT::datatable()
+
+de_2017_final %>% 
+    filter(!is.na(swd_diff)) %>% 
+    count(vote_previous_nat_election, vote_choice, stable_voter, 
+          sort = TRUE) %>% 
+    DT::datatable()
 ```
 

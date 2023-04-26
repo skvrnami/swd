@@ -52,7 +52,7 @@ list(
   
   # merged waves CZ 1996
   tar_target(
-    cz_96_final, 
+    cz_1996, 
     full_join(
       cz_96_pre %>% 
         rename_with(., ~add_suffix(.x, "_w1"), .cols = -c("V2")) %>% 
@@ -64,24 +64,25 @@ list(
     ) %>% 
       mutate(
         voted = recode_voters(V10_w2, nda = c(98, 99), abstain = 87), 
-        winner_biggest_party = recode_winners(as_factor(V10_w2), winners = "ODS"), 
+        winner_party = recode_winners(as_factor(V10_w2), winners = "ODS"), 
+        winner = winner_party, 
         winner_government = recode_winners(
           as_factor(V10_w2), winners = c("ODS", "KDU-CSL", "ODA")),
-        swd_w1 = case_when(
-          V29_w1 == 1 ~ 2, # Very satisfied
-          V29_w1 == 2 ~ 1, # Fairly satisfied
-          V29_w1 == 3 ~ -1, # Not very satisfied 
-          V29_w1 == 4 ~ -2, # Not satisfied at all
+        swd_pre = case_when(
+          V29_w1 == 1 ~ 4, # Very satisfied
+          V29_w1 == 2 ~ 3, # Fairly satisfied
+          V29_w1 == 3 ~ 2, # Not very satisfied 
+          V29_w1 == 4 ~ 1, # Not satisfied at all
           TRUE ~ V29_w1
         ), 
-        swd_w2 = case_when(
-          V71_w2 == 1 ~ 2, # Very satisfied
-          V71_w2 == 2 ~ 1, # Fairly satisfied
-          V71_w2 == 3 ~ -1, # Not very satisfied 
-          V71_w2 == 4 ~ -2, # Not satisfied at all
+        swd_post = case_when(
+          V71_w2 == 1 ~ 4, # Very satisfied
+          V71_w2 == 2 ~ 3, # Fairly satisfied
+          V71_w2 == 3 ~ 2, # Not very satisfied 
+          V71_w2 == 4 ~ 1, # Not satisfied at all
           TRUE ~ V71_w2
         ),
-        swd_diff = swd_w2 - swd_w1, 
+        swd_diff = swd_post - swd_pre, 
         vote_intention_w1 = as_factor(V13_w1), 
         vote_intention_w1 = case_when(
           vote_intention_w1 %in% c("None", "Refused to answer", "No answer") ~ NA_character_, 
@@ -89,22 +90,24 @@ list(
           vote_intention_w1 == "Other'" ~ "Other", 
           TRUE ~ as.character(vote_intention_w1)
         ), 
-        vote_choice_last_election = as_factor(V9_w1),
-        vote_choice_last_election = case_when(
-            vote_choice_last_election %in% c("No answer", "Do not know", "Refused to answer") ~
+        vote_previous_nat_election = as_factor(V9_w1),
+        vote_previous_nat_election = case_when(
+            vote_previous_nat_election %in% c("No answer", "Do not know", "Refused to answer") ~
                 NA_character_,
-            vote_choice_last_election == "ODS (joint list with KDS)" ~ "ODS",
-            vote_choice_last_election == "KDS (joint list with ODS)" ~ "ODS",
-            TRUE ~ as.character(vote_choice_last_election)
+            vote_previous_nat_election == "ODS (joint list with KDS)" ~ "ODS",
+            vote_previous_nat_election == "KDS (joint list with ODS)" ~ "ODS",
+            TRUE ~ as.character(vote_previous_nat_election)
         ),
-        vote_choice_w2 = as_factor(V10_w2),
+        vote_choice = as_factor(V10_w2),
         stable_voter = case_when(
-            vote_choice_last_election == "Did not vote" |
-                vote_choice_w2 == "Did not vote" ~ 0,
-            as.character(vote_choice_last_election) == as.character(vote_choice_w2) ~ 1,
+            vote_previous_nat_election == "Did not vote" |
+                vote_choice == "Did not vote" ~ 0,
+            as.character(vote_previous_nat_election) == as.character(vote_choice) ~ 1,
+            vote_previous_nat_election == "LB (KSCM etc)" & vote_choice == "KSCM" ~ 1,
+            vote_previous_nat_election %in% c("OH", "CSS") & vote_choice == "SD-LSNS" ~ 1,
             TRUE ~ 0
         ),
-        stable_intention = (vote_intention_w1 == vote_choice_w2), 
+        stable_intention = (vote_intention_w1 == vote_choice), 
         stable_intention = if_else(is.na(stable_intention), FALSE, stable_intention),
         w1 = if_else(is.na(w1), 0, w1), 
         w2 = if_else(is.na(w2), 0, w2), 
@@ -144,8 +147,8 @@ list(
           as.numeric(V78_w2 == 1))
         ) %>% 
       set_variable_labels(.,
-                          swd_w1 = "Satisfaction with democracy (pre-election wave)", 
-                          swd_w2 = "Satisfaction with democracy (post-election wave)")
+                          swd_pre = "Satisfaction with democracy (pre-election wave)", 
+                          swd_post = "Satisfaction with democracy (post-election wave)")
   ), 
   
   # EU 2019 -----------------------------------------------
@@ -164,8 +167,8 @@ list(
       filter(W1_S0 == "Poland") %>% 
       select(where(function(x) any(!is.na(x)))) %>% 
       rename(
-        swd_w1 = W1_Q9, 
-        swd_w2 = W2_Q9, 
+        swd_pre = W1_Q9, 
+        swd_post = W2_Q9, 
         lrself = W1_Q16,
         # pid = W1_Q17, 
         age = W1_Q1b, 
@@ -177,27 +180,49 @@ list(
         vote_choice = W2_Q60a
       ) %>% 
       mutate(
-        swd_diff = as.numeric(swd_w2) - as.numeric(swd_w1), 
+        swd_diff = as.numeric(swd_post) - as.numeric(swd_pre), 
         voted = case_when(
           W2_Q59a == "I am sure that I voted on May 26 2019" ~ 1L,
           W2_Q59a %in% c("Refuse") | grepl("know", W2_Q59a) ~ NA_integer_,
           is.na(W2_Q59a) ~ NA_integer_,
           TRUE ~ 0
         ), 
-        swd_w1 = as.numeric(swd_w1), 
-        stable_voter = case_when(
+        swd_pre = as.numeric(swd_pre), 
+        swd_post = as.numeric(swd_post),
+        stable_intention = case_when(
           vote_intention %in% c("Don't know", "Refuse", "Other party", 
                                 "Would spoil the ballot") | 
             vote_choice %in% c("Don't know", "Refuse", "Other party", 
                                "Spoilt the ballot") ~ NA_integer_,
           as.character(vote_intention) == as.character(vote_choice) ~ 1,
-          as.character(vote_intention) != as.character(vote_choice) ~ 0
+          as.character(vote_intention) != as.character(vote_choice) ~ 0, 
+          W1_Q59 < 5 ~ 0
         ), 
-        winner_country = case_when(
+        stable_voter = case_when(
+            vote_previous_nat_election %in% c("Refuse", "Don't know") | 
+                vote_choice %in% c("Refuse", "Don't know") ~ NA_integer_, 
+            vote_previous_nat_election %in% c("I did not vote", "I spoiled the ballot") ~ 0,
+            vote_choice == "PSL-PO-.N-SLD-Zielo" & 
+                vote_previous_nat_election %in% c(
+                    "Platforma Obywatelska (PO)", 
+                    "Polskie Stronnictwo Ludowe (PSL)", 
+                    "Nowoczesna (.N)", 
+                    "Zjednoczona Lewica (ZL))") ~ 1, 
+            vote_previous_nat_election == "Zjednoczona Lewica (ZL))" & 
+                vote_choice == "Wiosna" ~ 1,
+            vote_choice == "PiS/Zjednoczsona Prawica" & 
+                vote_previous_nat_election == "Prawo i Sprawiedliwosc (PiS)" ~ 1,
+            vote_choice == "Wolnosc (KORWIN)-Ruch Narodowy" & 
+                vote_previous_nat_election == "Wolnosc (KORWIN)" ~ 1,
+            as.character(vote_choice) == as.character(vote_previous_nat_election) ~ 1,
+            TRUE ~ 0
+        ),
+        winner_party = case_when(
           vote_choice == "PiS/Zjednoczsona Prawica" ~ 1,
           vote_choice %in% c("Don't know", "Refuse") ~ NA_integer_, 
           !is.na(vote_choice) ~ 0 
         ), 
+        winner = winner_party,
         female = as.numeric(gender == "Female"), 
         postsecondary_edu = as.numeric(edu == "High"), 
         party_close = as.numeric(
@@ -206,7 +231,13 @@ list(
         pol_interest_cat = factor(W1_Q5, levels = rev(c(
           "Very interested", "Fairly interested", "A little interested", 
           "Not at all interested"))), 
-          pol_interest_num = as.numeric(pol_interest_cat)
+        pol_interest_num = as.numeric(pol_interest_cat), 
+        know1 = as.numeric(W1_Q33 == "The European Parliament"), 
+        know2 = as.numeric(W1_Q35 == "He was approved by a majority of the members of the European Parliament"), 
+        know3 = as.numeric(W1_Q37 == "The European Commission"), 
+        know4 = as.numeric(W1_Q65 == "Expenditure on the salaries of the EU officials is the largest item in the EU budget"), 
+        know5 = as.numeric(W1_Q67 == "The Council of the European Union"), 
+        pol_knowledge_pct = (rowSums(across(matches("know[1-5]{1}"))) / 5) * 100
       )
   ), 
 
@@ -217,8 +248,8 @@ list(
       filter(W1_S0 == "Hungary") %>% 
       select(where(function(x) any(!is.na(x)))) %>% 
       rename(
-        swd_w1 = W1_Q9, 
-        swd_w2 = W2_Q9, 
+        swd_pre = W1_Q9, 
+        swd_post = W2_Q9, 
         lrself = W1_Q16,
         # pid = W1_Q17, 
         age = W1_Q1b, 
@@ -230,27 +261,37 @@ list(
         vote_choice = W2_Q60a
       ) %>% 
       mutate(
-        swd_diff = as.numeric(swd_w2) - as.numeric(swd_w1),
+        swd_diff = as.numeric(swd_post) - as.numeric(swd_pre),
         voted = case_when(
           W2_Q59a == "I am sure that I voted on May 26 2019" ~ 1L,
           W2_Q59a %in% c("Refuse") | grepl("know", W2_Q59a) ~ NA_integer_,
           is.na(W2_Q59a) ~ NA_integer_,
           TRUE ~ 0
         ), 
-        swd_w1 = as.numeric(swd_w1), 
-        stable_voter = case_when(
+        swd_pre = as.numeric(swd_pre), 
+        swd_post = as.numeric(swd_post),
+        stable_intention = case_when(
           vote_intention %in% c("Don't know", "Refuse", "Other party", 
                                 "Would spoil the ballot") | 
             vote_choice %in% c("Don't know", "Refuse", "Other party", 
                                "Spoilt the ballot") ~ NA_integer_,
           as.character(vote_intention) == as.character(vote_choice) ~ 1,
-          as.character(vote_intention) != as.character(vote_choice) ~ 0
+          as.character(vote_intention) != as.character(vote_choice) ~ 0, 
+          W1_Q59 < 5 ~ 0
         ), 
-        winner_country = case_when(
+        stable_voter = case_when(
+            vote_choice %in% c("Refuse", "Don't know") |
+                vote_previous_nat_election %in% c("Refuse", "Don't know") ~ NA_integer_,
+            vote_previous_nat_election %in% c("I did not vote", "I spoiled the ballot") ~ 0,
+            as.character(vote_choice) == as.character(vote_previous_nat_election) ~ 1,
+            TRUE ~ 0
+        ),
+        winner_party = case_when(
           vote_choice == "FIDESZ-KNDP" ~ 1,
           vote_choice %in% c("Don't know", "Refuse") ~ NA_integer_, 
           !is.na(vote_choice) ~ 0 
         ), 
+        winner = winner_party, 
         female = as.numeric(gender == "Female"), 
         postsecondary_edu = as.numeric(edu == "High"), 
         party_close = as.numeric(
@@ -259,7 +300,13 @@ list(
         pol_interest_cat = factor(W1_Q5, levels = rev(c(
           "Very interested", "Fairly interested", "A little interested", 
           "Not at all interested"))), 
-        pol_interest_num = as.numeric(pol_interest_cat)
+        pol_interest_num = as.numeric(pol_interest_cat), 
+        know1 = as.numeric(W1_Q33 == "The European Parliament"), 
+        know2 = as.numeric(W1_Q35 == "He was approved by a majority of the members of the European Parliament"), 
+        know3 = as.numeric(W1_Q37 == "The European Commission"), 
+        know4 = as.numeric(W1_Q65 == "Expenditure on the salaries of the EU officials is the largest item in the EU budget"), 
+        know5 = as.numeric(W1_Q67 == "The Council of the European Union"), 
+        pol_knowledge_pct = (rowSums(across(matches("know[1-5]{1}"))) / 5) * 100
       
   )), 
   
@@ -308,6 +355,8 @@ list(
           swd_w3 %in% c("NS", "NR") ~ NA_integer_, 
           is.na(swd_w3) ~ NA_integer_
         ), 
+        swd_pre = swd_w1, 
+        swd_post = swd_w3,
         swd_diff = swd_w3 - swd_w1,
         voted_2r = case_when(
           Q23XX == "Sunt sigur ca am votat" ~ 1, 
@@ -328,9 +377,9 @@ list(
           as.character(Q24B) == as.character(Q21B) ~ 1, 
           as.character(Q24B) != as.character(Q21B) ~ 0
         ), 
+        stable_voter = same_candidate_in_2r,
         female = as.numeric(GEN == "Femeie"), 
         age = as.numeric(as.character(VARSTA)), 
-        
         postsecondary_edu = case_when(
           EDUC %in% c("scoala postliceala", "facultate neterminata", 
                       "facultate - subingineri sau colegiu", "facultate complet", 
@@ -403,6 +452,8 @@ list(
         swd_w1 = if_else(D10 %in% c("Nu stiu", "Nu raspund"), NA_integer_, as.numeric(D10)), 
         swd_w2 = if_else(D10_w2 %in% c("Nu stiu", "Nu raspund"), NA_integer_, as.numeric(D10_w2)), 
         swd_w3 = if_else(D10_w3 %in% c("Nu stiu", "Nu raspund"), NA_integer_, as.numeric(D10_w3)),
+        swd_pre = swd_w1, 
+        swd_post = swd_w3,
         swd_diff = swd_w3 - swd_w1, 
         swd_diff_w2 = swd_w3 - swd_w2, 
         voted = case_when(
@@ -431,7 +482,27 @@ list(
             Q5LH_CD_w3 %in% c("Refuz", "Nu stiu") ~ NA_integer_, 
           !is.na(Q5LH_CS_w3) ~ 0
           ), 
-        stable_voter = as.numeric(as.character(P12V) == as.character(Q5LH_CS_w3)), 
+        winner_government = winner,
+        stable_intention = as.numeric(as.character(P12V) == as.character(Q5LH_CS_w3)), 
+        stable_voter = case_when(
+            # TODO
+            Q5LH_C3_w3 %in% c("Refuz", "Nu stiu") | 
+                Q5LH_CD_w3 %in% c("Refuz", "Nu stiu") ~ NA_integer_,
+            Q5LH_C3_w3 %in% c("Vot invalid (alb/anulat)") | 
+                Q5LH_CD_w3 %in% c("Vot invalid (alb/anulat)") ~ 0, 
+            as.character(Q5LH_C3_w3) == as.character(Q5LH_CD_w3) ~ 1,
+            Q5LH_C3_w3 %in% c("Partidul National Liberal (PNL)", "Partidul Social Democrat (PSD)", 
+                                  "Partidul Conservator (PC)") &
+                Q5LH_CD_w3 %in% c("Uniunea Social-Liberala (USL: PSD+PNL+PC+UNPR)") ~ 1,
+            Q5LH_C3_w3 == "Alianta PSD+PC" & 
+                Q5LH_CD_w3 %in% c("Uniunea Social-Liberala (USL: PSD+PNL+PC+UNPR)") ~ 1,
+            Q5LH_C3_w3 %in% c("Partidul Democrat Liberal (PDL)", 
+                                  "Partidul National Taranesc Crestin Democrat (PNTCD)") &
+                Q5LH_CD_w3 %in% c("Alianta România Dreapta (ARD: PDL+PNT-CD+FC)") ~ 1,
+            TRUE ~ 0
+        ),
+        vote_previous_nat_election = Q5LH_C3_w3,
+        vote_choice = Q5LH_CD_w3, 
         female = as.numeric(GEN == "Femeie"), 
         age = varsta, 
         postsecondary_edu = as.numeric(r_EDUC == "Higher education"), 
@@ -500,6 +571,8 @@ list(
           Q15_w3 == "Foarte multumit" ~ 4, 
           Q15_w3 %in% c("Nu stiu", "Refuz") ~ NA_integer_
         ), 
+        swd_pre = swd_w2, 
+        swd_post = swd_w3,
         swd_diff_w2 = swd_w3 - swd_w2, 
         voted = case_when(
           Q5LH_AG1_w3 == "Sunt sigur ca am votat" | Q5LH_AG2_w3 == "Am votat" ~ 1, 
@@ -528,12 +601,30 @@ list(
             Q5LH_CD_w3 %in% c("Refuz", "Nu stiu") ~ NA_integer_, 
           !is.na(Q5LH_CS_w3) ~ 0
         ), 
-        stable_voter = as.numeric(as.character(P12V_w2) == as.character(Q5LH_CS_w3)), 
+        stable_voter = case_when(
+            Q5LH_CD2008_w3 %in% c("Refuz", "Nu stiu") | 
+                Q5LH_CD_w3 %in% c("Refuz", "Nu stiu") ~ NA_integer_,
+            Q5LH_CD2008_w3 %in% c("Vot invalid (alb/anulat)") | 
+                Q5LH_CD_w3 %in% c("Vot invalid (alb/anulat)") ~ 0, 
+            as.character(Q5LH_CD2008_w3) == as.character(Q5LH_CD_w3) ~ 1,
+            Q5LH_CD2008_w3 %in% c("Partidul National Liberal (PNL)", "Partidul Social Democrat (PSD)", 
+                                  "Partidul Conservator (PC)") &
+                Q5LH_CD_w3 %in% c("Uniunea Social-Liberala (USL: PSD+PNL+PC+UNPR)") ~ 1,
+            Q5LH_CD2008_w3 == "Alianta PSD+PC" & 
+                Q5LH_CD_w3 %in% c("Uniunea Social-Liberala (USL: PSD+PNL+PC+UNPR)") ~ 1,
+            Q5LH_CD2008_w3 %in% c("Partidul Democrat Liberal (PDL)", 
+                                  "Partidul National Taranesc Crestin Democrat (PNTCD)") &
+                Q5LH_CD_w3 %in% c("Alianta România Dreapta (ARD: PDL+PNT-CD+FC)") ~ 1,
+            TRUE ~ 0
+        ),
+        vote_previous_nat_election = Q5LH_CD2008_w3,
+        vote_choice = Q5LH_CD_w3, 
+        stable_intention = as.numeric(as.character(P12V_w2) == as.character(Q5LH_CS_w3)), 
         GEN = GEN_w2, 
         female = as.numeric(GEN == "Femeie"), 
         age = as.numeric(as.character(age_w2)), 
         postsecondary_edu = as.numeric(r_EDUC == "Higher education"), 
-        pol_interest = case_when(
+        pol_interest_cat = case_when(
           IP1_a_w2 %in% c("Nu stiu", "Nu raspund") ~ NA_character_,
           IP1_a_w2 == "Deloc interesat" ~ "not at all interested", 			
           IP1_a_w2 == "Putin interesat" ~ "little interested", 
@@ -542,6 +633,7 @@ list(
         ) %>% factor(., levels = c("not at all interested", "little interested", "quite interested", 
                                    "very interested"), 
                      ordered = TRUE), 
+        pol_interest_num = as.numeric(pol_interest_cat),
         party_close = as.numeric(Q4_w2 == "Da" | Q4a_w2 == "Da")
       )
   ),
@@ -549,7 +641,10 @@ list(
   tar_target(
     ro_2012_all, {
       COMMON_VARS <- c("ID", "r_EDUC", "age", "swd_w2", "swd_w3", "swd_diff_w2", 
-                       "winner", "stable_voter", "voted", "female")
+                       "swd_pre", "swd_post", "pol_interest_num",
+                       "winner", "stable_voter", "stable_intention", 
+                       "voted", "female", "vote_previous_nat_election", 
+                       "vote_choice", "postsecondary_edu", "party_close")
       bind_rows(
         ro_2012_p1_final %>% select(any_of(COMMON_VARS)), 
         ro_2012_p2_final %>% select(any_of(COMMON_VARS))  
@@ -561,7 +656,7 @@ list(
   
   tar_target(
     de_2017_final, 
-    read_sav(here("data", "DE_2021", "ZA6838_w1to9_sA_v5-0-0.sav"), user_na = TRUE) %>% 
+    read_sav(here("data", "DE_2017", "ZA6838_w1to9_sA_v5-0-0.sav"), user_na = TRUE) %>% 
         haven::as_factor() %>% 
         rename(birth_year = kpx_2290s) %>% 
         filter(kp9_2601 %in% c("Mecklenburg-Vorpommern", "Sachsen", 
@@ -608,17 +703,28 @@ list(
                 kp8_200ba == "CDU/CSU" | kp8_200bb == "CDU/CSU" ~ 1,
                 TRUE ~ 0
             ), 
+            winner = winner_party,
+            winner_government = case_when(
+                kp8_200ba %in% c("CDU/CSU", "SPD") | 
+                    kp8_200bb %in% c("CDU/CSU", "SPD") ~ 1,
+                TRUE ~ 0
+            ),
             vote_intention = as_factor(kp7_190ba),
-            previous_vote_choice = as_factor(kp1_350ba),
+            vote_previous_nat_election = as_factor(kp1_350ba),
             vote_choice = as_factor(kp8_200ba), 
             stable_voter = case_when(
+                kp1_2780 %in% c("nein, ich habe nicht gewaehlt", "nicht wahlberechtigt") ~ 0,
                 vote_choice %in% c("keine Angabe", "trifft nicht zu", 
                                        "Interview abgebrochen", "andere Partei") | 
-                    previous_vote_choice %in% c("keine Angabe", "weiss nicht", 
+                    vote_previous_nat_election %in% c("keine Angabe", "weiss nicht", 
                                                 "andere Partei", "nicht teilgenommen") ~ NA_integer_,
-                as.character(vote_choice) == as.character(previous_vote_choice) ~ 1,
+                as.character(vote_choice) == as.character(vote_previous_nat_election) ~ 1,
                 TRUE ~ 0
             ), 
+            stable_intention = case_when(
+                as.character(vote_choice) == as.character(vote_intention) ~ 1, 
+                TRUE ~ 0
+            ),
             vote_duty = case_when(
                 kp8_050l %in% c("keine Angabe", "Interview abgebrochen", 
                                 "nicht teilgenommen") ~ NA_character_, 
@@ -747,6 +853,70 @@ list(
           "teils/teils", "stimme eher zu", "stimme voll und ganz zu"
         ), ordered = TRUE)
       )
+  ),
+  
+  # All panels --------------------------------------------------------------
+  tar_target(
+      all_panels, command = {
+          common_vars <- c("age", "swd_diff", "postsecondary_edu",
+                           "winner", "winner_government",
+                           "stable_voter", "stable_intention", 
+                           "voted", "female", "vote_previous_nat_election", 
+                           "vote_choice", "swd_pre", "swd_post", 
+                           "pol_knowledge_pct", "pol_interest_num", 
+                           "party_close", "candidate_qualified_2nd")
+          
+          cz_1996_norm <- cz_1996 %>% 
+              select(any_of(common_vars)) %>% 
+              mutate(election = "CZ 1996") %>% 
+              mutate(across(c("swd_pre", "swd_post"), normalize_scale), 
+                     swd_diff = swd_post - swd_pre)
+          
+          pl_2019_norm <- pl_2019 %>% 
+              select(any_of(common_vars)) %>% 
+              mutate(election = "PL 2019") %>% 
+              mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
+                            normalize_scale), 
+                     swd_diff = swd_post - swd_pre)
+          
+          hu_2019_norm <- hu_2019 %>% 
+              select(any_of(common_vars)) %>% 
+              mutate(election = "HU 2019") %>% 
+              mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
+                            normalize_scale), 
+                     swd_diff = swd_post - swd_pre)
+          
+          ro_2009_norm <- ro_2009_final %>% 
+              rename(voted = voted_2r) %>% 
+              select(any_of(common_vars)) %>% 
+              mutate(election = "RO 2009") %>% 
+              mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
+                            normalize_scale), 
+                     swd_diff = swd_post - swd_pre)
+          
+          ro_2012_norm <- ro_2012_all %>% 
+              select(any_of(common_vars)) %>% 
+              mutate(election = "RO 2012") %>% 
+              mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
+                            normalize_scale), 
+                     swd_diff = swd_post - swd_pre)
+          
+          de_2017_norm <- de_2017_final %>% 
+              select(any_of(common_vars)) %>% 
+              mutate(election = "DE (Ost) 2017") %>% 
+              mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
+                            normalize_scale), 
+                     swd_diff = swd_post - swd_pre)
+          
+          bind_rows(
+              cz_1996_norm, 
+              pl_2019_norm, 
+              hu_2019_norm,
+              ro_2009_norm, 
+              ro_2012_norm, 
+              de_2017_norm
+          )
+      }
   ),
   
   tar_render(
