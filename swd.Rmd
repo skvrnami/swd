@@ -7,6 +7,7 @@ output:
     toc: true
     toc_float: true
     theme: readable
+    code_folding: hide
 ---
 
 ```{r setup, include=FALSE}
@@ -75,6 +76,13 @@ library(sjPlot)
     - Which of the following EU institutions formally proposes new laws at the EU level? (The European Commission, The European Parliament, The Council of the European Union, All of the above)
     - Which of the following statements is not true? (All EU citizens have the right to work in another EU country, Mobile phone roaming charges have decreased within the EU, Expenditure on the salaries of the EU officials is the largest item in the EU budget, Individual EU countries cannot conclude their own trade agreements )
     - In which of the following EU institutions are the ministers of national governments represented? (The European Commission, The European Parliament, The Council of the European Union, None of the Above)
+- DE 2017
+    - Which percentage of votes does a party definitely need to send representatives to the Bundestag? (open-ended question)
+    - What do you think: Which vote decides how many seats each party will have in parliament? (first vote, second vote, both equally important, don't know)
+    - Who elects the Chancellor of the Federal Republic of Germany? (Federal Council, Federal Assembly, Federal Parliament, the people)
+    - Which party do the following politicians belong to? (6 questions in total)
+    - What is the current unemployment rate in Germany? (4, 6, 8, 10 percent, don't know)
+
 
 ## Voting as a civic duty
 - DE 2017: 5-point scale: "Please state to what extent you agree or disagree with each statement: l)  In a democracy, it is the duty of all citizens to vote regularly in elections." (strongly disagree, disagree, neither agree nor disagree, agree, strongly agree)

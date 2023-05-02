@@ -1,6 +1,6 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
 add_suffix|function|419ba647970dbe6c|||||||||||||||
-all_panels|stem|68b18aeb50b3358c|fb30e6d7985791ba|ebc3b78f7ff5e326|136737702||t19473.5025695287s|e52c8733f8b06e66|110447|rds|local|vector|||0.044||
+all_panels|stem|143636135d63e815|fb30e6d7985791ba|ef42e058b141017e|136737702||t19479.7590607173s|b4b1af512e872eb7|112743|rds|local|vector|||0.043||
 cbook_cz_96_post|stem|c6fea57320b57fe0|75b0af0f5f8abf1f|44ec0cd02c63fc46|-2140438487||t19459.6149639092s|345bc8a01e72b42f|3130|rds|local|vector|||0.023||
 cbook_cz_96_post_file|stem|a1997e72ccd4b04d|1ecbea0df8dc1704|dcb66fb0508c419b|-1434508316||t19453.4622239237s|2247cb837b5b96db|124|rds|local|vector|||0.008||
 cbook_cz_96_pre|stem|5ec62fdb2205e7b6|e68aa194d5f43665|df2a65f2c1e90cd1|1082649608||t19459.6149659557s|6a104a36980acf98|1320|rds|local|vector|||0.007||
@@ -11,7 +11,7 @@ cz_96_final|stem|4cee3d3ad2510c25|c01e8258cf6971fb|3755cab0d5abcc3a|1682770841||
 cz_96_merged|stem|2232bcf89c2d75b6|dd5105da8ed5a345|97139bc3b89d489e|1984540019||t19454.8585328468s|badda8d461e9213d|316688|rds|local|vector|||0.041||
 cz_96_post|stem|cf65310749b2aaab|422439f3c3e85e59|a9d95ab2b1ed64ff|309038667||t19453.3524394186s|030080ff506cdda8|152302|rds|local|vector|||0.094||
 cz_96_pre|stem|ee29945b81060639|d2353ba7776f56cd|a9d95ab2b1ed64ff|978930292||t19453.3524399554s|4014024490b26be4|66330|rds|local|vector|||0.013||
-de_2017_final|stem|f4e92926222d4dc6|3a54d9abcfa8ec1f|a8c5d8b63922c6ac|1900035232||t19473.5025585317s|1a5cfeadeec28535|4995141|rds|local|vector|||11.591|1m22mThere was 1 warning in mutate.1m22m36mℹ39m In argument birth_year  case_whenbirth_year  1955 und frueher  1955,  TRUE  as.numericbirth_year.Caused by warning33m39m NAs introduced by coercion|
+de_2017_final|stem|561b191e597aa1c2|c580fab3c215b57f|3a14e200e0f1c6a7|1900035232||t19479.7590579672s|02fa8c41e40fe035|5011520|rds|local|vector|||11.549|1m22mThere was 1 warning in mutate.1m22m36mℹ39m In argument birth_year  case_whenbirth_year  1955 und frueher  1955,  TRUE  as.numericbirth_year.Caused by warning33m39m NAs introduced by coercion|
 de_2021_final|stem|d0d021ef57a354df|b3fc075f75e0536c|273ed5997d0f6b9e|-1173931392||t19467.6021313739s|966ad2ac91377b35|1050902|rds|local|vector|||0.648||
 de_2021_panel|stem|06b6e1a03b15af14|0dfde9334c11ea4e|6df1e1e70699feef|-1348884986||t19460.8055294472s|d0b3824698507f6c|1036155|rds|local|vector|||0.632||
 de_2021_w1|stem|783dc18758b2957f|991b1b7f201e46f7|77618c8a068e92c2|-1814609243||t19467.5791601626s|5edcbb338009e0e3|123648|rds|local|vector|||8.154|1m22mThere was 1 warning in mutate.1m22m36mℹ39m In argument birth_year  case_whenbirth_year  1955 und frueher  1955,  TRUE  as.numericbirth_year.Caused by warning33m39m NAs introduced by coercion|
@@ -50,4 +50,4 @@ ro_2012_p2|stem|cf912be3e9eaa1e7|de75298af3b431c3|d9c11b95a36f19e9|112656273||t1
 ro_2012_p2_final|stem|1c89caf209b159b0|78b9948661175daa|9a69d5e1e0152fc2|2046540839||t19473.3643565174s|886ab9188efc298a|660545|rds|local|vector|||0.336|1m22mThere was 1 warning in mutate.1m22m36mℹ39m In argument age  as.numericas.characterage_w2.Caused by warning33m39m NAs introduced by coercion|
 ro_2012_p2v1|stem|e176f106d2d2b865|59a8f548699491ae|a9d95ab2b1ed64ff|1038652231||t19460.7022158499s|735e749bf885427c|382271|rds|local|vector|||0.189||
 ro_2012_p2v2|stem|c7c0fff3e3845112|822a15e59a337060|a9d95ab2b1ed64ff|-1246035250||t19460.7022185896s|bec9540c87464770|343129|rds|local|vector|||0.154||
-swd_rmd|stem|79b0371a6dd52bf0|a678f859a3bab312|95e8075c384f2f5d|-127931443|swd.html*swd.Rmd|t19473.5104977079s|d02fa3d745e08dc7|1630305|file|local|vector|||13.576||
+swd_rmd|stem|85095d431261b582|a678f859a3bab312|a8279fbdeb7170eb|-127931443|swd.html*swd.Rmd|t19479.7640041817s|a74c65bb36f40e8d|1634944|file|local|vector|||14.075||

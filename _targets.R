@@ -747,6 +747,69 @@ list(
                 "weniger stark", "ueberhaupt nicht")), 
                 ordered = TRUE), 
             pol_interest_num = as.numeric(pol_interest_cat), 
+            pol_know1 = case_when(
+                kp1_090_v1 %in% c("nicht teilgenommen", 
+                                  "Interview abgebrochen") ~ NA_integer_, 
+                kp1_090_v1 == "Richtige Antwort (5%)" ~ 
+                    1, 
+                TRUE ~ 0
+            ), 
+            pol_know2 = case_when(
+                kp1_110 %in% c("nicht teilgenommen", 
+                               "Interview abgebrochen") ~ NA_integer_,
+                kp1_110 == "Zweitstimme*" ~ 1,
+                TRUE ~ 0
+            ), 
+            pol_know3 = case_when(
+                kp1_130 %in% c("nicht teilgenommen", 
+                               "Interview abgebrochen") ~ NA_integer_, 
+                kp1_130 == "den Bundestag*" ~ 1, 
+                TRUE ~ 0
+            ), 
+            pol_know4 = case_when(
+                kp2_3430q %in% c("nicht teilgenommen", 
+                               "Interview abgebrochen") ~ NA_integer_, 
+                grepl("\\*", kp2_3430q) ~ 1, 
+                TRUE ~ 0
+            ), 
+            pol_know5 = case_when(
+                kp2_3430c %in% c("nicht teilgenommen", 
+                                 "Interview abgebrochen") ~ NA_integer_, 
+                grepl("\\*", kp2_3430c) ~ 1, 
+                TRUE ~ 0
+            ), 
+            pol_know6 = case_when(
+                kp2_3430l %in% c("nicht teilgenommen", 
+                                 "Interview abgebrochen") ~ NA_integer_, 
+                grepl("\\*", kp2_3430l) ~ 1, 
+                TRUE ~ 0
+            ), 
+            pol_know7 = case_when(
+                kp2_3430p %in% c("nicht teilgenommen", 
+                                 "Interview abgebrochen") ~ NA_integer_, 
+                grepl("\\*", kp2_3430p) ~ 1, 
+                TRUE ~ 0
+            ), 
+            pol_know8 = case_when(
+                kp2_3430m %in% c("nicht teilgenommen", 
+                                 "Interview abgebrochen") ~ NA_integer_, 
+                grepl("\\*", kp2_3430m) ~ 1, 
+                TRUE ~ 0
+            ), 
+            pol_know9 = case_when(
+                kp2_3430r %in% c("nicht teilgenommen", 
+                                 "Interview abgebrochen") ~ NA_integer_, 
+                grepl("\\*", kp2_3430r) ~ 1, 
+                TRUE ~ 0
+            ), 
+            pol_know10 = case_when(
+                kp2_3440 %in% c("nicht teilgenommen", 
+                                 "Interview abgebrochen") ~ NA_integer_, 
+                grepl("\\*", kp2_3440) ~ 1, 
+                TRUE ~ 0
+            ), 
+            pol_know = rowSums(across(matches("pol_know[0-9]+"))), 
+            pol_knowledge_pct = (pol_know / 10) * 100
         )
   ),
   
