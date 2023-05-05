@@ -1,11 +1,11 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
 add_suffix|function|419ba647970dbe6c|||||||||||||||
-all_panels|stem|143636135d63e815|fb30e6d7985791ba|ef42e058b141017e|136737702||t19479.7590607173s|b4b1af512e872eb7|112743|rds|local|vector|||0.043||
+all_panels|stem|26721b23396f7705|cffca446fb943f46|d3e68d53d8fbb337|136737702||t19481.5336460431s|2c592b0ed79179e7|113719|rds|local|vector|||0.026||
 cbook_cz_96_post|stem|c6fea57320b57fe0|75b0af0f5f8abf1f|44ec0cd02c63fc46|-2140438487||t19459.6149639092s|345bc8a01e72b42f|3130|rds|local|vector|||0.023||
 cbook_cz_96_post_file|stem|a1997e72ccd4b04d|1ecbea0df8dc1704|dcb66fb0508c419b|-1434508316||t19453.4622239237s|2247cb837b5b96db|124|rds|local|vector|||0.008||
 cbook_cz_96_pre|stem|5ec62fdb2205e7b6|e68aa194d5f43665|df2a65f2c1e90cd1|1082649608||t19459.6149659557s|6a104a36980acf98|1320|rds|local|vector|||0.007||
 cbook_cz_96_pre_file|stem|592ddf2dde7e4993|f6132d093a203ed5|3dfa8d94728d5cc5|-1661415879||t19453.4622440077s|24d52ebf1535bba2|123|rds|local|vector|||0.003||
-cz_1996|stem|e4a7395028b5463f|2d8ae541379fd678|9a3fcb0ceb93c241|-1765088649||t19473.4770167061s|dd5b18b5d9cc36fd|326983|rds|local|vector|||0.036||
+cz_1996|stem|d4cd438094999f98|e9bf4fead55dc2d8|da6ae2bad30da264|-1765088649||t19481.533640851s|c0db45cd7dcee308|328021|rds|local|vector|||0.049||
 cz_1996_final|stem|ec9be5534e3fcf1f|3f6ee122e6df257a|00ec91088e6f10a2|900923272||t19468.5553828287s|b42663120c0dc9c1|326604|rds|local|vector|||0.049||
 cz_96_final|stem|4cee3d3ad2510c25|c01e8258cf6971fb|3755cab0d5abcc3a|1682770841||t19468.4983173415s|64301caf38caf595|326591|rds|local|vector|||0.049||
 cz_96_merged|stem|2232bcf89c2d75b6|dd5105da8ed5a345|97139bc3b89d489e|1984540019||t19454.8585328468s|badda8d461e9213d|316688|rds|local|vector|||0.041||
@@ -50,4 +50,4 @@ ro_2012_p2|stem|cf912be3e9eaa1e7|de75298af3b431c3|d9c11b95a36f19e9|112656273||t1
 ro_2012_p2_final|stem|1c89caf209b159b0|78b9948661175daa|9a69d5e1e0152fc2|2046540839||t19473.3643565174s|886ab9188efc298a|660545|rds|local|vector|||0.336|1m22mThere was 1 warning in mutate.1m22m36mℹ39m In argument age  as.numericas.characterage_w2.Caused by warning33m39m NAs introduced by coercion|
 ro_2012_p2v1|stem|e176f106d2d2b865|59a8f548699491ae|a9d95ab2b1ed64ff|1038652231||t19460.7022158499s|735e749bf885427c|382271|rds|local|vector|||0.189||
 ro_2012_p2v2|stem|c7c0fff3e3845112|822a15e59a337060|a9d95ab2b1ed64ff|-1246035250||t19460.7022185896s|bec9540c87464770|343129|rds|local|vector|||0.154||
-swd_rmd|stem|85095d431261b582|a678f859a3bab312|a8279fbdeb7170eb|-127931443|swd.html*swd.Rmd|t19479.7640041817s|a74c65bb36f40e8d|1634944|file|local|vector|||14.075||
+swd_rmd|stem|d6d08ed8f8507659|a678f859a3bab312|2bffb88e68460e1e|-127931443|swd.html*swd.Rmd|t19481.5951609386s|32a775778d141ce1|1578594|file|local|vector|||8.191||

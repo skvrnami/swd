@@ -16,6 +16,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 library(dplyr)
 library(targets)
 library(sjPlot)
+library(modelsummary)
 
 ```
 
@@ -83,6 +84,7 @@ library(sjPlot)
     - Which party do the following politicians belong to? (6 questions in total)
     - What is the current unemployment rate in Germany? (4, 6, 8, 10 percent, don't know)
 
+## Party close
 
 ## Voting as a civic duty
 - DE 2017: 5-point scale: "Please state to what extent you agree or disagree with each statement: l)  In a democracy, it is the duty of all citizens to vote regularly in elections." (strongly disagree, disagree, neither agree nor disagree, agree, strongly agree)
@@ -118,20 +120,19 @@ tar_load(all_panels)
 
 ## H1
 ```{r}
-lm1_1 <- glm(voted ~ swd_pre + age + I(age^2) + female +
-                 postsecondary_edu + factor(election), 
+lm1_1 <- glm(voted ~ swd_pre + factor(election), 
              data = all_panels)
 
-lm1_2 <- glm(voted ~ swd_pre + age + I(age^2) + female + 
-                 postsecondary_edu +
-                 party_close + 
-                 factor(election), data = all_panels)
+# lm1_2 <- glm(voted ~ swd_pre + age + I(age^2) + female + 
+#                  postsecondary_edu +
+#                  party_close + 
+                 # factor(election), data = all_panels)
 
-lm1_3 <- glm(voted ~ swd_pre + age + I(age^2) + female + 
-                 postsecondary_edu +
-                 pol_knowledge_pct + 
-                 party_close + 
-                 factor(election), data = all_panels)
+# lm1_3 <- glm(voted ~ swd_pre + age + I(age^2) + female + 
+#                  postsecondary_edu +
+#                  pol_knowledge_pct + 
+#                  party_close + 
+#                  factor(election), data = all_panels)
 
 lm1_4 <- glm(voted ~ swd_pre + age + I(age^2) + female + 
                  postsecondary_edu +
@@ -139,15 +140,41 @@ lm1_4 <- glm(voted ~ swd_pre + age + I(age^2) + female +
                  party_close + 
                  factor(election), data = all_panels)
 
-tab_model(list(lm1_1, lm1_2, lm1_3, lm1_4))
+create_fe_row <- function(coefs, n_models = 2){
+    new_rows <- tibble(
+        term = "Election FE", 
+        models = rep("Yes", times = n_models),
+        name = paste0("Model ", 1:n_models)
+    ) %>% tidyr::pivot_wider(., id_cols = "term", 
+                             names_from = name, values_from = models)
+    
+    attr(new_rows, "position") <- (length(coefs) * 2) + 1
+    new_rows
+}
+
+coefs1 <- c(
+    "(Intercept)"="(Intercept)", 
+    "swd_pre"="Satisfaction w/ democracy (pre-election wave)", 
+    "age" = "Age", 
+    "I(age^2)" = "Age (squared)", 
+    "female" = "Female", 
+    "postsecondary_edu" = "Postsecondary education", 
+    "pol_interest_num" = "Political interest",
+    "party_close" = "Close to a party"
+)
+# tab_model(list(lm1_1, lm1_4))
+new_rows <- create_fe_row(coefs1, 2)
+
+modelsummary(
+    list(lm1_1, lm1_4), 
+    coef_map = coefs1, 
+    add_rows = new_rows, 
+    fmt = 2, stars = TRUE
+)
 ```
 
 ## H2
 ```{r}
-lm2_1 <- glm(voted ~ swd_pre + age + I(age^2) + female +
-                 postsecondary_edu + factor(election), 
-             data = all_panels)
-
 lm2_2 <- glm(voted ~ swd_post + age + I(age^2) + female + 
                  postsecondary_edu +
                  party_close + 
@@ -155,11 +182,23 @@ lm2_2 <- glm(voted ~ swd_post + age + I(age^2) + female +
 
 lm2_3 <- glm(voted ~ swd_post + swd_pre + age + I(age^2) + female + 
                  postsecondary_edu +
-                 pol_knowledge_pct + 
+                 pol_interest_num + 
                  party_close + 
                  factor(election), data = all_panels)
 
-tab_model(list(lm2_1, lm2_2, lm2_3))
+coefs2 <- c(
+    "(Intercept)"="(Intercept)", 
+    "swd_post"="Satisfaction w/ democracy (post-election wave)", 
+    "age" = "Age", 
+    "I(age^2)" = "Age (squared)", 
+    "female" = "Female", 
+    "postsecondary_edu" = "Postsecondary education", 
+    "pol_interest_num" = "Political interest", 
+    "party_close" = "Close to a party"
+)
+new_rows <- create_fe_row(coefs2, 2)
+
+modelsummary(list(lm2_2, lm2_3), coef_map = coefs2, add_rows = new_rows, fmt = 2, stars = TRUE)
 ```
 
 ## H3
@@ -175,30 +214,59 @@ lm3_2 <- lm(swd_diff ~ voted + swd_pre + age + I(age^2) + female +
                  pol_interest_num + 
                  factor(election), data = all_panels)
 
-lm3_3 <- lm(swd_diff ~ voted + swd_pre + age + I(age^2) + female + 
-                 postsecondary_edu +
-                 party_close + 
-                 pol_knowledge_pct + 
-                 factor(election), data = all_panels)
+# lm3_3 <- lm(swd_diff ~ voted + swd_pre + age + I(age^2) + female + 
+#                  postsecondary_edu +
+#                  party_close + 
+#                  pol_knowledge_pct + 
+#                  factor(election), data = all_panels)
 
+coefs3 <- c(
+    "(Intercept)"="(Intercept)", 
+    "voted" = "Voted in the election",
+    "swd_pre"="Satisfaction w/ democracy (pre-election wave)", 
+    "age" = "Age", 
+    "I(age^2)" = "Age (squared)", 
+    "female" = "Female", 
+    "postsecondary_edu" = "Postsecondary education", 
+    "party_close" = "Close to a party",
+    "pol_interest_num" = "Political interest"
+)
+new_rows3 <- create_fe_row(coefs3, 2)
 
-tab_model(list(lm3_1, lm3_2, lm3_3))
+modelsummary(list(lm3_1, lm3_2), coef_map = coefs3, add_rows = new_rows3, fmt = 2, stars = TRUE)
 ```
 
 ## H4
+
+Data only from Romanian presidential election, no fixed effects.
 ```{r}
 lm4_1 <- lm(swd_diff ~ candidate_qualified_2nd + swd_pre + 
                 age + I(age^2) + female + 
                 postsecondary_edu +
-                party_close, 
+                party_close + pol_interest_num, 
                data = all_panels)
 lm4_2 <- lm(swd_diff ~ candidate_qualified_2nd + winner + swd_pre + 
                 age + I(age^2) + female + 
                 postsecondary_edu +
-                party_close, 
+                party_close + pol_interest_num, 
                data = all_panels)
 
-tab_model(list(lm4_1, lm4_2))
+coefs4 <- c(
+    "(Intercept)"="(Intercept)", 
+    "candidate_qualified_2nd" = "Preferred candidate qualified to 2nd round",
+    "winner" = "Preferred candidate won election",
+    "swd_pre"="Satisfaction w/ democracy (pre-election wave)", 
+    "age" = "Age", 
+    "I(age^2)" = "Age (squared)", 
+    "female" = "Female", 
+    "postsecondary_edu" = "Postsecondary education", 
+    "party_close" = "Close to a party",
+    "pol_interest_num" = "Political interest"
+)
+# new_rows4 <- create_fe_row(coefs4, 2)
+
+modelsummary(list(lm4_1, lm4_2), coef_map = coefs4, fmt = 2, stars = TRUE)
+
 ```
 
 ## H5
@@ -207,22 +275,41 @@ lm5_0 <- lm(swd_diff ~ winner + stable_voter + swd_pre +
                 age + I(age^2) + female + 
                 postsecondary_edu +
                 party_close + 
+                pol_interest_num + 
                 factor(election), 
             data = all_panels)
 lm5_1 <- lm(swd_diff ~ winner * stable_voter + swd_pre + 
                 age + I(age^2) + female + 
                 postsecondary_edu +
                 party_close + 
+                pol_interest_num + 
                 factor(election), 
             data = all_panels)
 lm5_2 <- lm(swd_diff ~ winner * stable_intention + swd_pre + 
                 age + I(age^2) + female + 
                 postsecondary_edu +
                 party_close + 
+                pol_interest_num + 
                 factor(election), 
             data = all_panels)
 
-tab_model(list(lm5_0, lm5_1, lm5_2))
+coefs5 <- c(
+    "(Intercept)"="(Intercept)", 
+    "winner" = "Preferred candidate/party won",
+    "stable_voter" = "Stable voter (prev. national election)",
+    "stable_intention" = "Stable vote intention (wrt pre-election wave)",
+    "swd_pre"="Satisfaction w/ democracy (pre-election wave)", 
+    "age" = "Age", 
+    "I(age^2)" = "Age (squared)", 
+    "female" = "Female", 
+    "postsecondary_edu" = "Postsecondary education", 
+    "party_close" = "Close to a party",
+    "pol_interest_num" = "Political interest"
+)
+new_rows5 <- create_fe_row(coefs5, 3)
+
+modelsummary(list(lm5_0, lm5_1, lm5_2), coef_map = coefs5, 
+             add_rows = new_rows5, fmt = 2, stars = TRUE)
 ```
 
 # Czech Republic, parliamentary election 1996
@@ -238,7 +325,7 @@ cz_lm1_1 <- glm(voted ~ swd_pre + age + I(age^2) + female +
              data = cz_1996)
 cz_lm1_2 <- glm(voted ~ swd_pre + age + I(age^2) + female + 
                  postsecondary_edu +
-                 pol_knowledge + party_close, data = cz_1996)
+                 pol_interest_num + party_close, data = cz_1996)
 
 tab_model(list(cz_lm1_1, cz_lm1_2))
 ```

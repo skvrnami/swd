@@ -137,6 +137,14 @@ list(
           !is.na(r_education_w2) ~ as.numeric(r_education_w2 == "post-secondary")
         ),
         female = as.numeric(gender == "female"), 
+        V4_w2 = as_factor(V4_w2),
+        pol_interest_num = case_when(
+            V4_w2 == "DK,NA" ~ NA_integer_, 
+            V4_w2 == "A great deal" ~ 3L,
+            V4_w2 == "Some extent" ~ 2L,
+            V4_w2 == "Not much" ~ 1L, 
+            V4_w2 == "Not at all" ~ 0L
+        ),
         # correct answers to political knowledge questions
         pol_knowledge1 = as.numeric(V144_w2 == 5),
         pol_knowledge2 = as.numeric(V145_w2 == 1), 
@@ -932,7 +940,8 @@ list(
           cz_1996_norm <- cz_1996 %>% 
               select(any_of(common_vars)) %>% 
               mutate(election = "CZ 1996") %>% 
-              mutate(across(c("swd_pre", "swd_post"), normalize_scale), 
+              mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
+                            normalize_scale), 
                      swd_diff = swd_post - swd_pre)
           
           pl_2019_norm <- pl_2019 %>% 
