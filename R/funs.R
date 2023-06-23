@@ -61,7 +61,7 @@ recode_winners <- function(x, winners){
     )
 }
 
-normalize_scale <- function(x, base_multiplier = 10){
+normalize_scale <- function(x, base_multiplier = 1){
     minimum <- min(x, na.rm = TRUE)
     maximum <- max(x, na.rm = TRUE)
     

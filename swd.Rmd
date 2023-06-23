@@ -316,6 +316,14 @@ modelsummary(list(lm5_0, lm5_1, lm5_2), coef_map = coefs5,
 
 ```{r}
 tar_load(cz_1996)
+
+cz_1996 %>% 
+  select(swd_pre, swd_post) %>% 
+  table(., useNA = "always")
+
+mean(cz_1996$swd_pre, na.rm = TRUE)
+mean(cz_1996$swd_post, na.rm = TRUE)
+mean(cz_1996$swd_diff, na.rm = TRUE)
 ```
 
 ## H1
@@ -375,6 +383,14 @@ tab_model(list(cz_lm5_0b, cz_lm5_1b, cz_lm5_2b))
 # Romanian presidential election, 2009
 ```{r}
 tar_load(ro_2009_final)
+
+ro_2009_final %>% 
+  select(swd_pre, swd_post) %>% 
+  table(., useNA = "always")
+
+mean(ro_2009_final$swd_pre, na.rm = TRUE)
+mean(ro_2009_final$swd_post, na.rm = TRUE)
+mean(ro_2009_final$swd_diff, na.rm = TRUE)
 ```
 
 ## H1
@@ -432,6 +448,15 @@ tab_model(list(ro_lm5_0, ro_lm5_1))
 ```{r}
 tar_load(ro_2012_p1_final)
 tar_load(ro_2012_all)
+
+ro_2012_all %>% 
+  select(swd_pre, swd_post) %>% 
+  table(., useNA = "always")
+
+mean(ro_2012_all$swd_pre, na.rm = TRUE)
+mean(ro_2012_all$swd_post, na.rm = TRUE)
+mean(ro_2012_all$swd_diff_w2, na.rm = TRUE)
+
 ```
 
 ## H1
@@ -508,6 +533,14 @@ tab_model(list(ro2_lm5_0, ro2_lm5_1))
 
 ```{r}
 tar_load(pl_2019)
+
+pl_2019 %>% 
+  select(swd_pre, swd_post) %>% 
+  table(., useNA = "always")
+
+mean(pl_2019$swd_pre, na.rm = TRUE)
+mean(pl_2019$swd_post, na.rm = TRUE)
+mean(pl_2019$swd_diff, na.rm = TRUE)
 ```
 
 
@@ -566,6 +599,14 @@ tab_model(list(pl_lm5_0b, pl_lm5_1b))
 
 ```{r}
 tar_load(hu_2019)
+
+hu_2019 %>% 
+  select(swd_pre, swd_post) %>% 
+  table(., useNA = "always")
+
+mean(hu_2019$swd_pre, na.rm = TRUE)
+mean(hu_2019$swd_post, na.rm = TRUE)
+mean(hu_2019$swd_diff, na.rm = TRUE)
 ```
 
 
@@ -624,6 +665,14 @@ tab_model(list(hu_lm5_0b, hu_lm5_1b))
 
 ```{r}
 tar_load(de_2017_final)
+
+de_2017_final %>% 
+  select(swd_pre, swd_post) %>% 
+  table(., useNA = "always")
+
+mean(de_2017_final$swd_pre, na.rm = TRUE)
+mean(de_2017_final$swd_post, na.rm = TRUE)
+mean(de_2017_final$swd_diff, na.rm = TRUE)
 ```
 
 ## H1

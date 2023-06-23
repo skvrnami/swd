@@ -73,14 +73,14 @@ list(
           V29_w1 == 2 ~ 3, # Fairly satisfied
           V29_w1 == 3 ~ 2, # Not very satisfied 
           V29_w1 == 4 ~ 1, # Not satisfied at all
-          TRUE ~ V29_w1
+          TRUE ~ NA_integer_ # V29_w1
         ), 
         swd_post = case_when(
           V71_w2 == 1 ~ 4, # Very satisfied
           V71_w2 == 2 ~ 3, # Fairly satisfied
           V71_w2 == 3 ~ 2, # Not very satisfied 
           V71_w2 == 4 ~ 1, # Not satisfied at all
-          TRUE ~ V71_w2
+          TRUE ~ NA_integer_ # V71_w2
         ),
         swd_diff = swd_post - swd_pre, 
         vote_intention_w1 = as_factor(V13_w1), 
@@ -989,6 +989,13 @@ list(
               de_2017_norm
           )
       }
+  ),
+  
+  tar_target(
+    all_panels_data, command = {
+      all_panels
+      haven::write_sav(data = all_panels, path = "data/all_panels_merged.sav") 
+    }
   ),
   
   tar_render(
