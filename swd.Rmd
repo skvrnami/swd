@@ -23,6 +23,7 @@ library(modelsummary)
 # Variables
 ## Satisfaction with democracy
 - CZ 1996, 4-point scale: "Generally speaking, are you very satisfied, rather satisfied, rather dissatisfied or very dissatisfied with the way democracy functions in the Czech Republic?"  
+- CZ 2023, 11-point scale: "In general, how satisfied are you in the way democracy works in the country?"
 - RO 2009, 4-point scale: "In general, how satisfied are you in the way democracy works in Romania?" (Very satisfied, rather satisfied, rather dissatisfied, very dissatisfied)
 - RO 2012, 4-point scale: "In general, how satisfied are you in the way democracy works in Romania?"
 - PL + HU 2019, 11-point scale: "On the whole, how satisfied are you with the way democracy works in [COUNTRY NAME], where 0 means “not at all satisfied” and 10 means “completely satisfied”?"
@@ -31,6 +32,7 @@ library(modelsummary)
 ## Voter turnout
 - dummy variable, 1 = voted in the election, 0 = did not vote
 - DE 2017 - a combination of a variable from post-election survey (wave 8, question: "At the federal election on 24 September a lot of people did not manage to vote or did not participate in the election for other reasons. How about you?") and a option "I have already cast a postal vote" from question on vote intention from previous waves ("When elections are held a lot of people vote, others do not manage to vote or do not participate in elections for other reasons. How likely is it that you will vote in the federal election on 24 September 2017?"). People who answered that they casted a postal ballot were not asked the question on voter turnout in wave 8
+- CZ 2023 - voted in the 2nd round
 
 ## Stable voter
 - dummy variable, the respondent voted the same party as in previous national election
@@ -51,6 +53,7 @@ library(modelsummary)
 
 ## Political interest
 - CZ 1996: 4-point scale (Would you say that you are interested in politics?: "Very interested", "Fairly interested", "A little interested", "Not at all interested")
+- CZ 2023: 4-point scale
 - RO 2009: 4-point scale (How interested are you in politics in general?: "Very interested", "Fairly interested", "A little interested", "Not at all interested")
 - RO 2012: 4-point scale (How interested are you in politics in general?: "Very interested", "Fairly interested", "A little interested", "Not at all interested")
 - PL 2019: 4-point scale (Generally speaking, how interested are you in politics?: "Very interested", "Fairly interested", "A little interested", "Not at all interested")
@@ -62,6 +65,13 @@ library(modelsummary)
     - Can you tell me how many percent of votes has to gain a political party in our country in the elections in order to get into the Parliament? (open-ended)
     - Who was the last minister of transportation before the elections? (open-ended)
     - How many members has our Parliament? (open-ended)
+- CZ 2023: 6 questions
+    - Are MPs elected using PR or majoritarian electoral system?
+    - Is the President of the European Commission elected by the EU citizens?
+    - Czech Republic was officially established in 1989. True or False?
+    - The EU has currently 25 member states. True or False?
+    - Are regional councillors selected based on the results of regional elections. True or False?
+    - Canada is a permanent member of the UN Security Council. True or False?
 - RO 2009: 8 questions (true/false)
     - The President of Romania is elected for a period of 4 years.
     - A person can only be president of Romania only for two terms.
@@ -92,6 +102,7 @@ library(modelsummary)
 ## Winner
 - a respondent voted the party/candidate who won the election (the party with the largest vote share)
 - CZ 1996: 1 = voted ODS, 0 = did not vote ODS
+- CZ 2023: 1 = voted Petr Pavel
 - RO 2009: 1 = voted Traian Basescu
 - RO 2012: 1 = voted USL
 - PL 2019: 1 = voted PiS
@@ -104,6 +115,73 @@ library(modelsummary)
 ## Age
 - all data sets - numeric variable
 - in German data derived from year of birth, year of birth was capped at "1955 and before", in that case the year of birth was taken as 1955.
+
+# Presidential panels, descriptive stats
+
+## CZ 2023
+
+- 0-10 SWD scale
+```{r}
+tar_load(cz_2023)
+
+cz_2023 %>% 
+  group_by(winner_1r, winner_2r) %>% 
+  filter(!is.na(winner_1r), !is.na(winner_2r)) %>% 
+  summarise(across(matches("SWD_w[0-9]+"), ~mean(as.numeric(.x))), 
+              n = n(), 
+              .groups = "drop") %>% 
+  arrange(desc(winner_1r), desc(winner_2r)) %>% 
+  knitr::kable(., digits = 2)
+
+cz_2023 %>% 
+  group_by(winner_1r, winner_2r) %>% 
+  filter(!is.na(winner_1r), !is.na(winner_2r)) %>% 
+  mutate(vote_type = case_when(
+    winner_1r == "didn't vote" | winner_2r == "didn't vote" ~ "didn't vote (at least in one round)", 
+    TRUE ~ paste0(winner_1r, " + ", winner_2r)
+  )) %>% 
+  group_by(vote_type) %>% 
+  summarise(across(matches("SWD_w[0-9]+"), ~mean(as.numeric(.x))), 
+              n = n(), 
+              .groups = "drop") %>% 
+  arrange(desc(SWD_w4)) %>% 
+  knitr::kable(., digits = 2)
+
+```
+
+## RO 2009
+
+- 0-3 SWD scale. 
+- Basescu ultimately won, Geoana lost
+
+```{r}
+tar_load(ro_2009_final)
+
+ro_2009_final %>% 
+  group_by(winner_1r, winner_2r) %>% 
+  filter(!is.na(winner_1r), !is.na(winner_2r)) %>% 
+  summarise(across(matches("swd_w[0-9]+"), ~mean(.x, na.rm = TRUE)), 
+            n = n()) %>% 
+  knitr::kable(., digits = 2)
+
+ro_2009_final %>% 
+  group_by(winner_1r, winner_2r) %>% 
+  filter(!is.na(winner_1r), !is.na(winner_2r)) %>% 
+  mutate(vote_type = case_when(
+    winner_1r == "didn't vote" | winner_2r == "didn't vote" ~ "didn't vote (at least in one round)", 
+    TRUE ~ paste0(winner_1r, " + ", winner_2r)
+  )) %>% 
+  group_by(vote_type) %>% 
+  summarise(across(matches("swd_w[0-9]+"), ~mean(as.numeric(.x), na.rm = TRUE)), 
+              n = n(), 
+              .groups = "drop") %>% 
+  arrange(desc(swd_w3)) %>% 
+  knitr::kable(., digits = 2)
+
+
+
+```
+
 
 # Hypotheses from pre-analysis plan
 
@@ -118,10 +196,369 @@ library(modelsummary)
 tar_load(all_panels)
 ```
 
+## Dostupnost kontrolních proměnných
+```{r}
+all_panels %>% 
+  group_by(election) %>% 
+  summarise(across(c("female", "age", "postsecondary_edu", "pol_interest_num", 
+                     "pol_knowledge_pct", "party_close", "duty_to_vote"), 
+                   ~!all(is.na(.x)))) %>% 
+  knitr::kable()
+```
+
+
+## Chicken & Egg replication
+
+### Table 1
+```{r}
+
+ce1 <- glm(voted ~ swd_pre + swd_post + election, 
+           data = all_panels,
+           family = binomial(link = "logit"))
+ce2 <- glm(voted ~ swd_pre + female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close + 
+             election, 
+           data = all_panels, 
+           family = binomial(link = "logit"))
+ce3 <- glm(voted ~ swd_post + female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close + 
+             election, 
+           data = all_panels, 
+           family = binomial(link = "logit"))
+ce4 <- glm(voted ~ swd_pre + swd_post + 
+             female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + 
+             party_close + election, 
+           data = all_panels, 
+           family = binomial(link = "logit"))
+
+modelsummary(list(ce1, ce2, ce3, ce4), 
+             stars = TRUE)
+```
+
+```{r}
+ggeffects::ggpredict(ce3, "swd_post") %>% 
+  plot()
+```
+
+#### CZ 1996
+```{r}
+ce1_cz96 <- glm(voted ~ swd_pre + swd_post, 
+           data = all_panels %>% filter(election == "CZ 1996"),
+           family = binomial(link = "logit"))
+ce2_cz96 <- glm(voted ~ swd_pre + female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close, 
+           data = all_panels %>% filter(election == "CZ 1996"),
+           family = binomial(link = "logit"))
+ce3_cz96 <- glm(voted ~ swd_post + female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close, 
+           data = all_panels %>% filter(election == "CZ 1996"),
+           family = binomial(link = "logit"))
+ce4_cz96 <- glm(voted ~ swd_pre + swd_post + 
+             female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + 
+             party_close, 
+           data = all_panels %>% filter(election == "CZ 1996"),
+           family = binomial(link = "logit"))
+
+modelsummary(list(ce1_cz96, ce2_cz96, ce3_cz96, ce4_cz96), 
+             stars = TRUE)
+```
+
+#### CZ 2023
+```{r}
+ce1_cz23 <- glm(voted ~ swd_pre + swd_post, 
+           data = all_panels %>% filter(election == "CZ 2023"),
+           family = binomial(link = "logit"))
+ce2_cz23 <- glm(voted ~ swd_pre + female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close + 
+               duty_to_vote, 
+           data = all_panels %>% filter(election == "CZ 2023"),
+           family = binomial(link = "logit"))
+ce3_cz23 <- glm(voted ~ swd_post + female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close + 
+               duty_to_vote, 
+           data = all_panels %>% filter(election == "CZ 2023"),
+           family = binomial(link = "logit"))
+ce4_cz23 <- glm(voted ~ swd_pre + swd_post + 
+             female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + 
+             party_close + duty_to_vote, 
+           data = all_panels %>% filter(election == "CZ 2023"),
+           family = binomial(link = "logit"))
+
+modelsummary(list(ce1_cz23, ce2_cz23, ce3_cz23, ce4_cz23), 
+             stars = TRUE)
+```
+
+#### RO 2009
+```{r}
+ce1_ro09 <- glm(voted ~ swd_pre + swd_post, 
+           data = all_panels %>% filter(election == "RO 2009"),
+           family = binomial(link = "logit"))
+ce2_ro09 <- glm(voted ~ swd_pre + female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close, 
+           data = all_panels %>% filter(election == "RO 2009"),
+           family = binomial(link = "logit"))
+ce3_ro09 <- glm(voted ~ swd_post + female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close, 
+           data = all_panels %>% filter(election == "RO 2009"),
+           family = binomial(link = "logit"))
+ce4_ro09 <- glm(voted ~ swd_pre + swd_post + 
+             female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + 
+             party_close, 
+           data = all_panels %>% filter(election == "RO 2009"),
+           family = binomial(link = "logit"))
+
+modelsummary(list(ce1_ro09, 
+                  ce2_ro09, 
+                  ce3_ro09, 
+                  ce4_ro09), 
+             stars = TRUE)
+```
+
+#### RO 2012
+```{r}
+ce1_ro12 <- glm(voted ~ swd_pre + swd_post, 
+           data = all_panels %>% filter(election == "RO 2012"),
+           family = binomial(link = "logit"))
+ce2_ro12 <- glm(voted ~ swd_pre + female + age + postsecondary_edu + 
+             pol_interest_num + party_close, 
+           data = all_panels %>% filter(election == "RO 2012"),
+           family = binomial(link = "logit"))
+ce3_ro12 <- glm(voted ~ swd_post + female + age + postsecondary_edu + 
+             pol_interest_num + party_close, 
+           data = all_panels %>% filter(election == "RO 2012"),
+           family = binomial(link = "logit"))
+ce4_ro12 <- glm(voted ~ swd_pre + swd_post + 
+             female + age + postsecondary_edu + 
+             pol_interest_num + 
+             party_close, 
+           data = all_panels %>% filter(election == "RO 2012"),
+           family = binomial(link = "logit"))
+
+modelsummary(list(ce1_ro12, 
+                  ce2_ro12, 
+                  ce3_ro12, 
+                  ce4_ro12), 
+             stars = TRUE)
+```
+
+#### PL 2019
+```{r}
+ce1_pl19 <- glm(voted ~ swd_pre + swd_post, 
+           data = all_panels %>% filter(election == "PL 2019"),
+           family = binomial(link = "logit"))
+ce2_pl19 <- glm(voted ~ swd_pre + female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close, 
+           data = all_panels %>% filter(election == "PL 2019"),
+           family = binomial(link = "logit"))
+ce3_pl19 <- glm(voted ~ swd_post + female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close, 
+           data = all_panels %>% filter(election == "PL 2019"),
+           family = binomial(link = "logit"))
+ce4_pl19 <- glm(voted ~ swd_pre + swd_post + 
+             female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + 
+             party_close, 
+           data = all_panels %>% filter(election == "PL 2019"),
+           family = binomial(link = "logit"))
+
+modelsummary(list(ce1_pl19, 
+                  ce2_pl19, 
+                  ce3_pl19, 
+                  ce4_pl19), 
+             stars = TRUE)
+```
+
+#### HU 2019
+```{r}
+ce1_hu19 <- glm(voted ~ swd_pre + swd_post, 
+           data = all_panels %>% filter(election == "HU 2019"),
+           family = binomial(link = "logit"))
+ce2_hu19 <- glm(voted ~ swd_pre + female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close, 
+           data = all_panels %>% filter(election == "HU 2019"),
+           family = binomial(link = "logit"))
+ce3_hu19 <- glm(voted ~ swd_post + female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close, 
+           data = all_panels %>% filter(election == "HU 2019"),
+           family = binomial(link = "logit"))
+ce4_hu19 <- glm(voted ~ swd_pre + swd_post + 
+             female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + 
+             party_close, 
+           data = all_panels %>% filter(election == "HU 2019"),
+           family = binomial(link = "logit"))
+
+modelsummary(list(ce1_hu19, 
+                  ce2_hu19, 
+                  ce3_hu19, 
+                  ce4_hu19), 
+             stars = TRUE)
+```
+
+#### DE 2017
+```{r}
+ce1_de17 <- glm(voted ~ swd_pre + swd_post, 
+           data = all_panels %>% filter(election == "DE (Ost) 2017"),
+           family = binomial(link = "logit"))
+ce2_de17 <- glm(voted ~ swd_pre + female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close, 
+           data = all_panels %>% filter(election == "DE (Ost) 2017"),
+           family = binomial(link = "logit"))
+ce3_de17 <- glm(voted ~ swd_post + female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close, 
+           data = all_panels %>% filter(election == "DE (Ost) 2017"),
+           family = binomial(link = "logit"))
+ce4_de17 <- glm(voted ~ swd_pre + swd_post + 
+             female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + 
+             party_close, 
+           data = all_panels %>% filter(election == "DE (Ost) 2017"),
+           family = binomial(link = "logit"))
+
+modelsummary(list(ce1_de17, 
+                  ce2_de17, 
+                  ce3_de17, 
+                  ce4_de17), 
+             stars = TRUE)
+```
+
+### Table 2
+#### All panels
+```{r}
+ce1b <- lm(swd_diff ~ voted + swd_pre + female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close + 
+             election, data = all_panels)
+ce2b <- lm(swd_diff ~ voted * election_type + swd_pre + female + age +
+             postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close + 
+             election, data = all_panels)
+ce3b <- lm(swd_diff ~ voter_type + swd_pre + female + age +
+             postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close + 
+             election, data = all_panels)
+ce4b <- lm(swd_diff ~ voter_type * election_type + swd_pre + female + age +
+             postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close + 
+             election, data = all_panels)
+ce5b <- lm(swd_diff ~ prez_vote_type + swd_pre + female + age +
+             postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close + 
+             election, data = all_panels %>% filter(!is.na(winner_1r) & !is.na(winner_2r)))
+
+modelsummary(list(ce1b, ce2b, ce3b, ce4b, ce5b), stars = TRUE)
+
+
+ggeffects::ggpredict(ce2b, c("election_type", "voted")) %>% plot()
+ggeffects::ggpredict(ce4b, c("election_type", "voter_type")) %>% plot()
+```
+
+#### CZ 1996
+```{r}
+ce1b_cz96 <- lm(swd_diff ~ voted + swd_pre + female + age + 
+                  postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close, 
+             data = all_panels %>% filter(election == "CZ 1996"))
+ce2b_cz96 <- lm(swd_diff ~ voter_type + swd_pre + female + age + 
+                  postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close, 
+             data = all_panels %>% filter(election == "CZ 1996"))
+modelsummary(list(ce1b_cz96, ce2b_cz96), stars = TRUE)
+```
+
+#### CZ 2023
+```{r}
+ce1b_cz23 <- lm(swd_diff ~ voted + swd_pre + female + age + 
+                  postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close + 
+             duty_to_vote, 
+           data = all_panels %>% filter(election == "CZ 2023"))
+ce2b_cz23 <- lm(swd_diff ~ voter_type + swd_pre + female + age + 
+                  postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close + 
+             duty_to_vote, 
+           data = all_panels %>% filter(election == "CZ 2023"))
+modelsummary(list(ce1b_cz23, ce2b_cz23), stars = TRUE)
+```
+
+#### RO 2009
+```{r}
+ce1b_ro09 <- lm(swd_diff ~ voted + swd_pre + female + age + 
+                  postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close, 
+           data = all_panels %>% filter(election == "RO 2009"))
+ce2b_ro09 <- lm(swd_diff ~ voter_type + swd_pre + female + age + 
+                  postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close, 
+           data = all_panels %>% filter(election == "RO 2009"))
+modelsummary(list(ce1b_ro09, ce2b_ro09), stars = TRUE)
+```
+
+#### RO 2012
+```{r}
+ce1b_ro12 <- lm(swd_diff ~ voted + swd_pre + female + age + 
+                  postsecondary_edu + 
+             pol_interest_num + party_close, 
+           data = all_panels %>% filter(election == "RO 2012"))
+ce2b_ro12 <- lm(swd_diff ~ voter_type + swd_pre + female + age + 
+                  postsecondary_edu + 
+             pol_interest_num + party_close, 
+           data = all_panels %>% filter(election == "RO 2012"))
+
+modelsummary(list(ce1b_ro12, ce2b_ro12), stars = TRUE)
+```
+
+#### PL 2019
+```{r}
+ce1b_pl19 <- lm(swd_diff ~ voted + swd_pre + female + age + 
+                  postsecondary_edu + pol_interest_num + 
+                  pol_knowledge_pct + party_close, 
+           data = all_panels %>% filter(election == "PL 2019"))
+ce2b_pl19 <- lm(swd_diff ~ voter_type + swd_pre + female + age + 
+                  postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close, 
+           data = all_panels %>% filter(election == "PL 2019"))
+modelsummary(list(ce1b_pl19, ce2b_pl19), stars = TRUE)
+
+```
+
+#### HU 2019
+```{r}
+ce1b_hu19 <- lm(swd_diff ~ voted + swd_pre + female + age + 
+                  postsecondary_edu + pol_interest_num + 
+                  pol_knowledge_pct + party_close, 
+           data = all_panels %>% filter(election == "HU 2019"))
+ce2b_hu19 <- lm(swd_diff ~ voter_type + swd_pre + female + age + 
+                  postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close, 
+           data = all_panels %>% filter(election == "HU 2019"))
+modelsummary(list(ce1b_hu19, ce2b_hu19), stars = TRUE)
+
+```
+
+#### DE 2017
+```{r}
+ce1b_de17 <- lm(swd_diff ~ voted + swd_pre + female + age + 
+                  postsecondary_edu + pol_interest_num + 
+                  pol_knowledge_pct + party_close, 
+           data = all_panels %>% filter(election == "DE (Ost) 2017"))
+ce2b_de17 <- lm(swd_diff ~ voter_type + swd_pre + female + age + 
+                  postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close, 
+           data = all_panels %>% filter(election == "DE (Ost) 2017"))
+modelsummary(list(ce1b_de17, ce2b_de17), stars = TRUE)
+
+```
+
+
 ## H1
 ```{r}
 lm1_1 <- glm(voted ~ swd_pre + factor(election), 
-             data = all_panels)
+             data = all_panels, 
+             family = binomial(link = "logit"))
 
 # lm1_2 <- glm(voted ~ swd_pre + age + I(age^2) + female + 
 #                  postsecondary_edu +
@@ -138,7 +575,8 @@ lm1_4 <- glm(voted ~ swd_pre + age + I(age^2) + female +
                  postsecondary_edu +
                  pol_interest_num + 
                  party_close + 
-                 factor(election), data = all_panels)
+                 factor(election), data = all_panels, 
+             family = binomial(link = "logit"))
 
 create_fe_row <- function(coefs, n_models = 2){
     new_rows <- tibble(
@@ -380,6 +818,72 @@ cz_lm5_2b <- lm(swd_diff ~ winner_government * stable_intention + swd_pre,
 tab_model(list(cz_lm5_0b, cz_lm5_1b, cz_lm5_2b))
 ```
 
+# Czech Republic, 2023 presidential election
+```{r}
+tar_load(cz_2023)
+
+cz_2023 %>% 
+  select(swd_pre, swd_post) %>% 
+  table(., useNA = "always")
+
+mean(cz_2023$swd_pre, na.rm = TRUE)
+mean(cz_2023$swd_post, na.rm = TRUE)
+mean(cz_2023$swd_diff, na.rm = TRUE)
+```
+
+## H1
+```{r}
+cz_lm1_1 <- glm(voted ~ SWD_w2 + age + I(age^2) + female + postsecondary_edu, 
+                data = cz_2023)
+cz_lm1_2 <- glm(voted ~ SWD_w2 + age + I(age^2) + female + postsecondary_edu + 
+                    pol_knowledge_pct + pol_interest_num + party_close, 
+                data = cz_2023)
+
+tab_model(list(cz_lm1_1, cz_lm1_2))
+```
+
+## H2
+```{r}
+
+cz_lm2_1 <- glm(voted ~ SWD_w2, data = cz_2023)
+cz_lm2_2 <- glm(voted ~ SWD_w4, data = cz_2023)
+cz_lm2_3 <- glm(voted ~ SWD_w2 + SWD_w4, data = cz_2023)
+
+tab_model(list(cz_lm2_1, cz_lm2_2, cz_lm2_3))
+
+```
+
+## H3
+```{r}
+cz_lm3_1 <- lm(swd_diff ~ voted, data = cz_2023)
+cz_lm3_2 <- lm(swd_diff ~ voted + SWD_w1, data = cz_2023)
+
+tab_model(list(cz_lm3_1, cz_lm3_2))
+```
+
+## H4
+```{r}
+cz_lm4_1 <- lm(swd_diff ~ candidate_qualified_2nd + SWD_w2, 
+               data = cz_2023)
+cz_lm4_2 <- lm(swd_diff ~ candidate_qualified_2nd + winner + SWD_w2, 
+               data = cz_2023)
+
+tab_model(list(cz_lm4_1, cz_lm4_2))
+```
+
+## H5
+```{r}
+# same_candidate_in_2r
+cz_lm5_0 <- lm(swd_diff ~ winner + stable_voter + SWD_w2,
+            data = cz_2023)
+# cz_lm5_1 <- lm(swd_diff ~ winner * stable_voter + SWD_w1,
+#             data = cz_2023)
+
+tab_model(list(cz_lm5_0 #, cz_lm5_1
+               ))
+```
+
+
 # Romanian presidential election, 2009
 ```{r}
 tar_load(ro_2009_final)
@@ -395,9 +899,9 @@ mean(ro_2009_final$swd_diff, na.rm = TRUE)
 
 ## H1
 ```{r}
-ro_lm1_1 <- glm(voted_2r ~ swd_w1 + age + I(age^2) + female + postsecondary_edu, 
+ro_lm1_1 <- glm(voted ~ swd_w1 + age + I(age^2) + female + postsecondary_edu, 
                 data = ro_2009_final)
-ro_lm1_2 <- glm(voted_2r ~ swd_w1 + age + I(age^2) + female + postsecondary_edu + 
+ro_lm1_2 <- glm(voted ~ swd_w1 + age + I(age^2) + female + postsecondary_edu + 
                     pol_knowledge + pol_interest_num + party_close, 
                 data = ro_2009_final)
 
@@ -407,9 +911,9 @@ tab_model(list(ro_lm1_1, ro_lm1_2))
 ## H2
 ```{r}
 
-ro_lm2_1 <- glm(voted_2r ~ swd_w1, data = ro_2009_final)
-ro_lm2_2 <- glm(voted_2r ~ swd_w3, data = ro_2009_final)
-ro_lm2_3 <- glm(voted_2r ~ swd_w1 + swd_w3, data = ro_2009_final)
+ro_lm2_1 <- glm(voted ~ swd_w1, data = ro_2009_final)
+ro_lm2_2 <- glm(voted ~ swd_w3, data = ro_2009_final)
+ro_lm2_3 <- glm(voted ~ swd_w1 + swd_w3, data = ro_2009_final)
 
 tab_model(list(ro_lm2_1, ro_lm2_2, ro_lm2_3))
 
@@ -417,8 +921,8 @@ tab_model(list(ro_lm2_1, ro_lm2_2, ro_lm2_3))
 
 ## H3
 ```{r}
-ro_lm3_1 <- lm(swd_diff ~ voted_2r, data = ro_2009_final)
-ro_lm3_2 <- lm(swd_diff ~ voted_2r + swd_w1, data = ro_2009_final)
+ro_lm3_1 <- lm(swd_diff ~ voted, data = ro_2009_final)
+ro_lm3_2 <- lm(swd_diff ~ voted + swd_w1, data = ro_2009_final)
 
 tab_model(list(ro_lm3_1, ro_lm3_2))
 ```

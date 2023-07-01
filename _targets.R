@@ -159,6 +159,68 @@ list(
                           swd_post = "Satisfaction with democracy (post-election wave)")
   ), 
   
+  # CZ 2023 -----------------------------------------------
+  tar_target(
+    cz_2023, 
+    
+    readRDS(here("data", "CZ_2023", "wide_w1_w4_v02.rds")) %>% 
+      mutate(across(starts_with("SWD"), as.numeric)) %>% 
+      as_factor() %>% 
+      mutate(
+        swd_diff = SWD_w4 - SWD_w2,
+        winner_1r = case_when(
+          PRES2023CAND1r_w3 == "Petr Pavel" ~ "winner", 
+          PRES2023CAND1r_w3 == "Andrej Babiš" ~ "qualified to 2nd round",
+          PRES2023CAND1r_w3 == "nevolič" ~ "didn't vote", 
+          !is.na(PRES2023CAND1r_w3) ~ "loser"
+        ), 
+        winner_2r = case_when(
+          PRES2023CAND2r_w4 == "Petr Pavel" ~ "winner", 
+          PRES2023CAND2r_w4 == "Andrej Babiš" ~ "loser", 
+          PRES2023CAND2r_w4 == "nevolič" ~ "didn't vote"
+        ), 
+        voted = as.numeric(
+          PRES2023CAND2r_w4 != "nevolič"
+        ),
+        know_true1 = as.numeric(KNOW1_w4 == "poměrného"), 
+        know_true2 = as.numeric(KNOW2_w4 == "ne"), 
+        know_true3 = as.numeric(KNOW3_w4 == "nepravdivé"),
+        know_true4 = as.numeric(KNOW4_w4 == "nepravdivé"), 
+        know_true5 = as.numeric(KNOW5_w4 == "pravdivé"), 
+        know_true6 = as.numeric(KNOW6_w4 == "nepravdivé"),
+        pol_knowledge_pct = (rowSums(across(matches("know_true[1-6]+"))) / 6) * 100, 
+        pol_interest_num = case_when(
+          POLINT_w1 == "Vůbec ne" ~ 0, 
+          POLINT_w1 == "Jen trochu" ~ 1, 
+          POLINT_w1 == "Docela" ~ 2, 
+          POLINT_w1 == "Velmi" ~ 3
+        ), 
+        postsecondary_edu = as.numeric(
+          EDU %in% c(
+            "Vyšší odborné", 
+            "VŠ do úrovně bakalářského včetně", 
+            "Vysokoškolské nad úroveň bakalářského")
+        ), 
+        winner = as.numeric(winner_2r == "winner"), 
+        stable_voter = as.numeric(as.character(PRES2023CAND1r_w3) == as.character(PRES2023CAND2r_w4) & 
+                                    PRES2023CAND1r_w3 == "nevolič"), 
+        duty_to_vote = as.numeric(CIVIC_w1 == "Občanská povinnost"), 
+        voted_1r = as.numeric(PRES2023CAND1r_w3 != "nevolič"), 
+        female = as.numeric(SEX_w1 == "Žena"), 
+        party_close = as.numeric(CLOSER_w1 == "Ano"), 
+        candidate_qualified_2nd = as.numeric(
+          PRES2023CAND2r_w4 %in% c("Petr Pavel", "Andrej Babiš")
+        ), 
+        swd_pre = SWD_w2, 
+        swd_post = SWD_w4
+      ) %>% 
+      rename(
+        age = AGE_w1
+      )
+      
+      
+  ),
+  
   # EU 2019 -----------------------------------------------
   tar_target(
     eu_2019, 
@@ -366,7 +428,7 @@ list(
         swd_pre = swd_w1, 
         swd_post = swd_w3,
         swd_diff = swd_w3 - swd_w1,
-        voted_2r = case_when(
+        voted = case_when(
           Q23XX == "Sunt sigur ca am votat" ~ 1, 
           Q23XX %in% c("Nu am votat la turul 2 al alegerilor prezidentiale din 6 dec", 
                        "M-am gandit sa votez de aceasta data, dar nu am votat", 
@@ -407,7 +469,20 @@ list(
        pol_interest_num = as.numeric(pol_interest_cat), 
        pol_knowledge = cun_pol1,
        pol_knowledge_pct = (pol_knowledge / 8) * 100, 
-       party_close = as.numeric(Q4 == "Da" | Q4A == "Da")
+       party_close = as.numeric(Q4 == "Da" | Q4A == "Da"), 
+       winner_1r = case_when(
+         Q21B == "Traian Basescu" ~ "winner", 
+         Q21B == "Mircea Geoana" ~ "qualified to 2nd round", 
+         Q21B %in% c("Crin Antonescu", "Sorin Oprescu", 
+                     "Corneliu Vadim Tudor", " Kelemen Hunor", 
+                     "George Becali", "Alt candidat") ~ "loser", 
+         Q21X != "Sunt sigur ca am votat" ~ "didn't vote"
+       ), 
+       winner_2r = case_when(
+         Q24B == "Traian Basescu" ~ "winner", 
+         Q24B == "Mircea Geoana" ~ "loser", 
+         Q23XX != "Sunt sigur ca am votat" ~ "didn't vote"
+       )
        )
   ),
   
@@ -935,7 +1010,8 @@ list(
                            "voted", "female", "vote_previous_nat_election", 
                            "vote_choice", "swd_pre", "swd_post", 
                            "pol_knowledge_pct", "pol_interest_num", 
-                           "party_close", "candidate_qualified_2nd")
+                           "party_close", "candidate_qualified_2nd", 
+                           "duty_to_vote", "winner_1r", "winner_2r")
           
           cz_1996_norm <- cz_1996 %>% 
               select(any_of(common_vars)) %>% 
@@ -959,7 +1035,6 @@ list(
                      swd_diff = swd_post - swd_pre)
           
           ro_2009_norm <- ro_2009_final %>% 
-              rename(voted = voted_2r) %>% 
               select(any_of(common_vars)) %>% 
               mutate(election = "RO 2009") %>% 
               mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
@@ -980,14 +1055,43 @@ list(
                             normalize_scale), 
                      swd_diff = swd_post - swd_pre)
           
+          cz_2023_norm <- cz_2023 %>% 
+            select(any_of(common_vars)) %>% 
+            mutate(election = "CZ 2023") %>% 
+            mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
+                          normalize_scale), 
+                   swd_diff = swd_post - swd_pre)
+          
           bind_rows(
               cz_1996_norm, 
               pl_2019_norm, 
               hu_2019_norm,
               ro_2009_norm, 
               ro_2012_norm, 
-              de_2017_norm
-          )
+              de_2017_norm, 
+              cz_2023_norm
+          ) %>% 
+            mutate(
+              pol_knowledge_pct = pol_knowledge_pct / 100, 
+              election = factor(election), 
+              election_type = case_when(
+                election %in% c("CZ 2023", "RO 2009") ~ "presidential", 
+                election %in% c("PL 2019", "HU 2019") ~ "EP election", 
+                TRUE ~ "parliamentary"
+              ) %>% factor(., levels = c("parliamentary", "presidential", 
+                                         "EP election")), 
+              nonvoter = 1 - voted, 
+              voter_type = case_when(
+                nonvoter == 1 ~ "Abstainer", 
+                winner == 0 ~ "Voted", 
+                winner == 1 ~ "Voted for winner"
+              ) %>% factor(., levels = c("Voted", "Abstainer", "Voted for winner")), 
+              prez_vote_type = 
+                case_when(
+                  winner_1r == "didn't vote" | winner_2r == "didn't vote" ~ "didn't vote (at least in one round)", 
+                  TRUE ~ paste0(winner_1r, " + ", winner_2r)
+                ) %>% factor()
+              )
       }
   ),
   
