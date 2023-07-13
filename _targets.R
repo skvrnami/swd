@@ -1105,5 +1105,10 @@ list(
   tar_render(
     swd_rmd, 
     "swd.Rmd"
+  ), 
+  
+  tar_render(
+    swd2_rmd, 
+    "swd2.Rmd"
   )
 )
