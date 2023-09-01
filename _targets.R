@@ -167,7 +167,8 @@ list(
       mutate(across(starts_with("SWD"), as.numeric)) %>% 
       as_factor() %>% 
       mutate(
-        swd_diff = SWD_w4 - SWD_w2,
+        # swd_diff = SWD_w4 - SWD_w2,
+        swd_diff = SWD_w4 - SWD_w1,
         winner_1r = case_when(
           PRES2023CAND1r_w3 == "Petr Pavel" ~ "winner", 
           PRES2023CAND1r_w3 == "Andrej Babiš" ~ "qualified to 2nd round",
@@ -181,6 +182,12 @@ list(
         ), 
         voted = as.numeric(
           PRES2023CAND2r_w4 != "nevolič"
+        ),
+        voted_1r = as.numeric(
+          PRES2023PART1_w3 == "Ano"
+        ),
+        voted_2r = as.numeric(
+          PRES2023PART2_w4 == "Ano"
         ),
         know_true1 = as.numeric(KNOW1_w4 == "poměrného"), 
         know_true2 = as.numeric(KNOW2_w4 == "ne"), 
@@ -207,18 +214,41 @@ list(
         duty_to_vote = as.numeric(CIVIC_w1 == "Občanská povinnost"), 
         voted_1r = as.numeric(PRES2023CAND1r_w3 != "nevolič"), 
         female = as.numeric(SEX_w1 == "Žena"), 
-        party_close = as.numeric(CLOSER_w1 == "Ano"), 
+        party_close = case_when(
+            PIDHAS_w1 == "Ano" ~ 1,
+            CLOSER_w1 == "Ano" ~ 1, 
+            TRUE ~ 0
+        ), 
         candidate_qualified_2nd = as.numeric(
           PRES2023CAND2r_w4 %in% c("Petr Pavel", "Andrej Babiš")
         ), 
-        swd_pre = SWD_w2, 
+        swd_pre = SWD_w1,
+        # swd_pre = SWD_w2,
         swd_post = SWD_w4
       ) %>% 
       rename(
         age = AGE_w1
-      )
-      
-      
+      ) 
+  ),
+  
+  tar_target(
+    cz_2023_models, {
+      cz_2023 %>% 
+        mutate(
+          pol_knowledge_pct = pol_knowledge_pct / 100, 
+          nonvoter = 1 - voted, 
+          voter_type = case_when(
+            nonvoter == 1 ~ "Abstainer", 
+            winner == 0 ~ "Voted", 
+            winner == 1 ~ "Voted for winner"
+          ) %>% factor(., levels = c("Voted", "Abstainer", "Voted for winner")), 
+          prez_vote_type = 
+            case_when(
+              winner_1r == "didn't vote" | winner_2r == "didn't vote" ~ "didn't vote (at least in one round)", 
+              TRUE ~ paste0(winner_1r, " + ", winner_2r)
+            ) %>% factor()
+        )
+    }
   ),
   
   # EU 2019 -----------------------------------------------
