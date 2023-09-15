@@ -298,6 +298,7 @@ modelsummary(list(ce1_all, ce2_all, ce3_all, ce4_all),
              ), 
              coef_omit = "election",
              add_rows = additional_rows,
+             output = "output/tab3_models.tex",
              title = "Turnout and satisfaction with democracy, all panels")
 ```
 
