@@ -210,7 +210,7 @@ list(
         ), 
         winner = as.numeric(winner_2r == "winner"), 
         stable_voter = as.numeric(as.character(PRES2023CAND1r_w3) == as.character(PRES2023CAND2r_w4) & 
-                                    PRES2023CAND1r_w3 == "nevolič"), 
+                                    PRES2023CAND1r_w3 != "nevolič"), 
         duty_to_vote = as.numeric(CIVIC_w1 == "Občanská povinnost"), 
         voted_1r = as.numeric(PRES2023CAND1r_w3 != "nevolič"), 
         female = as.numeric(SEX_w1 == "Žena"), 
@@ -249,6 +249,51 @@ list(
             ) %>% factor()
         )
     }
+  ),
+  
+  tar_target(
+    cz_2023_long, 
+    readRDS("data/CZ_2023/long_w1_w5.rds") %>% 
+      haven::as_factor() %>% 
+      mutate(SWD_num = (as.numeric(SWD) - 1) / 10, 
+             wave = as.factor(wave)) %>% 
+      group_by(RADIOMETER_ID2) %>% 
+      mutate(# SWD_wi = SWD_num - mean(SWD_num, na.rm = TRUE), 
+        # SWD_bw = mean(SWD_num),
+        winner = case_when(
+          any(PRES2023PART2 == "Ne") ~ "nevolič",
+          any(PRES2023CAND2r == "Petr Pavel") ~ "winner", 
+          TRUE ~ "loser"
+        ) %>% factor(., levels = c("nevolič", "winner", "loser")), 
+        n_waves = n(), 
+        psp2021 = zoo::na.locf(V20),
+        vote_gov = as.numeric(psp2021 %in% c("Koalice SPOLU (ODS, TOP09 a KDU-ČSL)", 
+                                             "Koalice Piráti a Starostové a nezávislí (STAN)")),
+        fst_round = zoo::na.locf(PRES2023CAND1r, na.rm = FALSE) %>% 
+          zoo::na.locf0(., fromLast = TRUE), 
+        fst_round_r = case_when(
+          fst_round %in% c("Karel Diviš", "Tomáš Zima", "Jaroslav Bašta") ~ "other", 
+          TRUE ~ fst_round
+        ), 
+        winner_1r = case_when(
+          fst_round == "Petr Pavel" ~ "winner", 
+          fst_round == "Andrej Babiš" ~ "qualified to 2nd round", 
+          TRUE ~ "loser"
+        ),
+        winner_cat = case_when(
+          fst_round == "nevolič" | winner == "nevolič" ~ "didn't vote (at least in one round)", 
+          TRUE ~ paste0(winner_1r, "+", winner)
+        ), 
+        winner_stable = case_when(
+          fst_round == "nevolič" & winner == "nevolič" ~ "stable non-voter",
+          fst_round == "Petr Pavel" & winner == "winner" ~ "stable winner", 
+          fst_round == "Andrej Babiš" & winner == "loser" ~ "stable loser", 
+          winner == "winner" ~ "unstable winner", 
+          winner == "loser" ~ "unstable loser",
+          TRUE ~ "unstable non-voter",
+        )) %>% 
+      ungroup %>% 
+      filter(n_waves == 5)
   ),
   
   # EU 2019 -----------------------------------------------
@@ -1132,6 +1177,8 @@ list(
     }
   ),
   
+
+  # Tables ------------------------------------------------------------------
   tar_render(
     swd_rmd, 
     "swd.Rmd"
@@ -1140,5 +1187,11 @@ list(
   tar_render(
     swd2_rmd, 
     "swd2.Rmd"
-  )
+  ), 
+  
+  # tar_render(
+  #   swd_long_rmd, 
+  #   "swd_long.Rmd"
+  # )
+  NULL
 )

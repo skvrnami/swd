@@ -73,7 +73,18 @@ avg_swd_all_panels %>%
 cz_2023_all_waves_resp <- cz_2023 %>% 
     filter(w1 == 1 & w2 == 1 & w3 == 1 & w4 == 1) %>% 
     mutate(age = (age - 18) / 10) %>% 
-    rename(pol_knowledge = pol_knowledge_pct)
+    rename(pol_knowledge = pol_knowledge_pct) %>% 
+    mutate(prez_vote_type = case_when(
+      PRES2023CAND1r_w3 == "nevolič" & 
+        PRES2023CAND2r_w4 == "nevolič" ~ "stable abstainer",
+      PRES2023CAND1r_w3 == "Petr Pavel" & 
+        PRES2023CAND2r_w4 == "Petr Pavel" ~ "stable winner",
+      PRES2023CAND1r_w3 == "Andrej Babiš" & 
+        PRES2023CAND2r_w4 == "Andrej Babiš" ~ "stable loser",
+      PRES2023CAND2r_w4 == "Petr Pavel" ~ "unstable winner",
+      PRES2023CAND2r_w4 == "Andrej Babiš" ~ "unstable loser",
+      TRUE ~ "unstable abstainer"
+    ))
 
 # haven::write_sav(cz_2023_all_waves_resp, "tmp/cz_2023_vsechny_vlny.sav")
 
@@ -292,46 +303,96 @@ modelsummary(list(ce1_all, ce2_all, ce3_all, ce4_all),
 
 ## Table 4: SWD change, CZ 2023 panel
 ```{r}
-swd1_round1 <- lm(swd_diff ~ voted + swd_pre + female + age + postsecondary_edu + 
-             pol_interest_num + pol_knowledge + party_close + duty_to_vote, 
+swd1_round1 <- lm(swd_diff ~ voted + swd_pre + female + age +
+                    postsecondary_edu + pol_interest_num + 
+                    pol_knowledge + party_close + duty_to_vote, 
              data = cz_2023_all_waves_resp)
-swd2_round1 <- lm(swd_diff ~ voted + swd_pre + female + age + postsecondary_edu + 
-             pol_interest_num + party_close, data = cz_2023_all_waves_resp)
 swd3_round1 <- lm(swd_diff ~ voter_type + swd_pre + female + age +
-             postsecondary_edu + 
-             pol_interest_num + party_close, data = cz_2023_all_waves_resp)
-swd4_round1 <- lm(swd_diff ~ stable_voter + swd_pre + female + age +
-                      postsecondary_edu + pol_interest_num + party_close, 
+                    postsecondary_edu + pol_interest_num + 
+                    pol_knowledge + party_close + duty_to_vote, 
                   data = cz_2023_all_waves_resp)
-swd5_round1 <- lm(swd_diff ~ prez_vote_type + swd_pre + female + age +
-                      postsecondary_edu + 
-                      pol_interest_num + party_close, 
+swd4_round1 <- lm(swd_diff ~ prez_vote_type + swd_pre + female + age +
+                      postsecondary_edu + pol_interest_num + 
+                      pol_knowledge + party_close + duty_to_vote, 
+                  data = cz_2023_all_waves_resp)
+swd5_round1 <- lm(swd_diff ~ stable_voter + swd_pre + female + age +
+                    postsecondary_edu + pol_interest_num + 
+                    pol_knowledge + party_close + duty_to_vote, 
                   data = cz_2023_all_waves_resp)
 
-modelsummary(list(swd1_round1, swd2_round1, swd3_round1, 
-                  swd4_round1, swd5_round1), stars = TRUE)
+modelsummary(list(swd1_round1, swd3_round1, 
+                  swd4_round1, swd5_round1), 
+             stars = TRUE, 
+             coef_rename = c(
+               "voted" = "Turned out",
+               "swd_pre" = "Pre-election SWD",
+               "female" = "Female",
+               "age" = "Age (decades)",
+               "postsecondary_edu" = "Post-secondary education",
+               "pol_interest_num" = "Pol. interest", 
+               "pol_knowledge" = "Pol. knowledge",
+               "party_close" = "Feels close to a party",
+               "duty_to_vote" = "Duty to vote", 
+               "voter_typeAbstainer" = "Abstainer",
+               "voter_typeVoted for winner" = "Voted for winner",
+               "prez_vote_typestable loser" = "Stable loser",
+               "prez_vote_typestable winner" = "Stable winner",
+               "prez_vote_typeunstable abstainer" = "Unstable abstainer",
+               "prez_vote_typeunstable loser" = "Unstable loser",
+               "prez_vote_typeunstable winner" = "Unstable winner", 
+               "stable_voter" = "Stable voter"
+             ), 
+             output = "output/tab4_models.tex")
 ```
 
 ## Table 5: SWD change, all panels
 ```{r}
+all_panels <- all_panels %>% 
+  mutate(age = (age - 18) / 10)
+
 ce1b <- lm(swd_diff ~ voted + swd_pre + female + age + postsecondary_edu + 
              pol_interest_num + party_close + 
              election, data = all_panels)
-ce2b <- lm(swd_diff ~ voted * election_type + swd_pre + female + age +
-             postsecondary_edu + 
-             pol_interest_num + party_close, data = all_panels)
-ce3b <- lm(swd_diff ~ voter_type + swd_pre + female + age +
+ce2b <- lm(swd_diff ~ voter_type + swd_pre + female + age +
              postsecondary_edu + 
              pol_interest_num + party_close + 
              election, data = all_panels)
-ce4b <- lm(swd_diff ~ voter_type * election_type + swd_pre + female + age +
+ce3b <- lm(swd_diff ~ voted + election_type + swd_pre + female + age +
              postsecondary_edu + 
              pol_interest_num + party_close, data = all_panels)
-ce5b <- lm(swd_diff ~ prez_vote_type + swd_pre + female + age +
+ce4b <- lm(swd_diff ~ voted * election_type + swd_pre + female + age +
+             postsecondary_edu + 
+             pol_interest_num + party_close, data = all_panels)
+ce5b <- lm(swd_diff ~ voter_type * election_type + swd_pre + female + age +
              postsecondary_edu + 
              pol_interest_num + party_close + 
-             election, data = all_panels %>% filter(!is.na(winner_1r) & !is.na(winner_2r)))
+             election, data = all_panels)
 
-modelsummary(list(ce1b, ce2b, ce3b, ce4b, ce5b), stars = TRUE)
+fe_rows <- tribble(~term, ~m1, ~m2, ~m3, ~m4, ~m5, 
+                   "Country FE", "X", "X", "", "", "")
+fe_position <- broom::tidy(ce5b) %>% 
+    filter(!grepl("election", term)) %>% 
+    nrow()
+
+attr(fe_rows, "position") <- 21 + 16
+
+modelsummary(list(ce1b, ce2b, ce3b, ce4b, ce5b), 
+             stars = TRUE, 
+             coef_omit = "election[A-Za-z() ]+\\s[0-9]+$",
+             coef_rename = c(
+               "voted" = "Turned out",
+               "swd_pre" = "Pre-election SWD",
+               "female" = "Female",
+               "age" = "Age (decades)",
+               "postsecondary_edu" = "Post-secondary education",
+               "pol_interest_num" = "Pol. interest", 
+               "party_close" = "Feels close to a party",
+               "voter_typeAbstainer" = "Abstainer",
+               "voter_typeVoted for winner" = "Voted for winner", 
+               "election_typepresidential" = "Presidential election", 
+               "election_typeEP election" = "EP election"
+             ),
+             add_rows = fe_rows, 
+             output = "output/tab5_models.tex")
 ```
 
