@@ -1,8 +1,14 @@
 # README
 
-For replication run the script `run.R`
+For replication:
+- install `renv` package by `install.packages("renv")`
+- install all required packages using `renv::restore()`
+- run the script `run.R` 
 
-## Data  
+All steps for data preparation are declared in `_targets.R` script. 
+Models are estimated, tables and charts are produced in `.Rmd` files. 
+
+## Data sources  
 
 - Czechia, 2023 presidential election, data: [Czech presidential panel 2023]  
 - Czechia, 1996 parliamentary election, data: [Pre-election study](https://doi.org/10.4232/1.3631) & [Post-election study](https://doi.org/10.4232/1.3633)  

@@ -12,6 +12,7 @@ library(targets)
 library(ggplot2)
 
 tar_load(cz_2023_long)
+# cz_2023_long <- readRDS("output/cz_2023_long.rds")
 
 long_w1_w5 <- cz_2023_long
 long_w1_w4 <- cz_2023_long %>% 
@@ -54,18 +55,37 @@ m1_w4 <- lmer(SWD_num ~ winner * wave + (1 | RADIOMETER_ID2),
 
 m2_w4 <- lmer(SWD_num ~ winner_stable * wave + (1 | RADIOMETER_ID2), 
            data = long_w1_w4) 
+m2_w4b <- lmer(SWD_num ~ winner_stable2 * wave + (1 | RADIOMETER_ID2), 
+           data = long_w1_w4) 
 
 m3_w4 <- lmer(SWD_num ~ vote_gov * wave + (1 | RADIOMETER_ID2), 
            data = long_w1_w4) 
 
-modelsummary::modelsummary(list(m1_w4, m2_w4, m3_w4), 
+modelsummary::modelsummary(list(m1_w4, m2_w4, m2_w4b, m3_w4), 
                            stars = TRUE, 
                            coef_rename = rename_map
                            )
 
-ggeffects::ggeffect(m1_w4, c("wave", "winner")) %>% plot()
-ggeffects::ggeffect(m2_w4, c("wave", "winner_stable")) %>% plot()
-ggeffects::ggeffect(m3_w4, c("wave", "vote_gov")) %>% plot()
+ggeffects::ggeffect(m1_w4, c("wave", "winner")) %>% plot() + 
+    labs(title = "Predicted values of SWD", 
+         x = "Wave", 
+         y = "SWD", 
+         colour = "Voter type")
+ggeffects::ggeffect(m2_w4, c("wave", "winner_stable")) %>% plot() + 
+    labs(title = "Predicted values of SWD", 
+         x = "Wave", 
+         y = "SWD", 
+         colour = "Voter type")
+ggeffects::ggeffect(m2_w4b, c("wave", "winner_stable2")) %>% plot() + 
+    labs(title = "Predicted values of SWD", 
+         x = "Wave", 
+         y = "SWD", 
+         colour = "Voter type")
+ggeffects::ggeffect(m3_w4, c("wave", "vote_gov")) %>% plot() + 
+    labs(title = "Predicted values of SWD", 
+         x = "Wave", 
+         y = "SWD", 
+         colour = "Voter type")
 ```
 
 # Vlny 1-5
@@ -76,14 +96,34 @@ m1_w5 <- lmer(SWD_num ~ winner * wave + (1 | RADIOMETER_ID2),
 m2_w5 <- lmer(SWD_num ~ winner_stable * wave + (1 | RADIOMETER_ID2), 
            data = long_w1_w5) 
 
+m2_w5b <- lmer(SWD_num ~ winner_stable2 * wave + (1 | RADIOMETER_ID2), 
+           data = long_w1_w5) 
+
 m3_w5 <- lmer(SWD_num ~ vote_gov * wave + (1 | RADIOMETER_ID2), 
            data = long_w1_w5) 
 
-modelsummary::modelsummary(list(m1_w5, m2_w5, m3_w5), 
+modelsummary::modelsummary(list(m1_w5, m2_w5, m2_w5b, m3_w5), 
                            stars = TRUE, 
                            coef_rename = rename_map)
 
-ggeffects::ggeffect(m1_w5, c("wave", "winner")) %>% plot()
-ggeffects::ggeffect(m2_w5, c("wave", "winner_stable")) %>% plot()
-ggeffects::ggeffect(m3_w5, c("wave", "vote_gov")) %>% plot()
+ggeffects::ggeffect(m1_w5, c("wave", "winner")) %>% plot() + 
+    labs(title = "Predicted values of SWD", 
+         x = "Wave", 
+         y = "SWD",
+         colour = "Voter type")
+ggeffects::ggeffect(m2_w5, c("wave", "winner_stable")) %>% plot() + 
+    labs(title = "Predicted values of SWD", 
+         x = "Wave", 
+         y = "SWD", 
+         colour = "Voter type")
+ggeffects::ggeffect(m2_w5b, c("wave", "winner_stable2")) %>% plot() + 
+    labs(title = "Predicted values of SWD", 
+         x = "Wave", 
+         y = "SWD", 
+         colour = "Voter type")
+ggeffects::ggeffect(m3_w5, c("wave", "vote_gov")) %>% plot() + 
+    labs(title = "Predicted values of SWD", 
+         x = "Wave", 
+         y = "SWD", 
+         colour = "Voter type")
 ```

@@ -261,10 +261,10 @@ list(
       mutate(# SWD_wi = SWD_num - mean(SWD_num, na.rm = TRUE), 
         # SWD_bw = mean(SWD_num),
         winner = case_when(
-          any(PRES2023PART2 == "Ne") ~ "nevolič",
+          any(PRES2023PART2 == "Ne") ~ "abstainer",
           any(PRES2023CAND2r == "Petr Pavel") ~ "winner", 
           TRUE ~ "loser"
-        ) %>% factor(., levels = c("nevolič", "winner", "loser")), 
+        ) %>% factor(., levels = c("abstainer", "winner", "loser")), 
         n_waves = n(), 
         psp2021 = zoo::na.locf(V20),
         vote_gov = as.numeric(psp2021 %in% c("Koalice SPOLU (ODS, TOP09 a KDU-ČSL)", 
@@ -281,20 +281,29 @@ list(
           TRUE ~ "loser"
         ),
         winner_cat = case_when(
-          fst_round == "nevolič" | winner == "nevolič" ~ "didn't vote (at least in one round)", 
+          fst_round == "nevolič" | winner == "abstainer" ~ "didn't vote (at least in one round)", 
           TRUE ~ paste0(winner_1r, "+", winner)
         ), 
         winner_stable = case_when(
-          fst_round == "nevolič" & winner == "nevolič" ~ "stable non-voter",
+          fst_round == "abstainer" & winner == "abstainer" ~ "stable non-voter",
           fst_round == "Petr Pavel" & winner == "winner" ~ "stable winner", 
           fst_round == "Andrej Babiš" & winner == "loser" ~ "stable loser", 
           winner == "winner" ~ "unstable winner", 
           winner == "loser" ~ "unstable loser",
           TRUE ~ "unstable non-voter",
+        ), 
+        winner_stable2 = case_when(
+          winner == "abstainer" ~ "abstainer",
+          fst_round == "Petr Pavel" & winner == "winner" ~ "sincere winner", 
+          fst_round == "Andrej Babiš" & winner == "loser" ~ "sincere loser", 
+          winner == "winner" ~ "strategic winner", 
+          winner == "loser" ~ "strategic loser"
         )) %>% 
       ungroup %>% 
       filter(n_waves == 5)
   ),
+  
+  
   
   # EU 2019 -----------------------------------------------
   tar_target(
@@ -1176,18 +1185,22 @@ list(
       haven::write_sav(data = all_panels, path = "data/all_panels_merged.sav") 
     }
   ),
-  
 
   # Tables ------------------------------------------------------------------
-  tar_render(
-    swd_rmd, 
-    "swd.Rmd"
-  ), 
+  # tar_render(
+  #   swd_rmd, 
+  #   "swd.Rmd"
+  # ), 
+  # 
+  # tar_render(
+  #   swd2_rmd, 
+  #   "swd2.Rmd"
+  # ), 
   
   tar_render(
-    swd2_rmd, 
-    "swd2.Rmd"
-  ), 
+    swd_final_rmd,
+    "swd_final.Rmd"
+  ),
   
   # tar_render(
   #   swd_long_rmd, 

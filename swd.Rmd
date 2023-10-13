@@ -451,6 +451,7 @@ modelsummary(list(ce1_de17,
 ce1b <- lm(swd_diff ~ voted + swd_pre + female + age + postsecondary_edu + 
              pol_interest_num + party_close + 
              election, data = all_panels)
+
 ce2b <- lm(swd_diff ~ voted * election_type + swd_pre + female + age +
              postsecondary_edu + 
              pol_interest_num + party_close, data = all_panels)
@@ -458,7 +459,14 @@ ce3b <- lm(swd_diff ~ voter_type + swd_pre + female + age +
              postsecondary_edu + 
              pol_interest_num + party_close + 
              election, data = all_panels)
-ce4b <- lm(swd_diff ~ voter_type * election_type + swd_pre + female + age +
+
+ce4b0 <- lm(swd_diff ~ voter_type + swd_pre + 
+             female + age +
+             postsecondary_edu + 
+             pol_interest_num + party_close, data = all_panels)
+
+ce4b <- lm(swd_diff ~ voter_type * election_type + swd_pre + 
+             female + age +
              postsecondary_edu + 
              pol_interest_num + party_close, data = all_panels)
 ce5b <- lm(swd_diff ~ prez_vote_type + swd_pre + female + age +
@@ -471,6 +479,25 @@ modelsummary(list(ce1b, ce2b, ce3b, ce4b, ce5b), stars = TRUE)
 
 ggeffects::ggpredict(ce2b, c("election_type", "voted")) %>% plot()
 ggeffects::ggpredict(ce4b, c("election_type", "voter_type")) %>% plot()
+
+ggeffects::ggpredict(ce4b, c("election_type", "voter_type")) %>%
+  bind_rows(., ggeffects::ggpredict(ce4b0, "voter_type") %>% 
+              mutate(group = x, 
+                     x = "All")) %>% 
+  mutate(x = factor(x, levels = c("All", "parliamentary", "presidential", "EP election"))) %>% 
+  ggplot(., aes(x = x, y = predicted, colour = group)) + 
+  geom_point(position = position_dodge(width = 0.3)) + 
+  geom_linerange(aes(ymin = conf.low, ymax = conf.high), 
+                 position = position_dodge(width = 0.3)) + 
+  # plot() # + 
+  labs(x = "Election type", 
+       y = "SWD change", 
+       colour = "Voter type", 
+       title = "Predicted values of SWD change") + 
+  theme_minimal()
+
+ggsave("output/swd_change_election_type.png", 
+       width = 8, height = 5)
 ```
 
 ```{r}

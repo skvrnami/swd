@@ -1,6 +1,8 @@
 *.html
 .Rproj.user
+.Rprofile
 
 _targets/
+renv/
 
 data/all_panels_merged.sav
