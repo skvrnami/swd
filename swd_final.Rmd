@@ -1,6 +1,5 @@
 ---
 title: "Satisfaction with democracy"
-author: "Michael Škvrňák"
 date: "`r Sys.Date()`"
 output:
   html_document:
