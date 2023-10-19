@@ -4,7 +4,7 @@ library(tarchetypes) # Load other packages as needed. # nolint
 # Set target options:
 tar_option_set(
   packages = c("tibble", "haven", "here", "dplyr", 
-               "labelled"), # packages that your targets need to run
+               "labelled", "survey"), # packages that your targets need to run
   format = "rds" # default storage format
   # Set other options as needed.
 )
@@ -17,6 +17,22 @@ tar_source()
 
 # Replace the target list below with your own:
 list(
+  
+  tar_target(
+    turnout_df, {
+      tribble(
+        ~election, ~turnout, ~turnout_2nd_round,
+        "CZ 1996", 76.4, NA_real_,
+        "RO 2012", 41.8, NA_real_,
+        "DE 2017 (East)", 73.5, NA_real_,
+        "RO 2009", 54.4, 58.0,
+        "CZ 2023", 68.2, 70.2,
+        "PL 2019", 45.7, NA_real_,
+        "HU 2019", 43.6, NA_real_
+      )
+    }
+  ),
+  
   # CZ 1996 -----------------------------------------------
   # pre-election wave CZ 1996
   tar_target(
@@ -159,11 +175,24 @@ list(
                           swd_post = "Satisfaction with democracy (post-election wave)")
   ), 
   
+  tar_target(
+    cz_1996_weight, {
+      # pl_2019_weight <- calc_weight_turnout(pl_2019, turnout, "PL 2019")
+      cz_1996_weight <- calc_weight_turnout(cz_1996, turnout_df, "CZ 1996")
+      cz_1996 %>% 
+        filter(!is.na(swd_diff)) %>% 
+        filter(!is.na(voted)) %>% 
+        mutate(weight_turnout = cz_1996_weight) %>% 
+        mutate(weight_turnout_norm = weight_turnout / sum(weight_turnout) * 1000)
+    }
+  ),
+  
   # CZ 2023 -----------------------------------------------
   tar_target(
     cz_2023, 
     
-    readRDS(here("data", "CZ_2023", "wide_w1_w4_v02.rds")) %>% 
+    # readRDS(here("data", "CZ_2023", "wide_w1_w4_v02.rds")) %>% 
+    readRDS(here("data", "CZ_2023", "wide_w1_w5.rds")) %>% 
       mutate(across(starts_with("SWD"), as.numeric)) %>% 
       as_factor() %>% 
       mutate(
@@ -232,16 +261,28 @@ list(
   ),
   
   tar_target(
-    cz_2023_models, {
+    cz_2023_weight, {
+      cz_2023_weight <- calc_weight_turnout_presidential(cz_2023, turnout_df, "CZ 2023")
       cz_2023 %>% 
+        filter(!is.na(swd_diff)) %>% 
+        filter(!is.na(voted_1r)) %>% 
+        filter(!is.na(voted_2r)) %>% 
+        mutate(weight_turnout = cz_2023_weight,
+               weight_turnout_norm = weight_turnout / sum(weight_turnout) * 1000)
+    }
+  ),
+  
+  tar_target(
+    cz_2023_models, {
+      cz_2023_weight %>% 
         mutate(
           pol_knowledge_pct = pol_knowledge_pct / 100, 
           nonvoter = 1 - voted, 
           voter_type = case_when(
             nonvoter == 1 ~ "Abstainer", 
-            winner == 0 ~ "Voted", 
+            winner == 0 ~ "Voted for loser", 
             winner == 1 ~ "Voted for winner"
-          ) %>% factor(., levels = c("Voted", "Abstainer", "Voted for winner")), 
+          ) %>% factor(., levels = c("Abstainer", "Voted for winner", "Voted for loser")), 
           prez_vote_type = 
             case_when(
               winner_1r == "didn't vote" | winner_2r == "didn't vote" ~ "didn't vote (at least in one round)", 
@@ -302,8 +343,6 @@ list(
       ungroup %>% 
       filter(n_waves == 5)
   ),
-  
-  
   
   # EU 2019 -----------------------------------------------
   tar_target(
@@ -394,6 +433,17 @@ list(
         pol_knowledge_pct = (rowSums(across(matches("know[1-5]{1}"))) / 5) * 100
       )
   ), 
+  
+  tar_target(
+    pl_2019_weight, {
+      pl_2019_weight <- calc_weight_turnout(pl_2019, turnout_df, "PL 2019")
+      pl_2019 %>% 
+        filter(!is.na(swd_diff)) %>% 
+        filter(!is.na(voted)) %>% 
+        mutate(weight_turnout = pl_2019_weight) %>% 
+        mutate(weight_turnout_norm = weight_turnout / sum(weight_turnout) * 1000)
+    }
+  ),
 
   # HU 2019 -----------------------------------------------------------------
   tar_target(
@@ -464,6 +514,16 @@ list(
       
   )), 
   
+  tar_target(
+    hu_2019_weight, {
+      hu_2019_weight <- calc_weight_turnout(hu_2019, turnout_df, "HU 2019")
+      hu_2019 %>% 
+        filter(!is.na(swd_diff)) %>% 
+        filter(!is.na(voted)) %>% 
+        mutate(weight_turnout = hu_2019_weight) %>% 
+        mutate(weight_turnout_norm = weight_turnout / sum(weight_turnout) * 1000)
+    }
+  ),
 
   # RO 2009 -----------------------------------------------------------------
   tar_target(
@@ -512,6 +572,13 @@ list(
         swd_pre = swd_w1, 
         swd_post = swd_w3,
         swd_diff = swd_w3 - swd_w1,
+        voted_1r = case_when(
+          Q21XX == "Sunt sigur ca am votat" ~ 1,
+          Q21XX %in% c("Nu am votat la turul 1 al alegerilor prezidentiale din 22 no", 
+                       "M-am gandit sa votez de aceasta data, dar nu am votat", 
+                       "De obicei votez, dar de aceasta data nu am votat") ~ 0,
+          Q21XX %in% c("NS", "NR") ~ NA_integer_
+        ),
         voted = case_when(
           Q23XX == "Sunt sigur ca am votat" ~ 1, 
           Q23XX %in% c("Nu am votat la turul 2 al alegerilor prezidentiale din 6 dec", 
@@ -519,6 +586,7 @@ list(
                        "De obicei votez, dar de aceasta data nu am votat") ~ 0, 
           Q23XX %in% c("NS", "NR") ~ NA_integer_
         ),
+        voted_2r = voted,
         winner = as.numeric(Q24B == "Traian Basescu"), 
         candidate_qualified_2nd = case_when(
           Q21B %in% c("Traian Basescu", "Mircea Geoana") ~ 1, 
@@ -568,6 +636,18 @@ list(
          Q23XX != "Sunt sigur ca am votat" ~ "didn't vote"
        )
        )
+  ),
+  
+  tar_target(
+    ro_2009_weight, {
+      ro_2009_weight <- calc_weight_turnout_presidential(ro_2009_final, turnout_df, "RO 2009")
+      ro_2009_final %>% 
+        filter(!is.na(swd_diff)) %>% 
+        filter(!is.na(voted_1r)) %>% 
+        filter(!is.na(voted_2r)) %>% 
+        mutate(weight_turnout = ro_2009_weight,
+               weight_turnout_norm = weight_turnout / sum(weight_turnout) * 1000)
+    }
   ),
   
   # RO 2012 -----------------------------------------------------------------
@@ -819,6 +899,20 @@ list(
     }
   ),
   
+  
+  tar_target(
+    ro_2012_weight, {
+      ro_2012_all2 <- ro_2012_all %>% 
+        mutate(swd_diff = swd_post - swd_pre)
+      ro_2012_weight <- calc_weight_turnout(ro_2012_all2, turnout_df, "RO 2012")
+      ro_2012_all2 %>% 
+        filter(!is.na(swd_diff)) %>% 
+        filter(!is.na(voted)) %>% 
+        mutate(weight_turnout = ro_2012_weight) %>% 
+        mutate(weight_turnout_norm = weight_turnout / sum(weight_turnout) * 1000)
+    }
+  ),
+  
   # DE 2017 -----------------------------------------------
   
   tar_target(
@@ -980,6 +1074,17 @@ list(
         )
   ),
   
+  tar_target(
+    de_2017_weight, {
+      de_2017_weight <- calc_weight_turnout(de_2017_final, turnout_df, "DE 2017 (East)")
+      de_2017_final %>% 
+        filter(!is.na(swd_diff)) %>% 
+        filter(!is.na(voted)) %>% 
+        mutate(weight_turnout = de_2017_weight) %>% 
+        mutate(weight_turnout_norm = weight_turnout / sum(weight_turnout) * 1000)
+    }
+  ),
+  
   # DE 2021 -----------------------------------------------
   # a month before election
   tar_target(
@@ -1095,51 +1200,52 @@ list(
                            "vote_choice", "swd_pre", "swd_post", 
                            "pol_knowledge_pct", "pol_interest_num", 
                            "party_close", "candidate_qualified_2nd", 
-                           "duty_to_vote", "winner_1r", "winner_2r")
+                           "duty_to_vote", "winner_1r", "winner_2r", 
+                           "weight_turnout", "weight_turnout_norm")
           
-          cz_1996_norm <- cz_1996 %>% 
+          cz_1996_norm <- cz_1996_weight %>% 
               select(any_of(common_vars)) %>% 
               mutate(election = "CZ 1996") %>% 
               mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
                             normalize_scale), 
                      swd_diff = swd_post - swd_pre)
           
-          pl_2019_norm <- pl_2019 %>% 
+          pl_2019_norm <- pl_2019_weight %>% 
               select(any_of(common_vars)) %>% 
               mutate(election = "PL 2019") %>% 
               mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
                             normalize_scale), 
                      swd_diff = swd_post - swd_pre)
           
-          hu_2019_norm <- hu_2019 %>% 
+          hu_2019_norm <- hu_2019_weight %>% 
               select(any_of(common_vars)) %>% 
               mutate(election = "HU 2019") %>% 
               mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
                             normalize_scale), 
                      swd_diff = swd_post - swd_pre)
           
-          ro_2009_norm <- ro_2009_final %>% 
+          ro_2009_norm <- ro_2009_weight %>% 
               select(any_of(common_vars)) %>% 
               mutate(election = "RO 2009") %>% 
               mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
                             normalize_scale), 
                      swd_diff = swd_post - swd_pre)
           
-          ro_2012_norm <- ro_2012_all %>% 
+          ro_2012_norm <- ro_2012_weight %>% 
               select(any_of(common_vars)) %>% 
               mutate(election = "RO 2012") %>% 
               mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
                             normalize_scale), 
                      swd_diff = swd_post - swd_pre)
           
-          de_2017_norm <- de_2017_final %>% 
+          de_2017_norm <- de_2017_weight %>% 
               select(any_of(common_vars)) %>% 
               mutate(election = "DE (Ost) 2017") %>% 
               mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
                             normalize_scale), 
                      swd_diff = swd_post - swd_pre)
           
-          cz_2023_norm <- cz_2023 %>% 
+          cz_2023_norm <- cz_2023_weight %>% 
             select(any_of(common_vars)) %>% 
             mutate(election = "CZ 2023") %>% 
             mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
@@ -1167,9 +1273,9 @@ list(
               nonvoter = 1 - voted, 
               voter_type = case_when(
                 nonvoter == 1 ~ "Abstainer", 
-                winner == 0 ~ "Voted", 
+                winner == 0 ~ "Voted for loser", 
                 winner == 1 ~ "Voted for winner"
-              ) %>% factor(., levels = c("Voted", "Abstainer", "Voted for winner")), 
+              ) %>% factor(., levels = c("Abstainer", "Voted for winner", "Voted for loser")), 
               prez_vote_type = 
                 case_when(
                   winner_1r == "didn't vote" | winner_2r == "didn't vote" ~ "didn't vote (at least in one round)", 
@@ -1187,24 +1293,13 @@ list(
   ),
 
   # Tables ------------------------------------------------------------------
-  # tar_render(
-  #   swd_rmd, 
-  #   "swd.Rmd"
-  # ), 
-  # 
-  # tar_render(
-  #   swd2_rmd, 
-  #   "swd2.Rmd"
-  # ), 
+  tar_render(
+    weights_check, 
+    "weights.Rmd"
+  ),
   
   tar_render(
     swd_final_rmd,
     "swd_final.Rmd"
-  ),
-  
-  # tar_render(
-  #   swd_long_rmd, 
-  #   "swd_long.Rmd"
-  # )
-  NULL
+  )
 )

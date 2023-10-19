@@ -1,0 +1,129 @@
+---
+title: "Checking weights"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(targets)
+library(dplyr)
+```
+
+Check of two weights:  
+- `weight_turnout` - respondents are weighted by turnout in the election (if it is two-round election by the turnout in both rounds)
+- `weight_turnout_norm` - normalizing the weights so that the sum of weights for each panel equals to 1000 (respondents)
+
+```{r}
+tar_load(turnout_df)
+tar_load(cz_1996_weight)
+
+summarise_turnout <- function(df, weight){
+    df %>% 
+        group_by(voted) %>% 
+        summarise(sum_weight = sum({{weight}}), .groups = "drop") %>% 
+        mutate(weight_share = sum_weight / sum(sum_weight))
+}
+
+turnout_df %>% filter(election == "CZ 1996")
+
+cz_1996_weight %>% 
+    summarise_turnout(., weight_turnout)
+
+cz_1996_weight %>% 
+    summarise_turnout(., weight_turnout_norm)
+```
+## Poland 2019
+```{r}
+tar_load(pl_2019_weight)
+turnout_df %>% filter(election == "PL 2019")
+
+pl_2019_weight %>% 
+    summarise_turnout(., weight_turnout)
+
+pl_2019_weight %>% 
+    summarise_turnout(., weight_turnout_norm)
+```
+
+## Hungary 2019
+```{r}
+tar_load(hu_2019_weight)
+turnout_df %>% filter(election == "HU 2019")
+
+hu_2019_weight %>% 
+    summarise_turnout(., weight_turnout)
+
+hu_2019_weight %>% 
+    summarise_turnout(., weight_turnout_norm)
+```
+
+## East Germany 2017
+```{r}
+tar_load(de_2017_weight)
+turnout_df %>% filter(election == "DE 2017 (East)")
+
+de_2017_weight %>% 
+    summarise_turnout(., weight_turnout)
+
+de_2017_weight %>% 
+    summarise_turnout(., weight_turnout_norm)
+```
+
+## Romania 2012
+```{r}
+tar_load(ro_2012_weight)
+turnout_df %>% filter(election == "RO 2012")
+
+ro_2012_weight %>% 
+    summarise_turnout(., weight_turnout)
+
+ro_2012_weight %>% 
+    summarise_turnout(., weight_turnout_norm)
+```
+
+## Czechia 2023
+```{r}
+summarise_turnout_pres <- function(df, group, weight){
+    df %>% 
+        group_by({{group}}) %>% 
+        summarise(sum_weight = sum({{weight}}), .groups = "drop") %>% 
+        mutate(weight_share = sum_weight / sum(sum_weight))
+}
+
+tar_load(cz_2023_weight)
+turnout_df %>% filter(election == "CZ 2023")
+
+cz_2023_weight %>% 
+    summarise_turnout_pres(., voted_1r, weight_turnout)
+
+cz_2023_weight %>% 
+    summarise_turnout_pres(., voted_2r, weight_turnout)
+
+cz_2023_weight %>% 
+    summarise_turnout_pres(., voted_1r, weight_turnout_norm)
+
+cz_2023_weight %>% 
+    summarise_turnout_pres(., voted_2r, weight_turnout_norm)
+
+
+```
+
+## Romania 2009
+```{r}
+tar_load(ro_2009_weight)
+turnout_df %>% filter(election == "RO 2009")
+
+ro_2009_weight %>% 
+    summarise_turnout_pres(., voted_1r, weight_turnout)
+
+ro_2009_weight %>% 
+    summarise_turnout_pres(., voted_2r, weight_turnout)
+
+ro_2009_weight %>% 
+    summarise_turnout_pres(., voted_1r, weight_turnout_norm)
+
+ro_2009_weight %>% 
+    summarise_turnout_pres(., voted_2r, weight_turnout_norm)
+```
+
