@@ -101,7 +101,6 @@ ggplot(waves) +
             colour = "red", angle = 90, vjust = 1.1) + 
   geom_text(aes(x = mid_date, label = wave), 
             y = 1, angle = 90) + 
-  
   geom_point(data = boot_swd_w1_5, 
                   aes(x = mid_date, y = mean), shape = 3) + 
   
@@ -117,6 +116,85 @@ ggplot(waves) +
        # caption = "Note: Black points depict average SWD within the wave (all respondents participating in a given wave included)\nwith bootstrapped 95% confidence intervals. Grey rectangles show the dates of data collection, red lines indicate election days."
        ) 
 ggsave("output/wave_swd.png", width = 7, 
+       height = 5)
+```
+
+```{r}
+Y_MAX <- 5.5
+ggplot(waves) + 
+    geom_rect(aes(xmin = start_date, xmax = end_date, 
+                  ymin = 0, ymax = Y_MAX), 
+              fill = "gray60", alpha = 0.5
+              ) + 
+  geom_rect(data = elections, aes(
+    xmin = start_date, xmax = end_date, 
+    ymin = 0, ymax = Y_MAX), 
+    fill = "red") + 
+  geom_text(x = as.Date("2023-01-14"), y = 3, 
+            label = "Round 1", 
+            colour = "red", angle = 90, vjust = 1.1) + 
+  geom_text(x = as.Date("2023-01-28"), y = 3, 
+            label = "Round 2", 
+            colour = "red", angle = 90, vjust = 1.1) + 
+  geom_text(aes(x = mid_date, label = wave), 
+            y = 1, angle = 90) + 
+  geom_point(data = boot_swd_w1_5, 
+                  aes(x = mid_date, y = mean), shape = 3) + 
+  
+  geom_errorbar(data = boot_swd_w1_5, 
+                  aes(x = mid_date, y = mean, ymax = upper, 
+                      ymin = lower)) + 
+  geom_line(data = boot_swd_w1_5, aes(x = mid_date, y = mean)) + 
+  theme_minimal() + 
+  scale_y_continuous(limits = c(0, Y_MAX)) + 
+  guides(alpha = "none") + 
+  scale_x_date(date_labels = "%b %Y", date_breaks = "month") + 
+  labs(x = "", # title = "2023 Czech presidential election panel", 
+       y = "Average SWD (0–10 scale)", 
+       # caption = "Note: Black points depict average SWD within the wave (all respondents participating in a given wave included)\nwith bootstrapped 95% confidence intervals. Grey rectangles show the dates of data collection, red lines indicate election days."
+       ) 
+ggsave("output/wave_swd_useknute_shora.png", width = 7, 
+       height = 5)
+```
+
+
+```{r}
+Y_MIN <- 2.5
+Y_MAX <- 7.5
+ggplot(waves) + 
+    geom_rect(aes(xmin = start_date, xmax = end_date, 
+                  ymin = Y_MIN, ymax = Y_MAX), 
+              fill = "gray60", alpha = 0.5
+              ) + 
+  geom_rect(data = elections, aes(
+    xmin = start_date, xmax = end_date, 
+    ymin = Y_MIN, ymax = Y_MAX), 
+    fill = "red") + 
+  geom_text(x = as.Date("2023-01-14"), y = Y_MAX, 
+            label = "Round 1", 
+            colour = "red", angle = 90, vjust = 1.1, 
+            hjust = 1.1) + 
+  geom_text(x = as.Date("2023-01-28"), y = Y_MAX, 
+            label = "Round 2", 
+            colour = "red", angle = 90, vjust = 1.1, 
+            hjust = 1.1) + 
+  geom_text(aes(x = mid_date, label = wave), 
+            y = Y_MIN, angle = 90, hjust = -0.1) + 
+  geom_point(data = boot_swd_w1_5, 
+                  aes(x = mid_date, y = mean), shape = 3) + 
+  geom_errorbar(data = boot_swd_w1_5, 
+                  aes(x = mid_date, y = mean, ymax = upper, 
+                      ymin = lower)) + 
+  geom_line(data = boot_swd_w1_5, aes(x = mid_date, y = mean)) + 
+  theme_minimal() + 
+  scale_y_continuous(limits = c(Y_MIN, Y_MAX)) + 
+  guides(alpha = "none") + 
+  scale_x_date(date_labels = "%b %Y", date_breaks = "month") + 
+  labs(x = "", # title = "2023 Czech presidential election panel", 
+       y = "Average SWD (0–10 scale)", 
+       # caption = "Note: Black points depict average SWD within the wave (all respondents participating in a given wave included)\nwith bootstrapped 95% confidence intervals. Grey rectangles show the dates of data collection, red lines indicate election days."
+       ) 
+ggsave("output/wave_swd_useknute_shora_zdola.png", width = 7, 
        height = 5)
 ```
 
@@ -231,10 +309,10 @@ avg_swd_all_panels <- bootstrap_out %>%
   select(election, country, year, election_type, matches("swd_")) %>% 
   mutate(across(matches("swd_"), ~round(.x, 2))) %>% 
   mutate(swd_pre = paste0(f2d(swd_pre_mean), " (", f2d(swd_pre_lower), 
-                          " - ", f2d(swd_pre_upper), ")"), 
+                          " – ", f2d(swd_pre_upper), ")"), 
          swd_post = paste0(f2d(swd_post_mean), " (", f2d(swd_post_lower), 
-                           " - ", f2d(swd_post_upper), ")"), 
-         swd_diff = paste0(f2d(swd_diff_mean), " (", f2d(swd_diff_lower), " - ", 
+                           " – ", f2d(swd_post_upper), ")"), 
+         swd_diff = paste0(f2d(swd_diff_mean), " (", f2d(swd_diff_lower), " – ", 
                            f2d(swd_diff_upper), ")")
          ) %>% 
   left_join(., n, by = "election") %>% 
@@ -278,7 +356,10 @@ cz_2023_all_waves_resp <- cz_2023 %>%
                  "full winner", 
                  "partial winner", 
                  "full loser", 
-                 "partial loser")))
+                 "partial loser"))) %>% 
+  mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
+                normalize_scale), 
+         swd_diff = swd_post - swd_pre)
 
 # haven::write_sav(cz_2023_all_waves_resp, "tmp/cz_2023_vsechny_vlny.sav")
 
