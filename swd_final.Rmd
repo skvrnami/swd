@@ -68,7 +68,14 @@ waves <- tribble(
     "Wave 5", "2023-06-19", "2023-07-03"
 ) %>% 
     mutate(across(ends_with("date"), as.Date), 
-           mid_date = start_date + ((end_date - start_date) / 2))
+           mid_date = start_date + ((end_date - start_date) / 2)) %>% 
+    mutate(wave_label = case_when(
+      wave == "Wave 1" ~ "Wave 1 (25.11.–6.12.)", 
+      wave == "Wave 2" ~ "Wave 2 (9.–13.1.)",
+      wave == "Wave 3" ~ "Wave 3 (16.–22.1.)", 
+      wave == "Wave 4" ~ "Wave 4 (30.1.–6.2.)",
+      wave == "Wave 5" ~ "Wave 5 (19.6.–3.7.)"
+    ))
 
 elections <- tribble(
     ~round, ~start_date, ~end_date, 
@@ -82,79 +89,7 @@ boot_swd_w1_5 <- purrr::map_df(
        boot_ci_w4, boot_ci_w5), 
            boot_to_df) %>% 
   mutate(wave = paste("Wave ", row_number(), sep = "")) %>% 
-  left_join(., waves %>% select(wave, mid_date), by = "wave")
-
-ggplot(waves) + 
-    geom_rect(aes(xmin = start_date, xmax = end_date, 
-                  ymin = 0, ymax = 10), 
-              fill = "gray60", alpha = 0.5
-              ) + 
-  geom_rect(data = elections, aes(
-    xmin = start_date, xmax = end_date, 
-    ymin = 0, ymax = 10), 
-    fill = "red") + 
-  geom_text(x = as.Date("2023-01-14"), y = 3, 
-            label = "Round 1", 
-            colour = "red", angle = 90, vjust = 1.1) + 
-  geom_text(x = as.Date("2023-01-28"), y = 3, 
-            label = "Round 2", 
-            colour = "red", angle = 90, vjust = 1.1) + 
-  geom_text(aes(x = mid_date, label = wave), 
-            y = 1, angle = 90) + 
-  geom_point(data = boot_swd_w1_5, 
-                  aes(x = mid_date, y = mean), shape = 3) + 
-  
-  geom_errorbar(data = boot_swd_w1_5, 
-                  aes(x = mid_date, y = mean, ymax = upper, 
-                      ymin = lower)) + 
-  geom_line(data = boot_swd_w1_5, aes(x = mid_date, y = mean)) + 
-  theme_minimal() + 
-  guides(alpha = "none") + 
-  scale_x_date(date_labels = "%b %Y", date_breaks = "month") + 
-  labs(x = "", # title = "2023 Czech presidential election panel", 
-       y = "Average SWD", 
-       # caption = "Note: Black points depict average SWD within the wave (all respondents participating in a given wave included)\nwith bootstrapped 95% confidence intervals. Grey rectangles show the dates of data collection, red lines indicate election days."
-       ) 
-ggsave("output/wave_swd.png", width = 7, 
-       height = 5)
-```
-
-```{r}
-Y_MAX <- 5.5
-ggplot(waves) + 
-    geom_rect(aes(xmin = start_date, xmax = end_date, 
-                  ymin = 0, ymax = Y_MAX), 
-              fill = "gray60", alpha = 0.5
-              ) + 
-  geom_rect(data = elections, aes(
-    xmin = start_date, xmax = end_date, 
-    ymin = 0, ymax = Y_MAX), 
-    fill = "red") + 
-  geom_text(x = as.Date("2023-01-14"), y = 3, 
-            label = "Round 1", 
-            colour = "red", angle = 90, vjust = 1.1) + 
-  geom_text(x = as.Date("2023-01-28"), y = 3, 
-            label = "Round 2", 
-            colour = "red", angle = 90, vjust = 1.1) + 
-  geom_text(aes(x = mid_date, label = wave), 
-            y = 1, angle = 90) + 
-  geom_point(data = boot_swd_w1_5, 
-                  aes(x = mid_date, y = mean), shape = 3) + 
-  
-  geom_errorbar(data = boot_swd_w1_5, 
-                  aes(x = mid_date, y = mean, ymax = upper, 
-                      ymin = lower)) + 
-  geom_line(data = boot_swd_w1_5, aes(x = mid_date, y = mean)) + 
-  theme_minimal() + 
-  scale_y_continuous(limits = c(0, Y_MAX)) + 
-  guides(alpha = "none") + 
-  scale_x_date(date_labels = "%b %Y", date_breaks = "month") + 
-  labs(x = "", # title = "2023 Czech presidential election panel", 
-       y = "Average SWD (0–10 scale)", 
-       # caption = "Note: Black points depict average SWD within the wave (all respondents participating in a given wave included)\nwith bootstrapped 95% confidence intervals. Grey rectangles show the dates of data collection, red lines indicate election days."
-       ) 
-ggsave("output/wave_swd_useknute_shora.png", width = 7, 
-       height = 5)
+  left_join(., waves %>% select(wave, mid_date, wave_label), by = "wave")
 ```
 
 
@@ -169,23 +104,20 @@ ggplot(waves) +
   geom_rect(data = elections, aes(
     xmin = start_date, xmax = end_date, 
     ymin = Y_MIN, ymax = Y_MAX), 
-    fill = "red") + 
-  geom_text(x = as.Date("2023-01-14"), y = Y_MAX, 
+    fill = "black") + 
+  geom_text(x = as.Date("2023-01-14"), y = Y_MIN, 
             label = "Round 1", 
-            colour = "red", angle = 90, vjust = 1.1, 
-            hjust = 1.1) + 
-  geom_text(x = as.Date("2023-01-28"), y = Y_MAX, 
+            colour = "black", angle = 90, 
+            hjust = -0.1, vjust = 1.1) + 
+  geom_text(x = as.Date("2023-01-28"), y = Y_MIN, 
             label = "Round 2", 
-            colour = "red", angle = 90, vjust = 1.1, 
-            hjust = 1.1) + 
-  geom_text(aes(x = mid_date, label = wave), 
-            y = Y_MIN, angle = 90, hjust = -0.1) + 
-  geom_point(data = boot_swd_w1_5, 
-                  aes(x = mid_date, y = mean), shape = 3) + 
-  geom_errorbar(data = boot_swd_w1_5, 
-                  aes(x = mid_date, y = mean, ymax = upper, 
-                      ymin = lower)) + 
-  geom_line(data = boot_swd_w1_5, aes(x = mid_date, y = mean)) + 
+            colour = "black", angle = 90, 
+            hjust = -0.1, vjust = 1.1) + 
+  geom_text(aes(x = mid_date, label = wave_label), 
+            y = Y_MAX, angle = 90, hjust = 1.05) + 
+  geom_pointrange(data = boot_swd_w1_5,
+                  aes(x = mid_date, y = mean, ymax = upper,
+                      ymin = lower), shape = 3) +
   theme_minimal() + 
   scale_y_continuous(limits = c(Y_MIN, Y_MAX)) + 
   guides(alpha = "none") + 
@@ -194,8 +126,8 @@ ggplot(waves) +
        y = "Average SWD (0–10 scale)", 
        # caption = "Note: Black points depict average SWD within the wave (all respondents participating in a given wave included)\nwith bootstrapped 95% confidence intervals. Grey rectangles show the dates of data collection, red lines indicate election days."
        ) 
-ggsave("output/wave_swd_useknute_shora_zdola.png", width = 7, 
-       height = 5)
+ggsave("output/wave_swd.png", width = 8, 
+       height = 4)
 ```
 
 ```{r}
@@ -205,9 +137,9 @@ avg_swd_cz2023 <- cz_2023 %>%
                 function(x) x / 10)) %>% 
   summarise(across(matches("SWD_w[0-9]+"), ~round(mean(.x, na.rm = TRUE), 2)))
 
-avg_swd_cz2023 %>% 
-    knitr::kable(., format = "latex") %>% 
-    writeLines(., "output/avg_swd_cz2023_panel.tex")
+# avg_swd_cz2023 %>% 
+#     knitr::kable(., format = "latex") %>% 
+#     writeLines(., "output/avg_swd_cz2023_panel.tex")
 
 avg_swd_cz2023 %>% 
     knitr::kable()
@@ -323,7 +255,7 @@ avg_swd_all_panels %>%
       "Country", "Year", "Type of election", "Pre-election SWD",
       "Post-election SWD", "SWD difference", "N"
     )) %>% 
-    writeLines(., "output/avg_swd_all_panels.tex")
+    writeLines(., "output/tab1.tex")
 
 avg_swd_all_panels %>% 
     knitr::kable(col.names = c(
@@ -466,8 +398,9 @@ modelsummary(list("Round 1" = ce1_round1, "Round 1" = ce2_round1,
                  "party_close" = "Feels close to a party"
              ), 
              # add_rows = pr2,
+             notes = c("Data weighted by turnout."),
              title = "Turnout and satisfaction with democracy, 2023 Czech presidential election",
-             output = "output/tab1_models.tex")
+             output = "output/tab2_models.tex")
 
 modelsummary(list("Round 1" = ce1_round1, "Round 1" = ce2_round1, 
                   "Round 1" = ce3_round1, "Round 1" = ce4_round1), 
@@ -483,8 +416,9 @@ modelsummary(list("Round 1" = ce1_round1, "Round 1" = ce2_round1,
                  "party_close" = "Feels close to a party"
              ), 
              # add_rows = pr2a,
+             notes = c("Data weighted by turnout."),
              title = "Turnout and satisfaction with democracy, 2023 Czech presidential election",
-             output = "output/tab1_models_part1.tex")
+             output = "output/tab2_models_part1.tex")
 
 modelsummary(list("Round 2" = ce1_round2, "Round 2" = ce2_round2, 
                   "Round 2" = ce3_round2, "Round 2" = ce4_round2), 
@@ -500,8 +434,9 @@ modelsummary(list("Round 2" = ce1_round2, "Round 2" = ce2_round2,
                  "party_close" = "Feels close to a party"
              ), 
              # add_rows = pr2b,
+             notes = c("Data weighted by turnout."),
              title = "Turnout and satisfaction with democracy, 2023 Czech presidential election",
-             output = "output/tab1_models_part2.tex")
+             output = "output/tab2_models_part2.tex")
 
 
 modelsummary(list("Round 1" = ce1_round1, "Round 1" = ce2_round1, 
@@ -520,6 +455,7 @@ modelsummary(list("Round 1" = ce1_round1, "Round 1" = ce2_round1,
                  "party_close" = "Feels close to a party"
              ), 
              # add_rows = pr2,
+             notes = c("Data weighted by turnout."),
              title = "Turnout and satisfaction with democracy, 2023 Czech presidential election")
 
 ```
@@ -537,24 +473,24 @@ all_panels_both_waves <- all_panels %>%
 ce1_all <- glm(voted ~ swd_pre + swd_post + election, 
            data = all_panels_both_waves,
            family = binomial(link = "logit"), 
-           weights = weight_turnout_norm)
+           weights = weight_turnout)
 ce2_all <- glm(voted ~ swd_pre + female + age + postsecondary_edu + 
              pol_interest_num + party_close + election, 
            data = all_panels_both_waves, 
            family = binomial(link = "logit"), 
-           weights = weight_turnout_norm)
+           weights = weight_turnout)
 ce3_all <- glm(voted ~ swd_post + female + age + postsecondary_edu + 
              pol_interest_num + party_close + election, 
            data = all_panels_both_waves, 
            family = binomial(link = "logit"), 
-           weights = weight_turnout_norm)
+           weights = weight_turnout)
 ce4_all <- glm(voted ~ swd_pre + swd_post + 
              female + age + postsecondary_edu + 
              pol_interest_num + 
              party_close + election, 
            data = all_panels_both_waves, 
            family = binomial(link = "logit"), 
-           weights = weight_turnout_norm)
+           weights = weight_turnout)
 
 fe_rows <- tribble(~term, ~m1, ~m2, ~m3, ~m4, 
                    "Election FE", "X", "X", "X", "X")
@@ -654,8 +590,8 @@ swd5_round1_ord <- lm(swd_diff ~ pavel_decision + swd_pre + female + age +
                   weights = weight_turnout)
 
 modelsummary(list(swd1_round1, swd3_round1, 
-                  swd4_round1, swd5_round1, 
-                  swd5_round1_ord), 
+                  swd4_round1, swd5_round1
+                  ), 
              stars = TRUE, 
              coef_rename = c(
                "voted" = "Turned out",
@@ -673,16 +609,14 @@ modelsummary(list(swd1_round1, swd3_round1,
                "prez_vote_typepartial winner" = "Partial winner",
                "prez_vote_typefull loser" = "Full loser",
                "prez_vote_typepartial loser" = "Partial loser",
-               "stable_voter" = "Stable voter", 
-               "pavel_decisionV 2. vlně" = "Decided for Pavel in Wave 2",
-               "pavel_decisionV 3. vlně" = "Decided for Pavel in Wave 3",
-               "pavel_decisionV 4. vlně" = "Decided for Pavel in Wave 4"
+               "stable_voter" = "Stable winner"
              ), 
+             notes = c("Data weighted by turnout."),
              output = "output/tab4_models.tex")
 
 modelsummary(list(swd1_round1, swd3_round1, 
-                  swd4_round1, swd5_round1, 
-                  swd5_round1_ord), 
+                  swd4_round1, swd5_round1
+                  ), 
              stars = TRUE, 
              coef_rename = c(
                "voted" = "Turned out",
@@ -700,11 +634,9 @@ modelsummary(list(swd1_round1, swd3_round1,
                "prez_vote_typepartial winner" = "Partial winner",
                "prez_vote_typefull loser" = "Full loser",
                "prez_vote_typepartial loser" = "Partial loser",
-               "stable_voter" = "Stable voter", 
-               "pavel_decisionV 2. vlně" = "Decided for Pavel in Wave 2",
-               "pavel_decisionV 3. vlně" = "Decided for Pavel in Wave 3",
-               "pavel_decisionV 4. vlně" = "Decided for Pavel in Wave 4"
-             ))
+               "stable_voter" = "Stable winner"
+             ), 
+             notes = c("Data weighted by turnout."))
 ```
 
 ```{r}
@@ -724,12 +656,12 @@ all_panels <- all_panels %>%
 ce1b <- lm(swd_diff ~ voted + swd_pre + female + age + postsecondary_edu + 
              pol_interest_num + party_close + 
              election, data = all_panels, 
-           weights = weight_turnout_norm)
+           weights = weight_turnout)
 ce2b <- lm(swd_diff ~ voter_type + swd_pre + female + age +
              postsecondary_edu + 
              pol_interest_num + party_close + 
              election, data = all_panels, 
-           weights = weight_turnout_norm)
+           weights = weight_turnout)
 
 fe_rows <- tribble(~term, ~m1, ~m2,  
                    "Country FE", "X", "X")
@@ -756,6 +688,7 @@ modelsummary(list(ce1b, ce2b),
                "election_typeEP election" = "EP election"
              ),
              add_rows = fe_rows, 
+             notes = c("Data weighted by turnout."),
              output = "output/tab5_models.tex")
 
 modelsummary(list(ce1b, ce2b), 
@@ -774,7 +707,8 @@ modelsummary(list(ce1b, ce2b),
                "election_typepresidential" = "Presidential election", 
                "election_typeEP election" = "EP election"
              ),
-             add_rows = fe_rows # , 
+             add_rows = fe_rows,
+             notes = c("Data weighted by turnout.")
              # output = "output/tab5_models.tex"
              )
 ```
@@ -812,17 +746,18 @@ rename_map <- c(
 )
 
 m1_w5 <- lmer(SWD_num ~ winner * wave + (1 | RADIOMETER_ID2), 
-              data = long_w1_w5) 
+              data = long_w1_w5, weights = weight_turnout) 
 
 m2_w5 <- lmer(SWD_num ~ winner_stable2 * wave + (1 | RADIOMETER_ID2), 
-              data = long_w1_w5) 
+              data = long_w1_w5, weights = weight_turnout) 
 
 m3_w5 <- lmer(SWD_num ~ vote_gov * wave + (1 | RADIOMETER_ID2), 
-              data = long_w1_w5) 
+              data = long_w1_w5, weights = weight_turnout) 
 
 modelsummary::modelsummary(list(m1_w5, m2_w5, m3_w5), 
                            stars = TRUE, 
-                           coef_rename = rename_map
+                           coef_rename = rename_map, 
+                           notes = c("Data weighted by turnout.")
                            )
 
 ```
@@ -1006,24 +941,24 @@ all_panels_both_waves <- all_panels %>%
 ce1_all_b <- glm(voted ~ swd_pre + swd_post + election, 
            data = all_panels_both_waves,
            family = binomial(link = "logit"), 
-           weights = weight_turnout_norm)
+           weights = weight_turnout)
 ce2_all_b <- glm(voted ~ swd_pre + female + age + postsecondary_edu + 
              pol_interest_num + party_close + election, 
            data = all_panels_both_waves, 
            family = binomial(link = "logit"), 
-           weights = weight_turnout_norm)
+           weights = weight_turnout)
 ce3_all_b <- glm(voted ~ swd_post + female + age + postsecondary_edu + 
              pol_interest_num + party_close + election, 
            data = all_panels_both_waves, 
            family = binomial(link = "logit"), 
-           weights = weight_turnout_norm)
+           weights = weight_turnout)
 ce4_all_b <- glm(voted ~ swd_pre + swd_post + 
              female + age + postsecondary_edu + 
              pol_interest_num + 
              party_close + election, 
            data = all_panels_both_waves, 
            family = binomial(link = "logit"), 
-           weights = weight_turnout_norm)
+           weights = weight_turnout)
 
 fe_rows <- tribble(~term, ~m1, ~m2, ~m3, ~m4, 
                    "Election FE", "X", "X", "X", "X")

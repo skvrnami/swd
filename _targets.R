@@ -341,7 +341,9 @@ list(
           winner == "loser" ~ "strategic loser"
         )) %>% 
       ungroup %>% 
-      filter(n_waves == 5)
+      filter(n_waves == 5) %>% 
+      left_join(., cz_2023_weight %>% select(RADIOMETER_ID2, weight_turnout), 
+                by = "RADIOMETER_ID2")
   ),
   
   # EU 2019 -----------------------------------------------
