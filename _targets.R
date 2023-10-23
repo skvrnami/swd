@@ -13,7 +13,6 @@ tar_option_set(
 options(clustermq.scheduler = "multicore")
 
 tar_source()
-# source("other_functions.R") # Source other scripts as needed. # nolint
 
 # Replace the target list below with your own:
 list(
