@@ -63,7 +63,7 @@ ro_2012_p2_final|stem|1c89caf209b159b0|78b9948661175daa|58783744da7382e3|2046540
 ro_2012_p2v1|stem|e176f106d2d2b865|59a8f548699491ae|ef46db3751d8e999|1038652231||t19643.7467956411s|735e749bf885427c|382271|rds|local|vector|||0.126||
 ro_2012_p2v2|stem|c7c0fff3e3845112|822a15e59a337060|ef46db3751d8e999|-1246035250||t19643.746798924s|bec9540c87464770|343129|rds|local|vector|||0.18||
 ro_2012_weight|stem|a4f4879bd05f7478|4827e632f649a6ee|1714e11e76d512be|779647377||t19649.663933427s|dd3332697951bcad|24475|rds|local|vector|||0.142|No weights or probabilities supplied, assuming equal probability. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.|
-swd_final_rmd|stem|b972a55251f9f325|364301d54e081cb9|e934e2ff1204ca59|558811188|swd_final.html*swd_final.Rmd|t19653.771240039s|b588c8ecbf3c06a9|1467361|file|local|vector|||24.224||
+swd_final_rmd|stem|b972a55251f9f325|364301d54e081cb9|e934e2ff1204ca59|558811188|swd_final.html*swd_final.Rmd|t19653.771240039s||1467361|file|local|vector|||19.722||need finite xlim values
 swd_long_rmd|stem||1de22d597ffeba8d|b6c923331aeb39a3|589617560||t19615.6853152827s||0|file|local|vector|||3.178||need finite xlim values
 swd_rmd|stem|387a4e6f1df4a208|ec626d64359185b2|0541ad324224f814|-127931443|swd.html*swd.Rmd|t19615.7773572287s|14cb7a370a0ed5b6|1724405|file|local|vector|||7.777||
 swd2_rmd|stem|aae96b1d707226e1|46e3a69592d21748|e8c8bc883b335849|-674166384|swd2.html*swd2.Rmd|t19615.7772672873s|d63b6233c5808c64|1192757|file|local|vector|||12.469||
