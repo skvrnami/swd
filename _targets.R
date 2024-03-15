@@ -342,7 +342,17 @@ list(
       ungroup %>% 
       filter(n_waves == 5) %>% 
       left_join(., cz_2023_weight %>% select(RADIOMETER_ID2, weight_turnout), 
-                by = "RADIOMETER_ID2")
+                by = "RADIOMETER_ID2") %>% 
+      mutate(winner_stable2 = case_when(
+        winner_stable2 == "sincere winner" ~ "full winner", 
+        winner_stable2 == "strategic winner" ~ "sub-optimal winner",
+        winner_stable2 == "sincere loser" ~ "full loser",
+        winner_stable2 == "strategic loser" ~ "partial loser",
+        TRUE ~ winner_stable2
+      ) %>% factor(., levels = c("abstainer", "full winner", 
+                                 "sub-optimal winner",
+                                 "partial loser", 
+                                 "full loser"))) 
   ),
   
   # EU 2019 -----------------------------------------------
@@ -1291,6 +1301,92 @@ list(
       all_panels
       haven::write_sav(data = all_panels, path = "data/all_panels_merged.sav") 
     }
+  ),
+  
+  # Datasets for models 
+  tar_target(
+    cz_2023_all_waves_resp, 
+    command = {
+      cz_2023_models %>% 
+      filter(w1 == 1 & w2 == 1 & w3 == 1 & w4 == 1) %>% 
+      rename(pol_knowledge = pol_knowledge_pct) %>% 
+      mutate(prez_vote_type = case_when(
+        PRES2023CAND1r_w3 == "nevolič" & 
+          PRES2023CAND2r_w4 == "nevolič" ~ "abstainer",
+        PRES2023CAND1r_w3 == "Petr Pavel" & 
+          PRES2023CAND2r_w4 == "Petr Pavel" ~ "full winner",
+        PRES2023CAND1r_w3 == "Andrej Babiš" & 
+          PRES2023CAND2r_w4 == "Andrej Babiš" ~ "full loser",
+        PRES2023CAND2r_w4 == "Petr Pavel" ~ "sub-optimal winner",
+        PRES2023CAND2r_w4 == "Andrej Babiš" ~ "partial loser",
+        TRUE ~ "abstainer"
+      )) %>% 
+      mutate(prez_vote_type = factor(
+        prez_vote_type, 
+        levels = c("abstainer", 
+                   "full winner", 
+                   "sub-optimal winner",
+                   "partial loser",
+                   "full loser"))) %>% 
+      mutate(across(c("swd_pre", "swd_post", "pol_interest_num",
+                      "age", "SWD_w1", "SWD_w4"), 
+                    normalize_scale), 
+             swd_diff = swd_post - swd_pre) %>% 
+        mutate(pavel_decision = case_when(
+          IFPRESCAND_1_w1 == "Petr Pavel" & 
+            IFPRESCAND_2_w2 == "Petr Pavel" & 
+            PRES2023CAND1r_w3 == "Petr Pavel" ~ "V 1. vlně",
+          IFPRESCAND_2_w2 == "Petr Pavel" & 
+            PRES2023CAND1r_w3 == "Petr Pavel" ~ "V 2. vlně",
+          PRES2023CAND1r_w3 == "Petr Pavel" ~ "V 3. vlně", 
+          PRES2023CAND2r_w4 == "Petr Pavel" ~ "V 4. vlně"
+        ) %>% factor(., levels = c("V 1. vlně", "V 2. vlně", 
+                                   "V 3. vlně", "V 4. vlně"))) %>% 
+        mutate(
+          stable_voter = as.numeric(pavel_decision == "V 1. vlně")
+        )
+  }),
+  
+  tar_target(
+    cz_2023_model_data, 
+    saveRDS(cz_2023_all_waves_resp, "output/data/cz_2023_data_for_models.rds")
+  ),
+  
+  tar_target(
+    cz_2023_model_data_dta, 
+    haven::write_dta(cz_2023_all_waves_resp, "output/data/cz_2023_data_for_models.dta")
+  ),
+  
+  tar_target(
+    all_panels_both_waves, command = { 
+      all_panels %>% 
+      filter(!is.na(swd_pre) & !is.na(swd_post)) %>% 
+      filter(!is.na(female) & !is.na(age) & 
+               !is.na(postsecondary_edu) & 
+               !is.na(pol_interest_num) & 
+               !is.na(party_close)) %>% 
+      filter(election != "CZ 2023") %>% 
+      mutate(across(c("age"), normalize_scale))
+  }),
+  
+  tar_target(
+    all_panels_model_data, 
+    saveRDS(all_panels_both_waves, "output/data/all_panels_data_for_models.rds")
+  ),
+  
+  tar_target(
+    all_panels_model_data_dta, 
+    haven::write_dta(all_panels_both_waves, "output/data/all_panels_data_for_models.dta")
+  ),
+  
+  tar_target(
+    cz_2023_long_file, 
+    saveRDS(cz_2023_long, "output/data/cz_2023_long_data_for_models.rds")
+  ),
+  
+  tar_target(
+    cz_2023_long_file_dta, 
+    haven::write_dta(cz_2023_long, "output/data/cz_2023_long_data_for_models.dta")
   ),
 
   # Tables ------------------------------------------------------------------
