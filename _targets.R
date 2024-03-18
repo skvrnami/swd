@@ -1319,7 +1319,10 @@ list(
           PRES2023CAND2r_w4 == "Andrej Babiš" ~ "full loser",
         PRES2023CAND2r_w4 == "Petr Pavel" ~ "sub-optimal winner",
         PRES2023CAND2r_w4 == "Andrej Babiš" ~ "partial loser",
-        TRUE ~ "abstainer"
+        PRES2023CAND1r_w3 %in% c("Petr Pavel", "Andrej Babiš") &
+          PRES2023CAND2r_w4 == "nevolič" ~ "partial loser",
+        !PRES2023CAND1r_w3 %in% c("Petr Pavel", "Andrej Babiš") &
+          PRES2023CAND2r_w4 == "nevolič" ~ "full loser"
       )) %>% 
       mutate(prez_vote_type = factor(
         prez_vote_type, 

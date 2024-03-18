@@ -15,12 +15,12 @@ cz_1996|stem|4879f0f37dd270c1|949fbc6939536379|e6cd9c1c70076530|-1765088649||t19
 cz_1996_final|stem|ec9be5534e3fcf1f|3f6ee122e6df257a|00ec91088e6f10a2|900923272||t19468.5553828287s|b42663120c0dc9c1|326604|rds|local|vector|||0.049||
 cz_1996_weight|stem|2715dc0a504ab16c|dc3eee1bc28b582e|08278d112709442c|1264422100||t19649.6639315767s|b427b2f444944d7f|116305|rds|local|vector|||0.034|No weights or probabilities supplied, assuming equal probability. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.|
 cz_2023|stem|d6c769bdf77020f1|dbe2d851f3752599|ef46db3751d8e999|763412258||t19649.4843168669s|bafe99741f69ef09|1864746|rds|local|vector|||1.554||
-cz_2023_all_waves_resp|stem|fed62a55a9f1969e|36592e5f08097437|0dbf7ae776985c80|-616534420||t19788.4013656367s|8f9ef508c784f15b|1625013|rds|local|vector|||0.055||
+cz_2023_all_waves_resp|stem|d26464b28109197a|b2255cb823b27d2d|0dbf7ae776985c80|-616534420||t19797.6874612916s|5789b3ea4e50a0dd|1624979|rds|local|vector|||0.071||
 cz_2023_long|stem|10498f6e17cdbf95|17b5a97e51884f62|adc58c738a631520|-1227956337||t19788.4013581288s|05b32f5d5d393389|1368228|rds|local|vector|||2.955||
 cz_2023_long_file|stem|e0d1f2ac79fc7e12|704484cdc6637387|ff7842c256992ccd|-640633639||t19788.4013813731s|44e327d1ee1978d7|43|rds|local|vector|||0.422||
 cz_2023_long_file_dta|stem|10498f6e17cdbf95|a49f773f9748d6bb|ff7842c256992ccd|-773435780||t19788.4013764314s|05b32f5d5d393389|1368228|rds|local|vector|||0.508||
-cz_2023_model_data|stem|e0d1f2ac79fc7e12|d46f928445fa0a3d|dc7a8b1d7cc5797b|1610990866||t19788.4013877127s|44e327d1ee1978d7|43|rds|local|vector|||0.542||
-cz_2023_model_data_dta|stem|fed62a55a9f1969e|44261cef3ed7caaa|dc7a8b1d7cc5797b|1746977788||t19788.4013982939s|8f9ef508c784f15b|1625013|rds|local|vector|||0.368||
+cz_2023_model_data|stem|e0d1f2ac79fc7e12|d46f928445fa0a3d|878dce13269b1b4d|1610990866||t19797.6874676925s|44e327d1ee1978d7|43|rds|local|vector|||0.544||
+cz_2023_model_data_dta|stem|d26464b28109197a|44261cef3ed7caaa|878dce13269b1b4d|1746977788||t19797.6874798076s|5789b3ea4e50a0dd|1624979|rds|local|vector|||0.501||
 cz_2023_models|stem|150cb23c05ade200|70af0b2172907f22|adc58c738a631520|691722508||t19649.6478941843s|6346fbda68d73360|1623003|rds|local|vector|||0.016||
 cz_2023_weight|stem|640225bc8956b038|223c2ced9dd490ff|00bd33239e496472|-333891484||t19649.663921525s|2dc0732d37d55c0b|1621026|rds|local|vector|||0.314|No weights or probabilities supplied, assuming equal probability. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.|
 cz_96_final|stem|4cee3d3ad2510c25|c01e8258cf6971fb|3755cab0d5abcc3a|1682770841||t19468.4983173415s|64301caf38caf595|326591|rds|local|vector|||0.049||
@@ -71,7 +71,7 @@ ro_2012_p2_final|stem|1c89caf209b159b0|78b9948661175daa|58783744da7382e3|2046540
 ro_2012_p2v1|stem|e176f106d2d2b865|59a8f548699491ae|ef46db3751d8e999|1038652231||t19643.7467956411s|735e749bf885427c|382271|rds|local|vector|||0.126||
 ro_2012_p2v2|stem|c7c0fff3e3845112|822a15e59a337060|ef46db3751d8e999|-1246035250||t19643.746798924s|bec9540c87464770|343129|rds|local|vector|||0.18||
 ro_2012_weight|stem|a4f4879bd05f7478|4827e632f649a6ee|1714e11e76d512be|779647377||t19649.663933427s|dd3332697951bcad|24475|rds|local|vector|||0.142|No weights or probabilities supplied, assuming equal probability. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.|
-swd_final_rmd|stem|b972a55251f9f325|8f5d75c3a61e5ad7|f63c32637a3ddccc|558811188|swd_final.html*swd_final.Rmd|t19653.771240039s||1467361|file|local|vector|||18.812||need finite xlim values
+swd_final_rmd|stem|c014a93db4bd1547|8f5d75c3a61e5ad7|c6240f10891d9bab|558811188|swd_final.html*swd_final.Rmd|t19800.8865006568s|fb32ee037e63ab3a|2005705|file|local|vector|||33.523||
 swd_long_rmd|stem||1de22d597ffeba8d|b6c923331aeb39a3|589617560||t19615.6853152827s||0|file|local|vector|||3.178||need finite xlim values
 swd_rmd|stem|387a4e6f1df4a208|ec626d64359185b2|0541ad324224f814|-127931443|swd.html*swd.Rmd|t19615.7773572287s|14cb7a370a0ed5b6|1724405|file|local|vector|||7.777||
 swd2_rmd|stem|aae96b1d707226e1|46e3a69592d21748|e8c8bc883b335849|-674166384|swd2.html*swd2.Rmd|t19615.7772672873s|d63b6233c5808c64|1192757|file|local|vector|||12.469||
