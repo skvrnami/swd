@@ -252,7 +252,36 @@ list(
         ), 
         swd_pre = SWD_w1,
         # swd_pre = SWD_w2,
-        swd_post = SWD_w4
+        swd_post = SWD_w4, 
+        econ_precariousness = ECOENERGY_w1, 
+        econ_precariousness2 = as.numeric(
+          ECOENERGY_w1 %in% c("s velkými obtížemi", "s obtížemi", 
+                              "s menšími obtížemi")
+        ),
+        econ_precariousness3 = case_when(
+          ECOENERGY_w1 %in% c("snadno", "velmi snadno") ~ "Easy",
+          ECOENERGY_w1 %in% c("docela snadno") ~ "Fairly easy",
+          ECOENERGY_w1 %in% c("s menšími obtížemi") ~ "With minor difficulties",
+          ECOENERGY_w1 %in% c("s obtížemi", "s velkými obtížemi") ~ "With difficulties"
+        ) %>% factor(., levels = c("Easy", "Fairly easy", "With minor difficulties", "With difficulties")),
+        soc_class = S12A, 
+        soc_class_r = case_when(
+          soc_class == "Nezaměstnaný" ~ "Unemployed", 
+          soc_class == "Student, v domácnosti, na rodičovské dovolené apod." ~ 
+            "Econ. inactive (student, in household)",
+          soc_class == "Nepracující důchodce" ~ "Pensioner",
+          soc_class == "Zaměstnanec bez podřízených" ~ "Employee",
+          soc_class %in% c("Zaměstnanec - nižší vedoucí (1-5 podřízených)", 
+                           "Zaměstnanec - vyšší vedoucí (6 a více podřízených)", 
+                           "Zaměstnanec - vrcholový manažer, ředitel podnik", 
+                           "Soukromý podnikatel s 1-5 zaměstnanci", 
+                           "Soukromý podnikatel s 6 a více zaměstnanci") ~ 
+            "Manager/Businessperson",
+          soc_class == "Soukromý podnikatel bez zaměstnanců (OSVČ)" ~ "Freelancer",
+        ) %>% factor(., levels = c("Employee", "Unemployed", "Econ. inactive (student, in household)", 
+                                   "Pensioner", "Manager/Businessperson", "Freelancer", 
+                                   "Businessperson")), 
+        vote_intention_w1 = as.numeric(IFPRESPART_1_w1 %in% c("Určitě ano", "Spíše ano"))
       ) %>% 
       rename(
         age = AGE_w1
@@ -1332,7 +1361,7 @@ list(
                    "partial loser",
                    "full loser"))) %>% 
       mutate(across(c("swd_pre", "swd_post", "pol_interest_num",
-                      "age", "SWD_w1", "SWD_w4"), 
+                      "age", "SWD_w1", "SWD_w2", "SWD_w3", "SWD_w4"), 
                     normalize_scale), 
              swd_diff = swd_post - swd_pre) %>% 
         mutate(pavel_decision = case_when(

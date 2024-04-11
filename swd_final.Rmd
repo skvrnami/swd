@@ -158,7 +158,7 @@ avg_swd_cz2023 <- cz_2023 %>%
 #     writeLines(., "output/avg_swd_cz2023_panel.tex")
 
 avg_swd_cz2023 %>% 
-    knitr::kable()
+    knitr::kable(., format = "html")
 ```
 ```{r}
 mean_swd_pre_post <- function(data, indices){
@@ -277,7 +277,7 @@ avg_swd_all_panels %>%
     knitr::kable(col.names = c(
       "Country", "Year", "Type of election", "Pre-election SWD",
       "Post-election SWD", "SWD difference", "N"
-    ))
+    ), format = "html")
 ```
 
 
@@ -1022,7 +1022,7 @@ ggsave("output/swd_change_w1_w5_gov_voter.png",
 
 ## Robustness checks
 
-### Czech 2023 panel, pre-election SWD measured in Wave 2
+### Table A3: Czech 2023 panel, pre-election SWD measured in Wave 2
 Same models as in Table 2, but instead of pre-election SWD measured in Wave 1, pre-election SWD in Wave 2 is used
 ```{r}
 ce0_round1_r <- glm(voted_1r ~ 1, 
@@ -1035,6 +1035,13 @@ ce1_round1_r <- glm(voted_1r ~ SWD_w2 + SWD_w4,
            weights = weight_turnout)
 ce2_round1_r <- glm(voted_1r ~ SWD_w2 + female + age + postsecondary_edu + duty_to_vote + 
              pol_interest_num + pol_knowledge + party_close, 
+           data = cz_2023_all_waves_resp, 
+           family = binomial(link = "logit"), 
+           weights = weight_turnout)
+ce3_round1_r <- glm(voted_1r ~ SWD_w4 + 
+             female + age + postsecondary_edu + duty_to_vote + 
+             pol_interest_num + pol_knowledge + 
+             party_close, 
            data = cz_2023_all_waves_resp, 
            family = binomial(link = "logit"), 
            weights = weight_turnout)
@@ -1055,6 +1062,13 @@ ce2_round2_r <- glm(voted_2r ~ SWD_w2 + female + age + postsecondary_edu + duty_
            data = cz_2023_all_waves_resp, 
            family = binomial(link = "logit"), 
            weights = weight_turnout)
+ce3_round2_r <- glm(voted_2r ~ SWD_w4 + 
+             female + age + postsecondary_edu + 
+             duty_to_vote + pol_interest_num + pol_knowledge + 
+             party_close, 
+           data = cz_2023_all_waves_resp, 
+           family = binomial(link = "logit"), 
+           weights = weight_turnout)
 ce4_round2_r <- glm(voted_2r ~ SWD_w2 + SWD_w4 + 
              female + age + postsecondary_edu + 
              duty_to_vote + pol_interest_num + pol_knowledge + 
@@ -1063,13 +1077,15 @@ ce4_round2_r <- glm(voted_2r ~ SWD_w2 + SWD_w4 +
            family = binomial(link = "logit"), 
            weights = weight_turnout)
 
-pr2_r <- tribble(~term, ~m1, ~m2, ~m3, ~m4, ~m5, ~m6,
+pr2_r <- tribble(~term, ~m1, ~m2, ~m3, ~m4, ~m5, ~m6, ~m7, ~m8,
                "PseudoR2 (McFadden)",
                r2(ce0_round1_r, ce1_round1_r), 
                r2(ce0_round1_r, ce2_round1_r),
+               r2(ce0_round1_r, ce3_round1_r),
                r2(ce0_round1_r, ce4_round1_r),
                r2(ce0_round1_r, ce1_round2_r), 
                r2(ce0_round1_r, ce2_round2_r),
+               r2(ce0_round1_r, ce3_round2_r),
                r2(ce0_round1_r, ce4_round2_r)
                )
 
@@ -1081,9 +1097,11 @@ attr(pr2_r, "position") <- (model_n_vars * 2) + 2
 
 modelsummary(list("Round 1" = ce1_round1_r, 
                   "Round 1" = ce2_round1_r, 
+                  "Round 1" = ce3_round1_r, 
                   "Round 1" = ce4_round1_r,
                   "Round 2" = ce1_round2_r, 
                   "Round 2" = ce2_round2_r, 
+                  "Round 2" = ce3_round2_r, 
                   "Round 2" = ce4_round2_r), 
              stars = c("*"=.05, "**"=.01, "***"=0.001),fmt = 2, coef_rename = c(
                  "SWD_w2" = "Pre-election satisfaction (Wave 2)",
@@ -1100,10 +1118,12 @@ modelsummary(list("Round 1" = ce1_round1_r,
              title = "Turnout and satisfaction with democracy, 2023 Czech presidential election")
 
 modelsummary(list("Round 1" = ce1_round1_r, 
-                  "Round 1" = ce2_round1_r, 
+                  "Round 1" = ce2_round1_r,
+                  "Round 1" = ce3_round1_r,
                   "Round 1" = ce4_round1_r,
                   "Round 2" = ce1_round2_r, 
-                  "Round 2" = ce2_round2_r, 
+                  "Round 2" = ce2_round2_r,
+                  "Round 2" = ce3_round2_r,
                   "Round 2" = ce4_round2_r), 
              stars = c("*"=.05, "**"=.01, "***"=0.001),fmt = 2, coef_rename = c(
                  "SWD_w2" = "Pre-election satisfaction (Wave 2)",
@@ -1121,8 +1141,36 @@ modelsummary(list("Round 1" = ce1_round1_r,
 
 ```
 
-### Czech 2023 panel, pre-election SWD measured in Wave 3
+### Table A4: Czech 2023 panel, pre-election SWD measured in Wave 3
 ```{r}
+ce0_round1_r2 <- glm(voted_1r ~ 1, 
+           data = cz_2023_all_waves_resp,
+           family = binomial(link = "logit"), 
+           weights = weight_turnout)
+
+ce1_round1_r2 <- glm(voted_1r ~ SWD_w2 + SWD_w3, 
+           data = cz_2023_all_waves_resp,
+           family = binomial(link = "logit"), 
+           weights = weight_turnout)
+ce2_round1_r2 <- glm(voted_1r ~ SWD_w2 + female + age + postsecondary_edu + duty_to_vote + 
+             pol_interest_num + pol_knowledge + party_close, 
+           data = cz_2023_all_waves_resp, 
+           family = binomial(link = "logit"), 
+           weights = weight_turnout)
+ce3_round1_r2 <- glm(voted_1r ~ SWD_w3 + female + age + postsecondary_edu + duty_to_vote + 
+             pol_interest_num + pol_knowledge + party_close, 
+           data = cz_2023_all_waves_resp, 
+           family = binomial(link = "logit"), 
+           weights = weight_turnout)
+
+ce4_round1_r2 <- glm(voted_2r ~ SWD_w2 + SWD_w3 + 
+             female + age + postsecondary_edu + 
+             duty_to_vote + pol_interest_num + pol_knowledge + 
+             party_close, 
+           data = cz_2023_all_waves_resp, 
+           family = binomial(link = "logit"), 
+           weights = weight_turnout)
+
 ce0_round2_r2 <- glm(voted_2r ~ 1, 
            data = cz_2023_all_waves_resp,
            family = binomial(link = "logit"), 
@@ -1137,6 +1185,11 @@ ce2_round2_r2 <- glm(voted_2r ~ SWD_w3 + female + age + postsecondary_edu + duty
            data = cz_2023_all_waves_resp, 
            family = binomial(link = "logit"), 
            weights = weight_turnout)
+ce3_round2_r2 <- glm(voted_2r ~ SWD_w4 + female + age + postsecondary_edu + duty_to_vote + 
+             pol_interest_num + pol_knowledge + party_close, 
+           data = cz_2023_all_waves_resp, 
+           family = binomial(link = "logit"), 
+           weights = weight_turnout)
 ce4_round2_r2 <- glm(voted_2r ~ SWD_w3 + SWD_w4 + 
              female + age + postsecondary_edu + 
              duty_to_vote + pol_interest_num + pol_knowledge + 
@@ -1146,10 +1199,15 @@ ce4_round2_r2 <- glm(voted_2r ~ SWD_w3 + SWD_w4 +
            weights = weight_turnout)
 
 
-pr2_r2 <- tribble(~term, ~m1, ~m2, ~m3,
+pr2_r2 <- tribble(~term, ~m1, ~m2, ~m3, ~m4, ~m5, ~m6, ~m7, ~m8,
                "PseudoR2 (McFadden)",
+               r2(ce0_round1_r2, ce1_round1_r2),
+               r2(ce0_round1_r2, ce2_round1_r2),
+               r2(ce0_round1_r2, ce3_round1_r2),
+               r2(ce0_round1_r2, ce4_round1_r2),
                r2(ce0_round2_r2, ce1_round2_r2),
                r2(ce0_round2_r2, ce2_round2_r2),
+               r2(ce0_round2_r2, ce3_round2_r2),
                r2(ce0_round2_r2, ce4_round2_r2)
                )
 
@@ -1157,40 +1215,60 @@ model_n_vars_r2 <- broom::tidy(ce4_round2_r2) %>%
     filter(!grepl("election", term)) %>%
     nrow()
 
-attr(pr2_r2, "position") <- (model_n_vars_r2 * 2) + 2
+attr(pr2_r2, "position") <- (model_n_vars_r2 * 2) + 3
 
-modelsummary(list("Round 2" = ce1_round2_r2, 
-                  "Round 2" = ce2_round2_r2, 
-                  "Round 2" = ce4_round2_r2), 
-             stars = c("*"=.05, "**"=.01, "***"=0.001),fmt = 2, coef_rename = c(
-                 "SWD_w3" = "Pre-election satisfaction (Wave 3, before Round 2)",
-                 "SWD_w4" = "Post-election satisfaction (Wave 4)", 
-                 "female" = "Female",
-                 "age" = "Age", 
-                 "postsecondary_edu" = "Post-secondary education", 
-                 "duty_to_vote" = "Duty to vote", 
-                 "pol_interest_num" = "Interest in politics",
-                 "pol_knowledge" = "Political knowledge", 
-                 "party_close" = "Feels close to a party"
-             ), 
-             add_rows = pr2_r2)
+modelsummary(
+  list(
+    "Round 1" = ce1_round1_r2, 
+    "Round 1" = ce2_round1_r2, 
+    "Round 1" = ce3_round1_r2, 
+    "Round 1" = ce4_round1_r2,
+    "Round 2" = ce1_round2_r2, 
+    "Round 2" = ce2_round2_r2, 
+    "Round 2" = ce3_round2_r2, 
+    "Round 2" = ce4_round2_r2
+  ), 
+  stars = c("*"=.05, "**"=.01, "***"=0.001),
+  fmt = 2, coef_map = c(
+    "SWD_w2" = "Pre-election satisfaction (Wave 2, before Round 1)",
+    "SWD_w3" = "Pre-election satisfaction (Wave 3, before Round 2)",
+    "SWD_w4" = "Post-election satisfaction (Wave 4)", 
+    "female" = "Female",
+    "age" = "Age", 
+    "postsecondary_edu" = "Post-secondary education", 
+    "duty_to_vote" = "Duty to vote", 
+    "pol_interest_num" = "Interest in politics",
+    "pol_knowledge" = "Political knowledge", 
+    "party_close" = "Feels close to a party"
+  ), 
+  add_rows = pr2_r2)
 
-modelsummary(list("Round 2" = ce1_round2_r2, 
-                  "Round 2" = ce2_round2_r2, 
-                  "Round 2" = ce4_round2_r2), 
-             stars = c("*"=.05, "**"=.01, "***"=0.001),fmt = 2, coef_rename = c(
-                 "SWD_w3" = "Pre-election satisfaction (Wave 3, before Round 2)",
-                 "SWD_w4" = "Post-election satisfaction (Wave 4)", 
-                 "female" = "Female",
-                 "age" = "Age", 
-                 "postsecondary_edu" = "Post-secondary education", 
-                 "duty_to_vote" = "Duty to vote", 
-                 "pol_interest_num" = "Interest in politics",
-                 "pol_knowledge" = "Political knowledge", 
-                 "party_close" = "Feels close to a party"
-             ), 
-             add_rows = pr2_r2, 
-             output = "output/app_tab3_models_wave3.tex")
+modelsummary(
+  list(
+    "Round 1" = ce1_round1_r2, 
+    "Round 1" = ce2_round1_r2, 
+    "Round 1" = ce3_round1_r2, 
+    "Round 1" = ce4_round1_r2,
+    "Round 2" = ce1_round2_r2, 
+    "Round 2" = ce2_round2_r2, 
+    "Round 2" = ce3_round2_r2, 
+    "Round 2" = ce4_round2_r2
+  ), 
+  stars = c("*"=.05, "**"=.01, "***"=0.001),
+  fmt = 2, coef_map = c(
+    "SWD_w2" = "Pre-election satisfaction (Wave 2, before Round 1)",
+    "SWD_w3" = "Pre-election satisfaction (Wave 3, before Round 2)",
+    "SWD_w4" = "Post-election satisfaction (Wave 4)", 
+    "female" = "Female",
+    "age" = "Age", 
+    "postsecondary_edu" = "Post-secondary education", 
+    "duty_to_vote" = "Duty to vote", 
+    "pol_interest_num" = "Interest in politics",
+    "pol_knowledge" = "Political knowledge", 
+    "party_close" = "Feels close to a party"
+  ), 
+  add_rows = pr2_r2,
+  output = "output/app_tab3_models_wave3.tex")
 
 ```
 
@@ -1938,4 +2016,612 @@ knitr::kable(ro_12, digits = 2,
                            "max", "N"), 
              label = "RO 2012")
 
+```
+
+## Tables 3 and 4 with additional controls
+### Table 3 with precariousness and social class
+```{r}
+ce0_round1_e <- glm(voted_1r ~ 1, 
+           data = cz_2023_all_waves_resp %>% filter(!is.na(soc_class_r)),
+           family = binomial(link = "logit"), 
+           weights = weight_turnout) %>% 
+  coeftest(., vcov = vcovHC(., type="HC1")) 
+ce1_round1_e <- glm(voted_1r ~ SWD_w1 + SWD_w4, 
+           data = cz_2023_all_waves_resp %>% 
+             filter(!is.na(soc_class_r)),
+           family = binomial(link = "logit"), 
+           weights = weight_turnout) %>% 
+  coeftest(., vcov = vcovHC(., type="HC1")) 
+ce2_round1_e <- glm(voted_1r ~ SWD_w1 + female + age + 
+                    postsecondary_edu + duty_to_vote + 
+             pol_interest_num + pol_knowledge + party_close + 
+               econ_precariousness2 + soc_class_r, 
+           data = cz_2023_all_waves_resp %>% 
+             filter(!is.na(soc_class_r)), 
+           family = binomial(link = "logit"), 
+           weights = weight_turnout) %>% 
+  coeftest(., vcov = vcovHC(., type="HC1")) 
+ce3_round1_e <- glm(voted_1r ~ SWD_w4 + female + age + 
+                    postsecondary_edu + duty_to_vote + 
+             pol_interest_num + pol_knowledge + party_close + 
+               econ_precariousness2 + soc_class_r, 
+           data = cz_2023_all_waves_resp %>% 
+             filter(!is.na(soc_class_r)), 
+           family = binomial(link = "logit"), 
+           weights = weight_turnout) %>% 
+  coeftest(., vcov = vcovHC(., type="HC1")) 
+ce4_round1_e <- glm(voted_1r ~ SWD_w1 + SWD_w4 + 
+             female + age + postsecondary_edu + duty_to_vote + 
+             pol_interest_num + pol_knowledge + 
+             party_close + 
+               econ_precariousness2 + soc_class_r, 
+           data = cz_2023_all_waves_resp %>% 
+             filter(!is.na(soc_class_r)), 
+           family = binomial(link = "logit"), 
+           weights = weight_turnout) %>% 
+  coeftest(., vcov = vcovHC(., type="HC1")) 
+
+ce0_round2_e <- glm(voted_2r ~ 1, 
+           data = cz_2023_all_waves_resp %>% 
+             filter(!is.na(soc_class_r)),
+           family = binomial(link = "logit"), 
+           weights = weight_turnout) %>% 
+  coeftest(., vcov = vcovHC(., type="HC1")) 
+ce1_round2_e <- glm(voted_2r ~ SWD_w1 + SWD_w4, 
+           data = cz_2023_all_waves_resp %>% 
+             filter(!is.na(soc_class_r)),
+           family = binomial(link = "logit"), 
+           weights = weight_turnout) %>% 
+  coeftest(., vcov = vcovHC(., type="HC1")) 
+ce2_round2_e <- glm(voted_2r ~ SWD_w1 + female + 
+                    age + postsecondary_edu + duty_to_vote + 
+             pol_interest_num + pol_knowledge + party_close + 
+               econ_precariousness2 + soc_class_r, 
+           data = cz_2023_all_waves_resp %>% 
+             filter(!is.na(soc_class_r)), 
+           family = binomial(link = "logit"), 
+           weights = weight_turnout) %>% 
+  coeftest(., vcov = vcovHC(., type="HC1")) 
+ce3_round2_e <- glm(voted_2r ~ SWD_w4 + female + age +
+                    postsecondary_edu + 
+             duty_to_vote + pol_interest_num + 
+               pol_knowledge + party_close + 
+               econ_precariousness2 + soc_class_r, 
+           data = cz_2023_all_waves_resp %>% 
+             filter(!is.na(soc_class_r)), 
+           family = binomial(link = "logit"), 
+           weights = weight_turnout) %>% 
+  coeftest(., vcov = vcovHC(., type="HC1")) 
+ce4_round2_e <- glm(voted_2r ~ SWD_w1 + SWD_w4 + 
+             female + age + postsecondary_edu + 
+             duty_to_vote + pol_interest_num + pol_knowledge + 
+             party_close + 
+               econ_precariousness2 + soc_class_r, 
+           data = cz_2023_all_waves_resp %>% 
+             filter(!is.na(soc_class_r)), 
+           family = binomial(link = "logit"), 
+           weights = weight_turnout) %>% 
+  coeftest(., vcov = vcovHC(., type="HC1")) 
+
+pr2 <- tribble(~term, ~m1, ~m2, ~m3, ~m4, ~m5, ~m6, ~m7, ~m8,
+               "PseudoR2 (McFadden)",
+               r2(ce0_round1_e, ce1_round1_e), 
+               r2(ce0_round1_e, ce2_round1_e), 
+               r2(ce0_round1_e, ce3_round1_e), 
+               r2(ce0_round1_e, ce4_round1_e), 
+               r2(ce0_round2_e, ce1_round2_e),
+               r2(ce0_round2_e, ce2_round2_e),
+               r2(ce0_round2_e, ce3_round2_e),
+               r2(ce0_round2_e, ce4_round2_e))
+
+model_n_vars <- broom::tidy(ce4_round1_e) %>%
+    filter(!grepl("election", term)) %>%
+    nrow()
+
+attr(pr2, "position") <- (model_n_vars * 2) + 1
+
+modelsummary(list("Round 1" = ce1_round1_e, 
+                  "Round 1" = ce2_round1_e, 
+                  "Round 1" = ce3_round1_e, 
+                  "Round 1" = ce4_round1_e, 
+                  "Round 2" = ce1_round2_e, 
+                  "Round 2" = ce2_round2_e, 
+                  "Round 2" = ce3_round2_e, 
+                  "Round 2" = ce4_round2_e), 
+             stars = c("*"=.05, "**"=.01, "***"=0.001), 
+             fmt = 2, coef_map = c(
+                 "SWD_w1" = "Pre-election satisfaction (Wave 1)",
+                 "SWD_w4" = "Post-election satisfaction (Wave 4)", 
+                 "female" = "Female",
+                 "age" = "Age", 
+                 "postsecondary_edu" = "Post-secondary education", 
+                 "duty_to_vote" = "Duty to vote", 
+                 "pol_interest_num" = "Interest in politics",
+                 "pol_knowledge" = "Political knowledge", 
+                 "party_close" = "Feels close to a party", 
+                 "econ_precariousness2" = "Economic  precariousness",
+                 
+                 "soc_class_rUnemployed" = "Class: Unemployed",
+                 "soc_class_rEcon. inactive (student, in household)" = "Class: Econ. inactive",
+                 "soc_class_rPensioner" = "Class: Pensioner",
+                 "soc_class_rManager/Businessperson"= "Class: Manager/Businessperson",
+                 "soc_class_rFreelancer" = "Class: Freelancer",
+                 
+                 "(Intercept)" = "Intercept"
+             ), 
+             add_rows = pr2,
+             # notes = c("Data weighted by turnout."),
+             # title = "Turnout and satisfaction with democracy, 2023 Czech presidential election",
+             gof_map = "nobs",
+             output = "output/app_tab3_models_class_precarity.tex"
+             )
+
+
+modelsummary(list("Round 1" = ce1_round1_e, 
+                  "Round 1" = ce2_round1_e, 
+                  "Round 1" = ce3_round1_e, 
+                  "Round 1" = ce4_round1_e, 
+                  "Round 2" = ce1_round2_e, 
+                  "Round 2" = ce2_round2_e, 
+                  "Round 2" = ce3_round2_e, 
+                  "Round 2" = ce4_round2_e), 
+             stars = c("*"=.05, "**"=.01, "***"=0.001), 
+             fmt = 2, 
+             coef_rename = c(
+                 "SWD_w1" = "Pre-election satisfaction (Wave 1)",
+                 "SWD_w4" = "Post-election satisfaction (Wave 4)", 
+                 "female" = "Female",
+                 "age" = "Age", 
+                 "postsecondary_edu" = "Post-secondary education", 
+                 "duty_to_vote" = "Duty to vote", 
+                 "pol_interest_num" = "Interest in politics",
+                 "pol_knowledge" = "Political knowledge", 
+                 "party_close" = "Feels close to a party", 
+                 "econ_precariousness2" = "Economic  precariousness",
+                 "soc_class_rUnemployed" = "Class: Unemployed",
+                 "soc_class_rEcon. inactive (student, in household)" = "Class: Econ. inactive",
+                 "soc_class_rPensioner" = "Class: Pensioner",
+                 "soc_class_rManager/Businessperson"= "Class: Manager/Businessperson",
+                 "soc_class_rFreelancer" = "Class: Freelancer",
+                 "(Intercept)" = "Intercept"
+             ), 
+             add_rows = pr2,
+             # notes = c("Data weighted by turnout."),
+             # title = "Turnout and satisfaction with democracy, 2023 Czech presidential election",
+             gof_map = "nobs")
+```
+
+### Table 4 with precariousness and social class
+```{r}
+swd1_round1_e <- lm_robust(swd_diff ~ voted_1r + voted_2r + 
+                           swd_pre + female + 
+                           age +
+                    postsecondary_edu + pol_interest_num + 
+                    pol_knowledge + party_close + duty_to_vote + 
+                      econ_precariousness2 + soc_class_r, 
+             data = cz_2023_all_waves_resp %>% 
+               filter(!is.na(soc_class_r)), 
+             weights = weight_turnout, 
+          se_type = "stata")
+
+swd1_round1_e <- lm_robust(swd_diff ~ voted_1r + voted_2r +
+                            swd_pre + female + 
+                            age +
+                    postsecondary_edu + pol_interest_num + 
+                    pol_knowledge + party_close + duty_to_vote + 
+                      econ_precariousness2 + soc_class_r, 
+             data = cz_2023_all_waves_resp %>% 
+               filter(!is.na(soc_class_r)), 
+             weights = weight_turnout, 
+             se_type = "stata")
+
+swd3_round1_e <- lm_robust(swd_diff ~ voter_type + swd_pre + 
+                           female + age +
+                    postsecondary_edu + pol_interest_num + 
+                    pol_knowledge + party_close + duty_to_vote + 
+                      econ_precariousness2 + soc_class_r, 
+                  data = cz_2023_all_waves_resp %>% 
+                    filter(!is.na(soc_class_r)), 
+                  weights = weight_turnout, 
+                  se_type = "stata")
+
+swd4_round1_e <- lm_robust(swd_diff ~ prez_vote_type + swd_pre + 
+                    female + age +
+                      postsecondary_edu + pol_interest_num + 
+                      pol_knowledge + party_close + duty_to_vote + 
+                      econ_precariousness2 + soc_class_r, 
+                  data = cz_2023_all_waves_resp %>% 
+                    filter(!is.na(soc_class_r)), 
+                  weights = weight_turnout, 
+                  se_type = "stata")
+
+swd5_round1_e <- lm_robust(swd_diff ~ stable_voter + swd_pre + 
+                           female + age +
+                    postsecondary_edu + pol_interest_num + 
+                    pol_knowledge + party_close + duty_to_vote + 
+                      econ_precariousness2 + soc_class_r, 
+                  data = pavel_voters %>% 
+                    filter(!is.na(soc_class_r)), 
+                  weights = weight_turnout, 
+                  se_type = "stata")
+swd5_round1_ord_e <- lm_robust(swd_diff ~ pavel_decision + swd_pre + 
+                        female + age +
+                    postsecondary_edu + pol_interest_num + 
+                    pol_knowledge + party_close + duty_to_vote + 
+                      econ_precariousness2 + soc_class_r, 
+                  data = pavel_voters %>% 
+                    filter(!is.na(soc_class_r)), 
+                  weights = weight_turnout, 
+                  se_type = "stata")
+
+modelsummary(list(swd1_round1_e, swd3_round1_e, 
+                  swd4_round1_e, swd5_round1_e
+                  ), 
+             stars = c("*"=.05, "**"=.01, "***"=0.001),
+             coef_map = c(
+               "voted_1r" = "Voted (R1)",
+               "voted_2r" = "Voted (R2)",
+               "voter_typeVoted for winner" = "Winner",
+               "voter_typeVoted for loser" = "Loser",
+               "prez_vote_typefull winner" = "Full winner (A)",
+               "prez_vote_typesub-optimal winner" = "Sub-optimal winner (B)",
+               "prez_vote_typepartial loser" = "Partial loser (C)",
+               "prez_vote_typefull loser" = "Full loser (D)",
+               "stable_voter" = "Stable winner", 
+               "swd_pre" = "Pre-election SWD",
+               "female" = "Female",
+               "age" = "Age",
+               "postsecondary_edu" = "Post-secondary education",
+               "pol_interest_num" = "Pol. interest", 
+               "pol_knowledge" = "Pol. knowledge",
+               "party_close" = "Feels close to a party",
+               "duty_to_vote" = "Duty to vote",
+               "econ_precariousness2" = "Economic  precariousness",
+                 "soc_class_rUnemployed" = "Class: Unemployed",
+                 "soc_class_rEcon. inactive (student, in household)" = "Class: Econ. inactive",
+                 "soc_class_rPensioner" = "Class: Pensioner",
+                 "soc_class_rManager/Businessperson"= "Class: Manager/Businessperson",
+                 "soc_class_rFreelancer" = "Class: Freelancer",
+               "(Intercept)"="Intercept"
+             ), 
+             fmt = 2,
+             gof_map = c("nobs", "r.squared", "adj.r.squared"),
+             # notes = c("Data weighted by turnout."),
+             output = "output/app_tab4_models_precariousness.tex")
+
+modelsummary(list(swd1_round1_e, swd3_round1_e, 
+                  swd4_round1_e, swd5_round1_e
+                  ), 
+             stars = c("*"=.05, "**"=.01, "***"=0.001),
+             coef_rename = c(
+               "voted_1r" = "Voted (R1)",
+               "voted_2r" = "Voted (R2)",
+               "voter_typeVoted for winner" = "Winner",
+               "voter_typeVoted for loser" = "Loser",
+               "prez_vote_typefull winner" = "Full winner (A)",
+               "prez_vote_typesub-optimal winner" = "Sub-optimal winner (B)",
+               "prez_vote_typepartial loser" = "Partial loser (C)",
+               "prez_vote_typefull loser" = "Full loser (D)",
+               "stable_voter" = "Stable winner", 
+               "swd_pre" = "Pre-election SWD",
+               "female" = "Female",
+               "age" = "Age",
+               "postsecondary_edu" = "Post-secondary education",
+               "pol_interest_num" = "Pol. interest", 
+               "pol_knowledge" = "Pol. knowledge",
+               "party_close" = "Feels close to a party",
+               "duty_to_vote" = "Duty to vote",
+               "econ_precariousness2" = "Economic  precariousness",
+                 "soc_class_rUnemployed" = "Class: Unemployed",
+                 "soc_class_rEcon. inactive (student, in household)" = "Class: Econ. inactive",
+                 "soc_class_rPensioner" = "Class: Pensioner",
+                 "soc_class_rManager/Businessperson"= "Class: Manager/Businessperson",
+                 "soc_class_rFreelancer" = "Class: Freelancer",
+               "(Intercept)"="Intercept"
+             ), 
+             fmt = 2,
+             gof_map = c("nobs", "r.squared", "adj.r.squared"),
+             notes = c("Data weighted by turnout.")
+             )
+```
+
+
+## Models 2 and 6 from Table 3
+
+2) We should create additional analysis that would replicate Model 2 and 6 from Table 3. The table should include 4 models. The first two should replace the independent variable Pre-election satisfaction (from Wave 1) by change in satisfaction between Waves 1 and 2  (I checked it, it yields substantively and statistically insignificant results, that's correct). The other two should should, in addition, change also the dependent variable. The third model should use change between vote intention (in Wave 1) and turnout in round 1 (Wave 3) instead of turnout (in Wave 3). The fourth model should use change between vote intention (in Wave 1) and turnout in round 2 (Wave 4). 
+
+```{r}
+cz_2023_all_waves_resp_d <- cz_2023_all_waves_resp %>% 
+  mutate(swd_change_w2_w1 = SWD_w2 - SWD_w1, 
+         turnout_change_1r = voted_1r - vote_intention_w1, 
+         turnout_change_2r = voted_2r - vote_intention_w1)
+
+ce0_round1_d <- glm(voted_1r ~ 1, 
+           data = cz_2023_all_waves_resp_d,
+           family = binomial(link = "logit"), 
+           weights = weight_turnout) %>% 
+  coeftest(., vcov = vcovHC(., type="HC1")) 
+ce2_round1_d <- glm(voted_1r ~ swd_change_w2_w1 + female + age + 
+                    postsecondary_edu + duty_to_vote + 
+             pol_interest_num + pol_knowledge + party_close, 
+           data = cz_2023_all_waves_resp_d, 
+           family = binomial(link = "logit"), 
+           weights = weight_turnout) %>% 
+  coeftest(., vcov = vcovHC(., type="HC1")) 
+
+ce0_round2_d <- glm(voted_2r ~ 1, 
+           data = cz_2023_all_waves_resp_d,
+           family = binomial(link = "logit"), 
+           weights = weight_turnout) %>% 
+  coeftest(., vcov = vcovHC(., type="HC1")) 
+ce2_round2_d <- glm(voted_2r ~ swd_change_w2_w1 + female + 
+                    age + postsecondary_edu + duty_to_vote + 
+             pol_interest_num + pol_knowledge + party_close, 
+           data = cz_2023_all_waves_resp_d, 
+           family = binomial(link = "logit"), 
+           weights = weight_turnout) %>% 
+  coeftest(., vcov = vcovHC(., type="HC1")) 
+
+tch_round1_d <- lm_robust(turnout_change_1r ~ swd_change_w2_w1 +
+                            female + age + 
+                    postsecondary_edu + duty_to_vote + 
+             pol_interest_num + pol_knowledge + party_close, 
+             data = cz_2023_all_waves_resp_d, 
+             weights = weight_turnout, 
+             se_type = "stata")
+
+tch_round2_d <- lm_robust(turnout_change_2r ~ swd_change_w2_w1 +
+                            female + age + 
+                    postsecondary_edu + duty_to_vote + 
+             pol_interest_num + pol_knowledge + party_close, 
+             data = cz_2023_all_waves_resp_d, 
+             weights = weight_turnout, 
+             se_type = "stata")
+
+
+pr2 <- tribble(~term, ~m1, ~m2, ~m3, ~m4, 
+               "PseudoR2 (McFadden)",
+               r2(ce0_round1_d, ce2_round1_d), 
+               r2(ce0_round2_d, ce2_round2_d),
+               "", ""
+               # r2(ce0_round2, ce3_round2),
+               # r2(ce0_round2, ce4_round2)
+               )
+
+model_n_vars <- broom::tidy(ce2_round1_d) %>%
+    filter(!grepl("election", term)) %>%
+    nrow()
+
+attr(pr2, "position") <- (model_n_vars * 2) + 1
+
+modelsummary(list("Turnout (Round 1)" = ce2_round1_d, 
+                  "Turnout (Round 2)" = ce2_round2_d, 
+                  "Turnout - Vote intention (R1)"=tch_round1_d, 
+                  "Turnout - Vote intention (R2)"=tch_round2_d), 
+             stars = c("*"=.05, "**"=.01, "***"=0.001), 
+             fmt = 2, coef_map = c(
+                 # "SWD_w1" = "Pre-election satisfaction (Wave 1)",
+                 # "SWD_w4" = "Post-election satisfaction (Wave 4)",
+                 "swd_change_w2_w1" = "SWD change (W2 - W1)",
+                 "female" = "Female",
+                 "age" = "Age", 
+                 "postsecondary_edu" = "Post-secondary education", 
+                 "duty_to_vote" = "Duty to vote", 
+                 "pol_interest_num" = "Interest in politics",
+                 "pol_knowledge" = "Political knowledge", 
+                 "party_close" = "Feels close to a party", 
+                 "(Intercept)" = "Intercept"
+             ), 
+             add_rows = pr2,
+             # notes = c("Data weighted by turnout."),
+             # title = "Turnout and satisfaction with democracy, 2023 Czech presidential election",
+             gof_map = c("nobs", "adj.r.squared"),
+             output = "output/app_tab14_models.tex"
+             )
+
+modelsummary(list("Turnout (Round 1)" = ce2_round1_d, 
+                  "Turnout (Round 2)" = ce2_round2_d, 
+                  "Turnout - Vote intention (R1)"=tch_round1_d, 
+                  "Turnout - Vote intention (R2)"=tch_round2_d), 
+             stars = c("*"=.05, "**"=.01, "***"=0.001), 
+             fmt = 2, coef_map = c(
+                 # "SWD_w1" = "Pre-election satisfaction (Wave 1)",
+                 # "SWD_w4" = "Post-election satisfaction (Wave 4)",
+                 "swd_change_w2_w1" = "SWD change (W2 - W1)",
+                 "female" = "Female",
+                 "age" = "Age", 
+                 "postsecondary_edu" = "Post-secondary education", 
+                 "duty_to_vote" = "Duty to vote", 
+                 "pol_interest_num" = "Interest in politics",
+                 "pol_knowledge" = "Political knowledge", 
+                 "party_close" = "Feels close to a party", 
+                 "(Intercept)" = "Intercept"
+             ), 
+             add_rows = pr2,
+             # notes = c("Data weighted by turnout."),
+             # title = "Turnout and satisfaction with democracy, 2023 Czech presidential election",
+             gof_map = c("nobs", "adj.r.squared") # ,
+             # output = "output/tab3_models.tex"
+             )
+```
+
+
+## Figure 2 on pooled data
+
+2) We should create the equivalent of Figure 2 for the pooled analysis to be displayed in the main text. This figure already was there before and it was erased (apologies if there was any miscommunication on my part).   
+
+???
+
+## Table 5 and 6 with political knowledge
+
+```{r}
+ce0_all_c <- glm(voted ~ 1, 
+           data = all_panels_both_waves %>% 
+             filter(!is.na(pol_knowledge_pct)),
+           family = binomial(link = "logit"), 
+           weights = weight_turnout) %>% 
+  coeftest(., vcov = vcovHC(., type="HC1"))
+
+ce1_all_c <- glm(voted ~ swd_pre + swd_post + election, 
+           data = all_panels_both_waves %>% 
+             filter(!is.na(pol_knowledge_pct)),
+           family = binomial(link = "logit"), 
+           weights = weight_turnout) %>% 
+  coeftest(., vcov = vcovHC(., type="HC1"))
+
+ce2_all_c <- glm(voted ~ swd_pre + female + age + 
+                 postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + 
+               party_close + election, 
+           data = all_panels_both_waves, 
+           family = binomial(link = "logit"), 
+           weights = weight_turnout) %>% 
+  coeftest(., vcov = vcovHC(., type="HC1")) 
+
+ce3_all_c <- glm(voted ~ swd_post + female + age + 
+                 postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + 
+               party_close + election, 
+           data = all_panels_both_waves, 
+           family = binomial(link = "logit"), 
+           weights = weight_turnout) %>% 
+  coeftest(., vcov = vcovHC(., type="HC1")) 
+
+ce4_all_c <- glm(voted ~ swd_pre + swd_post + 
+             female + age + postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + 
+             party_close + election, 
+           data = all_panels_both_waves, 
+           family = binomial(link = "logit"), 
+           weights = weight_turnout) %>% 
+  coeftest(., vcov = vcovHC(., type="HC1")) 
+
+fe_rows <- tribble(~term, ~m1, ~m2, ~m3, ~m4, 
+                   "Election FE", "Yes", "Yes", "Yes", "Yes")
+fe_position <- broom::tidy(ce4_all_c) %>% 
+    filter(!grepl("election", term)) %>% 
+    nrow()
+
+pr2 <- tribble(~term, ~m1, ~m2, ~m3, ~m4,
+               "PseudoR2 (McFadden)",
+               r2(ce0_all_c, ce1_all_c), r2(ce0_all_c, ce2_all_c),
+               r2(ce0_all_c, ce3_all_c), r2(ce0_all_c, ce4_all_c)) %>% 
+  mutate(across(everything(), as.character))
+
+additional_rows <- bind_rows(
+  fe_rows, pr2
+)
+
+attr(additional_rows, "position") <- c(fe_position * 2 + 1, fe_position * 2 + 2)
+
+modelsummary(list(ce1_all_c, ce2_all_c, ce3_all_c, ce4_all_c), 
+             stars = c("*"=.05, "**"=.01, "***"=0.001),
+             fmt = 2, coef_map = c(
+                 "swd_pre" = "Pre-election satisfaction",
+                 "swd_post" = "Post-election satisfaction", 
+                 "female" = "Female",
+                 "age" = "Age", 
+                 "postsecondary_edu" = "Post-secondary education", 
+                 "duty_to_vote" = "Duty to vote", 
+                 "pol_interest_num" = "Interest in politics",
+                 "pol_knowledge_pct" = "Political knowledge", 
+                 "party_close" = "Feels close to a party", 
+                 "(Intercept)"="Intercept"
+             ), 
+             # coef_omit = "election",
+             gof_omit = "AIC|BIC",
+             add_rows = additional_rows,
+             output = "output/app_tab5_models_pol_knowledge.tex")
+
+modelsummary(list(ce1_all_c, ce2_all_c, ce3_all_c, ce4_all_c), 
+             stars = c("*"=.05, "**"=.01, "***"=0.001),
+             fmt = 2, 
+             coef_map = c(
+                 "swd_pre" = "Pre-election satisfaction",
+                 "swd_post" = "Post-election satisfaction",
+                 "female" = "Female",
+                 "age" = "Age",
+                 "postsecondary_edu" = "Post-secondary education",
+                 "duty_to_vote" = "Duty to vote",
+                 "pol_interest_num" = "Interest in politics",
+                 "pol_knowledge_pct" = "Political knowledge",
+                 "party_close" = "Feels close to a party",
+                 "(Intercept)"="Intercept"
+             ),
+             # coef_omit = "election",
+             gof_omit = "AIC|BIC",
+             add_rows = additional_rows,
+             title = "Turnout and satisfaction with democracy, all panels (without CZ 2023)")
+```
+
+```{r}
+ce1c <- lm_robust(swd_diff ~ voted + swd_pre + female + age +
+             postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + 
+               party_close + 
+             election, data = all_panels_both_waves %>% 
+               filter(!is.na(voter_type)), 
+           weights = weight_turnout, 
+           se_type = "stata") 
+ce2c <- lm_robust(swd_diff ~ voter_type + swd_pre + female + age +
+             postsecondary_edu + 
+             pol_interest_num + pol_knowledge_pct + party_close + 
+             election, data = all_panels_both_waves, 
+           weights = weight_turnout, 
+           se_type = "stata")
+
+fe_rows <- tribble(~term, ~m1, ~m2,  
+                   "Country FE", "Yes", "Yes")
+fe_position <- broom::tidy(ce2c) %>% 
+    filter(!grepl("election", term)) %>% 
+    nrow()
+
+attr(fe_rows, "position") <- 21
+
+modelsummary(list(ce1c, ce2c), 
+             stars = c("*"=.05, "**"=.01, "***"=0.001),
+             coef_omit = "election[A-Za-z() ]+\\s[0-9]+$",
+             coef_map = c(
+               "voted" = "Voted",
+               "voter_typeVoted for winner" = "Winner", 
+               "voter_typeVoted for loser" = "Loser",
+               "swd_pre" = "Pre-election SWD",
+               "female" = "Female",
+               "age" = "Age",
+               "postsecondary_edu" = "Post-secondary education",
+               "pol_interest_num" = "Pol. interest", 
+               "pol_knowledge_pct" = "Pol. knowledge",
+               "party_close" = "Feels close to a party",
+               "election_typepresidential" = "Presidential election", 
+               "election_typeEP election" = "EP election", 
+               "(Intercept)"="Intercept"
+             ),
+             fmt = 2,
+             add_rows = fe_rows, 
+             gof_map = c("nobs", "r.squared", "adj.r.squared"),
+             output = "output/app_tab6_models_pol_knowledge.tex")
+
+modelsummary(list(ce1c, ce2c), 
+             stars = c("*"=.05, "**"=.01, "***"=0.001),
+             coef_omit = "election[A-Za-z() ]+\\s[0-9]+$",
+             fmt = 2,
+             coef_map = c(
+               "voted" = "Voted",
+               "voter_typeVoted for winner" = "Winner", 
+               "voter_typeVoted for loser" = "Loser",
+               "swd_pre" = "Pre-election SWD",
+               "female" = "Female",
+               "age" = "Age",
+               "postsecondary_edu" = "Post-secondary education",
+               "pol_interest_num" = "Pol. interest", 
+               "pol_knowledge_pct" = "Pol. knowledge",
+               "party_close" = "Feels close to a party",
+               "election_typepresidential" = 
+                 "Presidential election", 
+               "election_typeEP election" = "EP election", 
+               "(Intercept)"="Intercept"
+             ),
+             add_rows = fe_rows,
+             gof_map = c("nobs", "r.squared", "adj.r.squared")
+             )
 ```
