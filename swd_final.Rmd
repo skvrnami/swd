@@ -144,6 +144,13 @@ ggplot(waves) +
        ) 
 ggsave("output/fig1_wave_swd.png", width = 8, 
        height = 4)
+
+ggsave("output/fig1_wave_swd.pdf", width = 8, 
+       height = 4)
+
+ggsave("output/fig1_wave_swd.eps", width = 8, 
+       height = 4)
+
 ```
 
 ```{r}
@@ -823,13 +830,24 @@ m1_fe <- lm_robust(swd ~ voter_type * wave + election * wave,
 
 
 ggeffect(m1_fe, c("wave", "voter_type")) %>% 
-  plot() + 
+  as.data.frame() %>% 
+  ggplot(., aes(x = x, y = predicted, colour = group)) + 
+  geom_pointrange(aes(ymin = conf.low, ymax = conf.high), 
+                  position = position_dodge2(width = 0.5, 
+                                             padding = 0.5)) + 
+  theme_ggeffects() + 
+  scale_colour_manual(values = c("#E41A1B", "#377EB8", 
+                                 "#4EAF4A")) + 
   theme(legend.position = "top") + 
   labs(colour = "Voter type", title = "", y = "SWD", 
-       x = "Wave")
+       x = "Wave") 
 
 ggsave("output/swd_all_panels_waves.png", 
        width = 6, 
+       height = 4)
+
+ggsave("output/swd_all_panels_waves.pdf", 
+       width = 5, 
        height = 4)
 
 ggeffect(m1_fe, c("wave", "voter_type", "election")) %>% 
@@ -839,7 +857,7 @@ ggeffect(m1_fe, c("wave", "voter_type", "election")) %>%
   labs(colour = "Voter type", title = "", y = "SWD", 
        x = "Wave")
 
-ggsave("output/swd_all_panels_waves_by_election.png", 
+ggsave("output/swd_all_panels_waves_by_election.pdf", 
        width = 7, 
        height = 6)
 
@@ -1016,7 +1034,7 @@ plot(mm1) +
          colour = "Voter type") + 
   theme(legend.position = "top")
 
-ggsave("output/swd_change_w1_w5_voter_type.png", 
+ggsave("output/swd_change_w1_w5_voter_type.pdf", 
        width = 7, height = 5)
 ```
 
@@ -1047,7 +1065,7 @@ p2 <- tmp %>%
                                    "#FF7F00")) + 
     guides(colour = guide_legend(nrow = 2))
 
-ggsave("output/swd_change_w1_w5_voter_type5.png", 
+ggsave("output/swd_change_w1_w5_voter_type5.pdf", 
        width = 7, height = 5)
 ```
 
@@ -1061,7 +1079,7 @@ ggeffect(m3_w5, c("wave", "vote_gov")) %>%
          y = "SWD", 
          colour = "Voter type", 
          caption = "Voter type: 1 = voted for parties that formed government after the 2021 parliamentary election")
-ggsave("output/swd_change_w1_w5_gov_voter.png", 
+ggsave("output/swd_change_w1_w5_gov_voter.pdf", 
        width = 7, height = 5)
 
 ```
