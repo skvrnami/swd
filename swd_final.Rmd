@@ -601,7 +601,7 @@ ggplot(mar_df, aes(x = factor, y = AME)) +
 #        x = "Voter type",
 #        y = "SWD change")
 
-ggsave("output/swd_change_ame.png", 
+ggsave("output/swd_change_ame.pdf", 
        width = 7, height = 5)
 ```
 
@@ -799,7 +799,7 @@ ggplot(mar_df2, aes(x = factor, y = AME)) +
 #        x = "Voter type",
 #        y = "SWD change")
 
-ggsave("output/swd_change_ame_pooled.png", 
+ggsave("output/swd_change_ame_pooled.pdf", 
        width = 7, height = 5)
 ```
 
