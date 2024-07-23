@@ -1,0 +1,25 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+entry=none,label=none,
+note{}={+ p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]Q[]},
+column{1}={halign=l,},
+column{2}={halign=c,},
+column{3}={halign=c,},
+column{4}={halign=c,},
+column{5}={halign=c,},
+hline{6}={1,2,3,4,5}{solid, 0.05em, black},
+}                     %% tabularray inner close
+\toprule
+& Attrition in Wave 2 & Attrition in Wave 3 & Attrition in Wave 4 & Attrition in Wave 5 \\ \midrule %% TinyTableHeader
+Pre-election SWD (Wave 1) & 0.05     & 0.01     & 0.01     & 0.02     \\
+& (0.04)   & (0.03)   & (0.03)   & (0.02)   \\
+Intercept                 & -2.99*** & -2.28*** & -2.07*** & -1.35*** \\
+& (0.22)   & (0.16)   & (0.15)   & (0.12)   \\
+Num.Obs.                  & 1501     & 1501     & 1501     & 1501     \\
+\bottomrule
+\end{talltblr}
+\end{table}

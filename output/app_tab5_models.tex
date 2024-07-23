@@ -1,34 +1,44 @@
 \begin{table}
 \centering
-\begin{tabular}[t]{lcccc}
+\begin{talltblr}[         %% tabularray outer open
+entry=none,label=none,
+note{}={* p < 0.05, ** p < 0.01, *** p < 0.001},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]Q[]},
+column{1}={halign=l,},
+column{2}={halign=c,},
+column{3}={halign=c,},
+column{4}={halign=c,},
+column{5}={halign=c,},
+hline{18}={1,2,3,4,5}{solid, 0.05em, black},
+}                     %% tabularray inner close
 \toprule
-  & (1) & (2) & (3) & (4)\\
-\midrule
-(Intercept) & 0.74*** & -0.99*** & -1.10*** & -1.12***\\
- & (0.11) & (0.13) & (0.14) & (0.14)\\
-Pre-election satisfaction & 0.23 & 0.46*** &  & 0.10\\
- & (0.12) & (0.11) &  & (0.13)\\
-Post-election satisfaction & 0.65*** &  & 0.65*** & 0.59***\\
- & (0.12) &  & (0.11) & (0.13)\\
-Female &  & 0.02 & 0.02 & 0.02\\
- &  & (0.05) & (0.05) & \vphantom{1} (0.05)\\
-Age &  & 1.41*** & 1.42*** & 1.42***\\
- &  & (0.12) & (0.12) & (0.12)\\
-Post-secondary education &  & 0.38*** & 0.39*** & 0.39***\\
- &  & (0.06) & (0.06) & (0.06)\\
-Interest in politics &  & 1.84*** & 1.85*** & 1.85***\\
- &  & (0.10) & (0.10) & (0.10)\\
-Feels close to a party &  & 0.93*** & 0.92*** & 0.92***\\
- &  & (0.05) & (0.05) & (0.05)\\
-\midrule
-Election FE & Yes & Yes & Yes & Yes\\
-Num.Obs. & 8126 & 8126 & 8126 & 8126\\
-PseudoR2 (McFadden) & 0.04 & 0.15 & 0.15 & 0.15\\
-AIC & 13121.6 & 11595.5 & 11574.3 & 11576.3\\
-BIC & 13177.6 & 11679.5 & 11658.4 & 11667.4\\
-Log.Lik. & -6552.796 & -5785.745 & -5775.170 & -5775.166\\
-RMSE & 0.46 & 0.42 & 0.42 & 0.42\\
+& (1) & (2) & (3) & (4) \\ \midrule %% TinyTableHeader
+(Intercept)                & 0.74***   & -0.99***  & -1.10***  & -1.12***  \\
+& (0.11)    & (0.13)    & (0.14)    & (0.14)    \\
+Pre-election satisfaction  & 0.23      & 0.46***   &           & 0.10      \\
+& (0.12)    & (0.11)    &           & (0.13)    \\
+Post-election satisfaction & 0.65***   &           & 0.65***   & 0.59***   \\
+& (0.12)    &           & (0.11)    & (0.13)    \\
+Female                     &           & 0.02      & 0.02      & 0.02      \\
+&           & (0.05)    & (0.05)    & (0.05)    \\
+Age                        &           & 1.41***   & 1.42***   & 1.42***   \\
+&           & (0.12)    & (0.12)    & (0.12)    \\
+Post-secondary education   &           & 0.38***   & 0.39***   & 0.39***   \\
+&           & (0.06)    & (0.06)    & (0.06)    \\
+Interest in politics       &           & 1.84***   & 1.85***   & 1.85***   \\
+&           & (0.10)    & (0.10)    & (0.10)    \\
+Feels close to a party     &           & 0.93***   & 0.92***   & 0.92***   \\
+&           & (0.05)    & (0.05)    & (0.05)    \\
+Election FE                & Yes       & Yes       & Yes       & Yes       \\
+Num.Obs.                   & 8126      & 8126      & 8126      & 8126      \\
+PseudoR2 (McFadden)        & 0.04      & 0.15      & 0.15      & 0.15      \\
+AIC                        & 13121.6   & 11595.5   & 11574.3   & 11576.3   \\
+BIC                        & 13177.6   & 11679.5   & 11658.4   & 11667.4   \\
+Log.Lik.                   & -6552.796 & -5785.745 & -5775.170 & -5775.166 \\
+F                          & 101.206   & 135.797   & 136.441   & 125.086   \\
+RMSE                       & 0.46      & 0.42      & 0.42      & 0.42      \\
 \bottomrule
-\multicolumn{5}{l}{\rule{0pt}{1em}* p $<$ 0.05, ** p $<$ 0.01, *** p $<$ 0.001}\\
-\end{tabular}
+\end{talltblr}
 \end{table}

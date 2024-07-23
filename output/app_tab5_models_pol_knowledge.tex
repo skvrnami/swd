@@ -1,32 +1,41 @@
 \begin{table}
 \centering
-\begin{tabular}[t]{lcccc}
+\begin{talltblr}[         %% tabularray outer open
+entry=none,label=none,
+note{}={* p < 0.05, ** p < 0.01, *** p < 0.001},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]Q[]},
+column{1}={halign=l,},
+column{2}={halign=c,},
+column{3}={halign=c,},
+column{4}={halign=c,},
+column{5}={halign=c,},
+hline{20}={1,2,3,4,5}{solid, 0.05em, black},
+}                     %% tabularray inner close
 \toprule
-  & (1) & (2) & (3) & (4)\\
-\midrule
-Pre-election satisfaction & 0.27 & 0.57*** &  & 0.20\\
- & (0.21) & (0.16) &  & (0.23)\\
-Post-election satisfaction & 0.57** &  & 0.70*** & 0.58*\\
- & (0.21) &  & (0.16) & (0.23)\\
-Female &  & 0.16 & 0.17 & 0.17\\
- &  & (0.09) & (0.09) & (0.09)\\
-Age &  & 1.56*** & 1.55*** & 1.57***\\
- &  & (0.23) & (0.23) & (0.23)\\
-Post-secondary education &  & 0.41*** & 0.42*** & 0.42***\\
- &  & (0.10) & (0.10) & \vphantom{1} (0.10)\\
-Interest in politics &  & 1.67*** & 1.67*** & 1.66***\\
- &  & (0.19) & (0.19) & (0.19)\\
-Political knowledge &  & 1.47*** & 1.49*** & 1.49***\\
- &  & (0.18) & (0.19) & (0.18)\\
-Feels close to a party &  & 0.86*** & 0.86*** & 0.85***\\
- &  & (0.10) & (0.10) & (0.10)\\
-Intercept & 0.76*** & -1.77*** & -1.86*** & -1.89***\\
- & (0.16) & (0.22) & (0.22) & (0.23)\\
-\midrule
-Election FE & Yes & Yes & Yes & Yes\\
-PseudoR2 (McFadden) & 0.04 & 0.18 & 0.18 & 0.18\\
-Num.Obs. & 5789 & 5789 & 5789 & 5789\\
+& (1) & (2) & (3) & (4) \\ \midrule %% TinyTableHeader
+Pre-election satisfaction  & 0.27    & 0.57***  &          & 0.20     \\
+& (0.21)  & (0.16)   &          & (0.23)   \\
+Post-election satisfaction & 0.57**  &          & 0.70***  & 0.58*    \\
+& (0.21)  &          & (0.16)   & (0.23)   \\
+Female                     &         & 0.16     & 0.17     & 0.17     \\
+&         & (0.09)   & (0.09)   & (0.09)   \\
+Age                        &         & 1.56***  & 1.55***  & 1.57***  \\
+&         & (0.23)   & (0.23)   & (0.23)   \\
+Post-secondary education   &         & 0.41***  & 0.42***  & 0.42***  \\
+&         & (0.10)   & (0.10)   & (0.10)   \\
+Interest in politics       &         & 1.67***  & 1.67***  & 1.66***  \\
+&         & (0.19)   & (0.19)   & (0.19)   \\
+Political knowledge        &         & 1.47***  & 1.49***  & 1.49***  \\
+&         & (0.18)   & (0.19)   & (0.18)   \\
+Feels close to a party     &         & 0.86***  & 0.86***  & 0.85***  \\
+&         & (0.10)   & (0.10)   & (0.10)   \\
+Intercept                  & 0.76*** & -1.77*** & -1.86*** & -1.89*** \\
+& (0.16)  & (0.22)   & (0.22)   & (0.23)   \\
+Election FE                & Yes     & Yes      & Yes      & Yes      \\
+PseudoR2 (McFadden)        & 0.04    & 0.18     & 0.18     & 0.18     \\
+Num.Obs.                   & 5789    & 5789     & 5789     & 5789     \\
 \bottomrule
-\multicolumn{5}{l}{\rule{0pt}{1em}* p $<$ 0.05, ** p $<$ 0.01, *** p $<$ 0.001}\\
-\end{tabular}
+\end{talltblr}
 \end{table}

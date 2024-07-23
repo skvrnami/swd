@@ -627,6 +627,8 @@ list(
           Q23XX %in% c("NS", "NR") ~ NA_integer_
         ),
         voted_2r = voted,
+        vote_choice = Q24B,
+        vote_choice_r1 = Q21B,
         winner = as.numeric(Q24B == "Traian Basescu"), 
         candidate_qualified_2nd = case_when(
           Q21B %in% c("Traian Basescu", "Mircea Geoana") ~ 1, 
@@ -1237,7 +1239,7 @@ list(
                            "winner", "winner_government",
                            "stable_voter", "stable_intention", 
                            "voted", "female", "vote_previous_nat_election", 
-                           "vote_choice", "swd_pre", "swd_post", 
+                           "vote_choice", "vote_choice_r1", "swd_pre", "swd_post", 
                            "pol_knowledge_pct", "pol_interest_num", 
                            "party_close", "candidate_qualified_2nd", 
                            "duty_to_vote", "winner_1r", "winner_2r", 
@@ -1430,5 +1432,100 @@ list(
   tar_render(
     swd_final_rmd,
     "swd_final.Rmd"
+  ),
+  
+  # Data for reviewers
+  tar_target(
+    all_panels_attrition, command = {
+      common_vars <- c("age", "swd_diff", "postsecondary_edu",
+                       "winner", "winner_government",
+                       "stable_voter", "stable_intention", 
+                       "voted", "female", "vote_previous_nat_election", 
+                       "vote_choice", "swd_pre", "swd_post", 
+                       "pol_knowledge_pct", "pol_interest_num", 
+                       "party_close", "candidate_qualified_2nd", 
+                       "duty_to_vote", "winner_1r", "winner_2r", 
+                       "weight_turnout", "weight_turnout_norm")
+      
+      cz_1996_norm <- cz_1996 %>% 
+        select(any_of(common_vars)) %>% 
+        mutate(election = "CZ 1996") %>% 
+        mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
+                      normalize_scale), 
+               swd_diff = swd_post - swd_pre)
+      
+      pl_2019_norm <- pl_2019 %>% 
+        select(any_of(common_vars)) %>% 
+        mutate(election = "PL 2019") %>% 
+        mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
+                      normalize_scale), 
+               swd_diff = swd_post - swd_pre)
+      
+      hu_2019_norm <- hu_2019 %>% 
+        select(any_of(common_vars)) %>% 
+        mutate(election = "HU 2019") %>% 
+        mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
+                      normalize_scale), 
+               swd_diff = swd_post - swd_pre)
+      
+      ro_2009_norm <- ro_2009_final %>% 
+        select(any_of(common_vars)) %>% 
+        mutate(election = "RO 2009") %>% 
+        mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
+                      normalize_scale), 
+               swd_diff = swd_post - swd_pre)
+      
+      ro_2012_norm <- ro_2012_all %>% 
+        select(any_of(common_vars)) %>% 
+        mutate(election = "RO 2012") %>% 
+        mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
+                      normalize_scale), 
+               swd_diff = swd_post - swd_pre)
+      
+      de_2017_norm <- de_2017_final %>% 
+        select(any_of(common_vars)) %>% 
+        mutate(election = "DE (Ost) 2017") %>% 
+        mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
+                      normalize_scale), 
+               swd_diff = swd_post - swd_pre)
+      
+      cz_2023_norm <- cz_2023 %>% 
+        select(any_of(common_vars)) %>% 
+        mutate(election = "CZ 2023") %>% 
+        mutate(across(c("swd_pre", "swd_post", "pol_interest_num"), 
+                      normalize_scale), 
+               swd_diff = swd_post - swd_pre)
+      
+      bind_rows(
+        cz_1996_norm, 
+        pl_2019_norm, 
+        hu_2019_norm,
+        ro_2009_norm, 
+        ro_2012_norm, 
+        de_2017_norm, 
+        cz_2023_norm
+      ) %>% 
+        mutate(
+          pol_knowledge_pct = pol_knowledge_pct / 100, 
+          election = factor(election), 
+          election_type = case_when(
+            election %in% c("CZ 2023", "RO 2009") ~ "presidential", 
+            election %in% c("PL 2019", "HU 2019") ~ "EP election", 
+            TRUE ~ "parliamentary"
+          ) %>% factor(., levels = c("parliamentary", "presidential", 
+                                     "EP election")), 
+          nonvoter = 1 - voted, 
+          voter_type = case_when(
+            nonvoter == 1 ~ "Abstainer", 
+            winner == 0 ~ "Voted for loser", 
+            winner == 1 ~ "Voted for winner"
+          ) %>% factor(., levels = c("Abstainer", "Voted for winner", "Voted for loser")), 
+          prez_vote_type = 
+            case_when(
+              winner_1r == "didn't vote" | winner_2r == "didn't vote" ~ "didn't vote (at least in one round)", 
+              TRUE ~ paste0(winner_1r, " + ", winner_2r)
+            ) %>% factor()
+        )
+    }
   )
 )

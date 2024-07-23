@@ -1,37 +1,44 @@
 \begin{table}
 \centering
-\begin{tabular}[t]{lcc}
+\begin{talltblr}[         %% tabularray outer open
+entry=none,label=none,
+note{}={* p < 0.05, ** p < 0.01, *** p < 0.001},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]},
+column{1}={halign=l,},
+column{2}={halign=c,},
+column{3}={halign=c,},
+hline{25}={1,2,3}{solid, 0.05em, black},
+}                     %% tabularray inner close
 \toprule
-  & (1) & (2)\\
-\midrule
-Voted & 0.02** & \\
- & (0.01) & \\
-Winner &  & 0.12***\\
- &  & \vphantom{1} (0.01)\\
-Loser &  & -0.01\\
- &  & (0.01)\\
-Pre-election SWD & -0.36*** & -0.41***\\
- & (0.01) & (0.02)\\
-Female & -0.01 & -0.02*\\
- & (0.01) & \vphantom{2} (0.01)\\
-Age & -0.01 & -0.02\\
- & (0.02) & \vphantom{3} (0.02)\\
-Post-secondary education & -0.01 & -0.01\\
- & (0.01) & \vphantom{1} (0.01)\\
-Pol. interest & 0.01 & 0.01\\
- & (0.02) & \vphantom{2} (0.02)\\
-Pol. knowledge & -0.02 & -0.02\\
- & (0.02) & \vphantom{1} (0.02)\\
-Feels close to a party & 0.02 & 0.02*\\
- & (0.01) & (0.01)\\
-Country FE & Yes & Yes\\
-Intercept & 0.20*** & 0.22***\\
- & (0.02) & (0.02)\\
-\midrule
-Num.Obs. & 5576 & 5576\\
-R2 & 0.180 & 0.213\\
-R2 Adj. & 0.178 & 0.211\\
+& (1) & (2) \\ \midrule %% TinyTableHeader
+Voted                    & 0.02**   &          \\
+& (0.01)   &          \\
+Winner                   &          & 0.12***  \\
+&          & (0.01)   \\
+Loser                    &          & -0.01    \\
+&          & (0.01)   \\
+Pre-election SWD         & -0.36*** & -0.41*** \\
+& (0.01)   & (0.02)   \\
+Female                   & -0.01    & -0.02*   \\
+& (0.01)   & (0.01)   \\
+Age                      & -0.01    & -0.02    \\
+& (0.02)   & (0.02)   \\
+Post-secondary education & -0.01    & -0.01    \\
+& (0.01)   & (0.01)   \\
+Pol. interest            & 0.01     & 0.01     \\
+& (0.02)   & (0.02)   \\
+Pol. knowledge           & -0.02    & -0.02    \\
+& (0.02)   & (0.02)   \\
+Feels close to a party   & 0.02     & 0.02*    \\
+& (0.01)   & (0.01)   \\
+Country FE               & Yes      & Yes      \\
+Intercept                & 0.20***  & 0.22***  \\
+& (0.02)   & (0.02)   \\
+Num.Obs.                 & 5576     & 5576     \\
+R2                       & 0.180    & 0.213    \\
+R2 Adj.                  & 0.178    & 0.211    \\
 \bottomrule
-\multicolumn{3}{l}{\rule{0pt}{1em}* p $<$ 0.05, ** p $<$ 0.01, *** p $<$ 0.001}\\
-\end{tabular}
+\end{talltblr}
 \end{table}

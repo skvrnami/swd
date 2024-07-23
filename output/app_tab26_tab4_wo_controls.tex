@@ -1,0 +1,45 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+entry=none,label=none,
+note{}={* p < 0.05, ** p < 0.01, *** p < 0.001},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]Q[]},
+column{1}={halign=l,},
+column{2}={halign=c,},
+column{3}={halign=c,},
+column{4}={halign=c,},
+column{5}={halign=c,},
+hline{24}={1,2,3,4,5}{solid, 0.05em, black},
+}                     %% tabularray inner close
+\toprule
+& (1) & (2) & (3) & (4) \\ \midrule %% TinyTableHeader
+Voted (R1)             & 0.01     &          &          &          \\
+& (0.03)   &          &          &          \\
+Voted (R2)             & 0.05     &          &          &          \\
+& (0.03)   &          &          &          \\
+Winner                 &          & 0.13***  &          &          \\
+&          & (0.02)   &          &          \\
+Loser                  &          & 0.00     &          &          \\
+&          & (0.02)   &          &          \\
+Full winner (A)        &          &          & 0.14***  &          \\
+&          &          & (0.02)   &          \\
+Sub-optimal winner (B) &          &          & 0.12***  &          \\
+&          &          & (0.02)   &          \\
+Partial loser (C)      &          &          & -0.02    &          \\
+&          &          & (0.03)   &          \\
+Full loser (D)         &          &          & 0.00     &          \\
+&          &          & (0.02)   &          \\
+Stable winner          &          &          &          & 0.02     \\
+&          &          &          & (0.02)   \\
+Pre-election SWD       & -0.44*** & -0.50*** & -0.50*** & -0.41*** \\
+& (0.03)   & (0.03)   & (0.03)   & (0.04)   \\
+Intercept              & 0.19***  & 0.22***  & 0.22***  & 0.29***  \\
+& (0.02)   & (0.02)   & (0.03)   & (0.02)   \\
+Num.Obs.               & 1326     & 1326     & 1326     & 597      \\
+R2                     & 0.264    & 0.313    & 0.314    & 0.266    \\
+R2 Adj.                & 0.263    & 0.311    & 0.312    & 0.264    \\
+\bottomrule
+\end{talltblr}
+\end{table}

@@ -2715,3 +2715,531 @@ modelsummary(list(ce1c, ce2c),
              gof_map = c("nobs", "r.squared", "adj.r.squared")
              )
 ```
+
+# Tables for review
+- Analyses showing that satisfaction does not predict attrition (DV: attrition; Ind. var: satisfaction in W1; different models: pooled, different waves). 
+
+```{r}
+tar_load(cz_2023)
+cz_2023_atrice <- cz_2023 %>% 
+  mutate(attrition_w2 = w2 == 0, 
+         attrition_w3 = w3 == 0, 
+         attrition_w4 = w4 == 0, 
+         attrition_w5 = w5 == 0)
+
+atr_w2 <- glm(attrition_w2 ~ SWD_w1, data = cz_2023_atrice, 
+              family = binomial("logit"))
+atr_w3 <- glm(attrition_w3 ~ SWD_w1, data = cz_2023_atrice, 
+              family = binomial("logit"))
+atr_w4 <- glm(attrition_w4 ~ SWD_w1, data = cz_2023_atrice, 
+              family = binomial("logit"))
+atr_w5 <- glm(attrition_w5 ~ SWD_w1, data = cz_2023_atrice, 
+              family = binomial("logit"))
+
+pscl::pR2(atr_w2)["McFadden"]
+pscl::pR2(atr_w3)["McFadden"]
+pscl::pR2(atr_w4)["McFadden"]
+pscl::pR2(atr_w5)["McFadden"]
+
+modelsummary(
+  list("Attrition in Wave 2"=atr_w2, 
+       "Attrition in Wave 3"=atr_w3, 
+       "Attrition in Wave 4"=atr_w4, 
+       "Attrition in Wave 5"=atr_w5), 
+  stars = TRUE, 
+  fmt = 2,
+  gof_map = c("nobs", "r.squared"), 
+  coef_map = c("SWD_w1"="Pre-election SWD (Wave 1)",
+               "(Intercept)"="Intercept")
+)
+
+modelsummary(
+  list("Attrition in Wave 2"=atr_w2, 
+       "Attrition in Wave 3"=atr_w3, 
+       "Attrition in Wave 4"=atr_w4, 
+       "Attrition in Wave 5"=atr_w5), 
+  stars = TRUE, 
+  fmt = 2,
+  gof_map = c("nobs", "r.squared"), 
+  coef_map = c("SWD_w1"="Pre-election SWD (Wave 1)",
+               "(Intercept)"="Intercept"), 
+  output = "output/app_tab17_attrition_cz_panel.tex"
+)
+
+
+tar_load(all_panels_attrition)
+all_panels_attrition <- all_panels_attrition %>% 
+  mutate(attrition_w2 = is.na(swd_post))
+
+atr_all <- glm(attrition_w2 ~ swd_pre + election, 
+               data = all_panels_attrition, 
+               family = binomial("logit"))
+atr_cz96 <- glm(attrition_w2 ~ swd_pre, 
+                data = all_panels_attrition %>% 
+                  filter(election == "CZ 1996"),
+                family = binomial("logit"))
+atr_cz23 <- glm(attrition_w2 ~ swd_pre, 
+                data = all_panels_attrition %>% 
+                  filter(election == "CZ 2023"), 
+                family = binomial("logit"))
+atr_de17 <- glm(attrition_w2 ~ swd_pre, 
+                data = all_panels_attrition %>% 
+                  filter(election == "DE (Ost) 2017"), 
+                family = binomial("logit"))
+atr_hu19 <- glm(attrition_w2 ~ swd_pre, 
+                data = all_panels_attrition %>% 
+                  filter(election == "HU 2019"), 
+                family = binomial("logit"))
+atr_pl19 <- glm(attrition_w2 ~ swd_pre, 
+                data = all_panels_attrition %>% 
+                  filter(election == "PL 2019"), 
+                family = binomial("logit"))
+atr_ro09 <- glm(attrition_w2 ~ swd_pre, 
+                data = all_panels_attrition %>% 
+                  filter(election == "RO 2009"), 
+                family = binomial("logit"))
+atr_ro12 <- glm(attrition_w2 ~ swd_pre, 
+                data = all_panels_attrition %>% 
+                  filter(election == "RO 2012"), 
+                family = binomial("logit"))
+
+modelsummary(
+  list("All panels"=atr_all, 
+       "CZ 1996"=atr_cz96,
+       "CZ 2023"=atr_cz23,
+       "East Germany 2017"=atr_de17,
+       "Hungary 2019"=atr_hu19, 
+       "Poland 2019"=atr_pl19, 
+       "Romania 2009"=atr_ro09, 
+       "Romania 2012"=atr_ro12),
+  stars = TRUE, 
+  coef_omit = "election",
+  fmt = 2,
+  gof_map = c("nobs", "r.squared", "adj.r.squared"), 
+  coef_map = c("swd_pre"="Pre-election SWD",
+               "(Intercept)"="Intercept") 
+  output = "output/app_tab18_attrition_all_panels.tex"
+)
+
+pscl::pR2(atr_all)["McFadden"]
+pscl::pR2(atr_cz96)["McFadden"]
+```
+
+
+- [ ] For the Appendix: Replication Tables 4 and 6 without controls (except for pre-election satisfaction and country FEs)
+
+### Table 4 without controls
+```{r}
+pavel_voters <- cz_2023_all_waves_resp %>% 
+  filter(PRES2023CAND2r_w4 == "Petr Pavel")
+
+swd1_round1 <- lm_robust(swd_diff ~ voted_1r + voted_2r + 
+                           swd_pre, 
+             data = cz_2023_all_waves_resp, 
+             weights = weight_turnout, 
+          se_type = "stata")
+
+swd1_round1b <- lm_robust(swd_diff ~ voted_1r + voted_2r +
+                            swd_pre, 
+             data = cz_2023_all_waves_resp, 
+             weights = weight_turnout, 
+             se_type = "stata")
+
+swd3_round1 <- lm_robust(swd_diff ~ voter_type + swd_pre, 
+                  data = cz_2023_all_waves_resp, 
+                  weights = weight_turnout, 
+                  se_type = "stata")
+
+swd4_round1 <- lm_robust(swd_diff ~ prez_vote_type + swd_pre, 
+                  data = cz_2023_all_waves_resp, 
+                  weights = weight_turnout, 
+                  se_type = "stata")
+
+swd5_round1 <- lm_robust(swd_diff ~ stable_voter + swd_pre, 
+                  data = pavel_voters, 
+                  weights = weight_turnout, 
+                  se_type = "stata")
+swd5_round1_ord <- lm_robust(swd_diff ~ pavel_decision + swd_pre, 
+                  data = pavel_voters, 
+                  weights = weight_turnout, 
+                  se_type = "stata")
+
+modelsummary(list(swd1_round1, swd3_round1, 
+                  swd4_round1, swd5_round1
+                  ), 
+             stars = c("*"=.05, "**"=.01, "***"=0.001),
+             coef_map = c(
+               "voted_1r" = "Voted (R1)",
+               "voted_2r" = "Voted (R2)",
+               "voter_typeVoted for winner" = "Winner",
+               "voter_typeVoted for loser" = "Loser",
+               "prez_vote_typefull winner" = "Full winner (A)",
+               "prez_vote_typesub-optimal winner" = "Sub-optimal winner (B)",
+               "prez_vote_typepartial loser" = "Partial loser (C)",
+               "prez_vote_typefull loser" = "Full loser (D)",
+               "stable_voter" = "Stable winner", 
+               "swd_pre" = "Pre-election SWD",
+               # "female" = "Female",
+               # "age" = "Age",
+               # "postsecondary_edu" = "Post-secondary education",
+               # "pol_interest_num" = "Pol. interest", 
+               # "pol_knowledge" = "Pol. knowledge",
+               # "party_close" = "Feels close to a party",
+               # "duty_to_vote" = "Duty to vote",
+               "(Intercept)"="Intercept"
+             ), 
+             fmt = 2,
+             gof_map = c("nobs", "r.squared", "adj.r.squared"),
+             # notes = c("Data weighted by turnout."),
+             output = "output/app_tab26_tab4_wo_controls.tex")
+```
+
+### Table 6 without controls
+```{r}
+ce1b <- lm_robust(swd_diff ~ voted + swd_pre + 
+             election, data = all_panels_both_waves, 
+           weights = weight_turnout, 
+           se_type = "stata") 
+ce2b <- lm_robust(swd_diff ~ voter_type + swd_pre + 
+             election, data = all_panels_both_waves, 
+           weights = weight_turnout, 
+           se_type = "stata")
+
+fe_rows <- tribble(~term, ~m1, ~m2,  
+                   "Country FE", "Yes", "Yes")
+fe_position <- broom::tidy(ce2b) %>% 
+    filter(!grepl("election", term)) %>% 
+    nrow()
+
+attr(fe_rows, "position") <- 11
+
+modelsummary(list(ce1b, ce2b), 
+             stars = c("*"=.05, "**"=.01, "***"=0.001),
+             coef_omit = "election[A-Za-z() ]+\\s[0-9]+$",
+             coef_map = c(
+               "voted"="Voted",
+               "voter_typeVoted for winner"="Winner",
+               "voter_typeVoted for loser"="Loser",
+               "swd_pre" = "Pre-election SWD",
+               "(Intercept)"="Intercept"
+             ),
+             fmt = 2,
+             add_rows = fe_rows, 
+             gof_map = c("nobs", "r.squared", "adj.r.squared"),
+             # output = "output/tab6_models.tex"
+             )
+
+modelsummary(list(ce1b, ce2b), 
+             stars = c("*"=.05, "**"=.01, "***"=0.001),
+             coef_omit = "election[A-Za-z() ]+\\s[0-9]+$",
+             coef_map = c(
+               "voted"="Voted",
+               "voter_typeVoted for winner"="Winner",
+               "voter_typeVoted for loser"="Loser",
+               "swd_pre" = "Pre-election SWD",
+               "(Intercept)"="Intercept"
+             ),
+             fmt = 2,
+             add_rows = fe_rows, 
+             gof_map = c("nobs", "r.squared", "adj.r.squared"),
+             output = "output/app_tab27_tab6_wo_controls.tex")
+```
+
+## Voting behaviour
+
+- [ ] For the Appendix: "Providing a side-by-side comparison of self-reported voting behaviors and actual election outcomes would be helpful for assessing the study's empirical validity." (Reviewer 2): Tables : Voter turnout and Vote choice for main parties in our data and in reality (CZ election, perhaps the other elections)
+
+```{r}
+# cz_2023_all_waves_resp %>% 
+#   group_by(PRES2023CAND2r_w4) %>% 
+#   summarise(n = sum(weight_turnout), .groups = "drop") %>% 
+#   mutate(pct = n / sum(n) * 100)
+
+cz_2023_true_w1 <- tribble(
+ ~vote, ~pct_true,
+ "nevolič" , 31.76,
+ "Andrej Babiš" , 23.88,
+ "Petr Pavel" , 24.16,
+ "Danuše Nerudová" , 9.50,
+ "Pavel Fischer" , 4.61,
+ "Jaroslav Bašta" , 3.04,
+ "Marek Hilšer" , 1.75,
+ "Karel Diviš" , 0.92,
+ "Tomáš Zima" , 0.38,
+)
+
+
+cz_2023_true_w2 <- tribble(
+  ~vote, ~pct_true_w2,
+  "nevolič", 29.75,
+  "Andrej Babiš", 29.27,
+  "Petr Pavel", 40.97
+)
+
+cz2023_results <- full_join(
+  cz_2023_all_waves_resp %>% 
+  group_by(PRES2023CAND1r_w3) %>% 
+  # summarise(n = sum(weight_turnout), .groups = "drop") %>% 
+  summarise(n = n(), .groups = "drop") %>%
+  mutate(pct = round(n / sum(n) * 100, 2)) %>% 
+  left_join(., cz_2023_true_w1, 
+            by = c("PRES2023CAND1r_w3"="vote")) %>% 
+  select(-n), 
+  cz_2023_all_waves_resp %>% 
+  group_by(PRES2023CAND2r_w4) %>% 
+  # summarise(n = sum(weight_turnout), .groups = "drop") %>% 
+  summarise(n = n(), .groups = "drop") %>%
+  mutate(pct = round(n / sum(n) * 100, 2)) %>% 
+  left_join(., cz_2023_true_w2, 
+            by = c("PRES2023CAND2r_w4"="vote")) %>% 
+    select(-n), 
+  by = c("PRES2023CAND1r_w3"="PRES2023CAND2r_w4")
+)
+
+cz2023_results %>% 
+  knitr::kable(., col.names = c("Vote choice", 
+                                "Reported behaviour (Round 1)", 
+                                "Results (Round 1)", 
+                                "Reported behaviour (Round 2)", 
+                                "Results (Round 2)"), 
+               format = "latex") %>% 
+  writeLines(., "output/app_tab19_cz2023_results.tex")
+  
+```
+```{r}
+cz_1996_results <- tribble(
+  ~vote, ~pct_true,
+  "ODS", 	22.6,
+  "CSSD", 	20.2,
+  "KSCM", 	7.9,
+  "KDU-CSL",	6.2,
+  "SPR-RSC",	6.1,
+  "ODA", 	4.9,
+  "DZJ", 	2.4,
+  "Others", 6.2, 
+  "Did not vote", 23.6
+)
+
+all_panels_both_waves %>% 
+  filter(election == "CZ 1996") %>% 
+  mutate(vote_choice = if_else(vote_choice %in% cz_1996_results$vote, 
+                               vote_choice, "Others")) %>% 
+  count(vote_choice) %>% 
+  mutate(pct = round(n / sum(n) * 100, 2)) %>% 
+  left_join(., cz_1996_results, by = c("vote_choice"="vote")) %>% 
+  select(-n) %>% 
+  knitr::kable(., col.names = c("Vote choice", "Reported behaviour", 
+                                "Results"), 
+               format = "latex") %>% 
+  writeLines(., "output/app_tab20_cz1996_results.tex")
+
+```
+
+```{r}
+# all_panels_both_waves %>% 
+#   filter(election == "DE (Ost) 2017")
+
+de17_results <- tribble(
+  ~vote_choice, ~pct_result,
+  "AfD", 8.58,
+  "CDU/CSU", 19.83,
+  "DIE LINKE", 10.08,
+  "FDP", 5.70,
+  "GRUENE", 4.01,
+  "SPD", 9.25,
+  "Others", 15.28+0.74,
+  "Did not vote", 26.52
+)
+
+all_panels_both_waves %>% 
+  filter(election == "DE (Ost) 2017") %>% 
+  mutate(vote_choice = case_when(
+    vote_choice == "trifft nicht zu" ~ "Did not vote",
+    vote_choice == "keine Angabe" ~ "No answer",
+    vote_choice == "Keine Erst-/ Zweitstimme vergeben" ~ "Others",
+    vote_choice == "andere Partei" ~ "Others",
+    TRUE ~ vote_choice
+  )) %>% 
+  count(vote_choice) %>% 
+  mutate(pct = round(n / sum(n) * 100, 2)) %>% 
+  full_join(., de17_results, by = "vote_choice") %>% 
+  select(-n) %>% 
+  knitr::kable(., col.names = c("Vote choice", "Reported behaviour", 
+                                "Results"), 
+               format = "latex") %>% 
+  writeLines(., "output/app_tab21_de2017_results.tex")
+
+```
+
+```{r}
+pl_2019_results <- tribble(
+  ~vote, ~pct_results,
+  "Did not vote",	54.30,
+  "PiS/Zjednoczsona Prawica", 20.74,
+  "PSL-PO-.N-SLD-Zielo", 17.58,
+  "Wiosna",	2.77,
+  "Kukiz'15 (K'15)", 1.69,
+  "Wolnosc (KORWIN)-Ruch Narodowy", 2.08,
+  "Partia Razem", 0.57,
+  "Others", 0.28
+)
+
+all_panels_both_waves %>% 
+  filter(election == "PL 2019") %>% 
+  mutate(vote_choice = if_else(is.na(vote_choice), 
+                               "Did not vote", vote_choice)) %>% 
+  mutate(vote_choice = if_else(vote_choice %in% c(
+    "Kongres Nowej Prawicy (KNP)", "Other party", "Spoilt the ballot"),
+                               "Others", vote_choice)) %>%
+  group_by(vote_choice) %>% 
+  summarise(n = n(), .groups = "drop") %>%
+  mutate(pct = round(n / sum(n) * 100, 2)) %>% 
+  full_join(., pl_2019_results, by = c("vote_choice"="vote")) %>% 
+  select(-n) %>% 
+  knitr::kable(., col.names = c("Vote choice", "Reported behaviour", 
+                                "Results"), 
+               format = "latex") %>% 
+  writeLines(., "output/app_tab22_pl2019_results.tex")
+```
+
+```{r}
+hu_2019_results <- tribble(
+  ~vote_choice, ~pct_results, 
+  "Did not vote",	56.52,
+  "FIDESZ-KNDP",	22.85,
+  "Demokratikus KoalÃ­ciÃ³ (DK)",	6.98,
+  "Momentum Mozgalom (MM)", 4.32,
+  "MSZP-PM", 2.87,
+  "JOBBIK",	2.76,
+  "Mi HazÃ¡nk Mozgalom (MH)",	1.43,
+  "Lehet MÃ¡s a Politika (LMP)", 1.14,
+  "Others",	1.13
+)
+
+all_panels_both_waves %>% 
+  filter(election == "HU 2019") %>% 
+  mutate(vote_choice = if_else(is.na(vote_choice), 
+                               "Did not vote", vote_choice)) %>% 
+  # filter(vote_choice != "Refuse") %>% 
+  mutate(vote_choice = if_else(vote_choice %in%
+                                 c("Other party", "Spoilt the ballot"),
+                               "Others", vote_choice)) %>%
+  group_by(vote_choice) %>% 
+  summarise(n = n(), .groups = "drop") %>%
+  mutate(pct = round(n / sum(n) * 100, 2)) %>% 
+  full_join(., hu_2019_results, by = "vote_choice") %>% 
+  select(-n) %>% 
+  knitr::kable(., col.names = c("Vote choice", "Reported behaviour", 
+                                "Results"), 
+               format = "latex") %>% 
+  writeLines(., "output/app_tab23_hu2019_results.tex")
+```
+
+```{r}
+ro_2009_results <- tribble(
+  ~vote_choice, ~pct_results,
+  "Mircea Geoana", 28.44,
+  "Traian Basescu", 28.82,
+  "Others/Invalid vote", 0.75, 
+  "Did not vote", 41.98,
+)
+
+ro_2009_results_r1 <- tribble(
+  ~vote_choice_r1, ~pct_results_r1,
+  "Did not vote", 45.63,
+  "Traian Basescu", 18.48,
+  "Mircea Geoana", 17.74,
+  "Crin Antonescu", 11.40,
+  "Corneliu Vadim Tudor", 0.32,
+  "Kelemen Hunor",2.18,
+  "Sorin Oprescu", 1.82,
+  "George Becali", 0.11,
+  "Others/Invalid vote", 0.35+0.26+0.20+0.13+0.12+1.25
+)
+
+full_join(
+  all_panels_both_waves %>% 
+  filter(election == "RO 2009") %>% 
+  mutate(vote_choice_r1 = if_else(is.na(vote_choice_r1), 
+                               "Did not vote", vote_choice_r1)) %>% 
+  mutate(vote_choice_r1 = case_when(
+    vote_choice_r1 == "Nu raspund" ~ "No response", 
+    vote_choice_r1 == "Nu stiu" ~ "Don't know",
+    vote_choice_r1 %in% c("Alt candidat", "Am anulat votul") ~ "Others/Invalid vote",
+    TRUE ~ vote_choice_r1)) %>%
+  group_by(vote_choice_r1) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  mutate(pct = round(n / sum(n) * 100, 2)) %>% 
+  full_join(., ro_2009_results_r1, by = "vote_choice_r1") %>% 
+  select(-n), 
+  all_panels_both_waves %>% 
+  filter(election == "RO 2009") %>% 
+  mutate(vote_choice = if_else(is.na(vote_choice), 
+                               "Did not vote", vote_choice)) %>% 
+  mutate(vote_choice = case_when(
+    vote_choice == "Am anulat votul" ~ "Others/Invalid vote", 
+    vote_choice == "NR" ~ "No response", 
+    vote_choice == "NS" ~ "Don't know",
+    TRUE ~ vote_choice)) %>%
+  group_by(vote_choice) %>% 
+  summarise(n = n(), .groups = "drop") %>%
+  mutate(pct = round(n / sum(n) * 100, 2)) %>% 
+  select(-n) %>% 
+  full_join(., ro_2009_results, by = "vote_choice"), 
+  by = c("vote_choice_r1"="vote_choice")
+) %>% 
+  knitr::kable(., col.names = c("Vote choice", 
+                                "Reported behaviour (Round 1)", 
+                                "Results (Round 1)", 
+                                "Reported behaviour (Round 2)", 
+                                "Results (Round 2)"), 
+               format = "latex") %>% 
+  writeLines(., "output/app_tab24_ro2009_results.tex")
+
+```
+
+```{r}
+ro_2012_results <- tribble(
+  ~vote_choice, ~pct_results,
+  "Did not vote",	58.24,
+  "Uniunea Social-Liberala (USL: PSD+PNL+PC+UNPR)",	23.58,
+  "Alianta România Dreapta (ARD: PDL+PNT-CD+FC)",	6.64,
+  "Partidul Poporului - Dan Diaconescu (PP-DD)",	5.62,
+  "Uniunea Democrata a Maghiarilor din România (UDMR)", 2.06,
+  "Partidul România Mare (PRM)", 0.50,
+  "Others/Invalid vote",	1.81+1.54
+)
+
+all_panels_both_waves %>% 
+  filter(election == "RO 2012") %>% 
+  mutate(vote_choice = if_else(is.na(vote_choice), 
+                               "Did not vote", vote_choice)) %>% 
+  # filter(vote_choice != "Refuse") %>% 
+  mutate(vote_choice = case_when(
+    vote_choice %in% c("Partidul Democrat Liberal (PDL)",
+                       "Forta Civica (FC)", 
+                       "Partidul National Taranesc Crestin Democrat (PNTCD)") ~ "Alianta România Dreapta (ARD: PDL+PNT-CD+FC)",
+    vote_choice %in% c("Partidul Social Democrat (PSD)", 
+                       "Partidul National Liberal (PNL)") ~ 
+      "Uniunea Social-Liberala (USL: PSD+PNL+PC+UNPR)", 
+    TRUE ~ vote_choice
+  )) %>% 
+  mutate(vote_choice = case_when(
+    vote_choice %in% c("Alt partid", "Candidat independent", 
+                                   "Vot invalid (alb/anulat)") ~ 
+      "Others/Invalid vote",
+    vote_choice == "Nu stiu" ~ "Don't know",
+    vote_choice == "Refuz" ~ "No answer/Refuse",
+    TRUE ~ vote_choice)) %>%
+  group_by(vote_choice) %>% 
+  summarise(n = n(), .groups = "drop") %>%
+  mutate(pct = round(n / sum(n) * 100, 2)) %>% 
+  full_join(., ro_2012_results, by = "vote_choice") %>% 
+  select(-n) %>% 
+  knitr::kable(., col.names = c("Vote choice", "Reported behaviour", 
+                                "Results"),
+               format = "latex") %>% 
+  writeLines(., "output/app_tab25_ro2012_results.tex")
+
+```
+

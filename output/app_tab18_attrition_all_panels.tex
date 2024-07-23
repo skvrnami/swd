@@ -1,0 +1,33 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+entry=none,label=none,
+note{}={+ p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]Q[]Q[]Q[]Q[]Q[]},
+column{1}={halign=l,},
+column{2}={halign=c,},
+column{3}={halign=c,},
+column{4}={halign=c,},
+column{5}={halign=c,},
+column{6}={halign=c,},
+column{7}={halign=c,},
+column{8}={halign=c,},
+column{9}={halign=c,},
+hline{6}={1,2,3,4,5,6,7,8,9}{solid, 0.05em, black},
+}                     %% tabularray inner close
+\toprule
+& All panels & CZ 1996 & CZ 2023 & East Germany 2017 & Hungary 2019 & Poland 2019 & Romania 2009 & Romania 2012 \\ 
+\midrule 
+Pre-election SWD & 0.03    & -0.77*** & 0.10     & -0.32    & 0.20     & 0.00     & 0.36     & 0.62*    \\
+& (0.08)  & (0.22)   & (0.29)   & (0.37)   & (0.15)   & (0.16)   & (0.38)   & (0.25)   \\
+Intercept        & 0.34*** & 0.71***  & -2.07*** & -2.86*** & -0.78*** & -0.54*** & -2.38*** & -1.70*** \\
+& (0.07)  & (0.12)   & (0.15)   & (0.20)   & (0.07)   & (0.09)   & (0.15)   & (0.10)   \\
+Election FE & Yes & & & & & & \\
+\midrule
+Num.Obs.         & 13225   & 1393     & 1501     & 2549     & 2012     & 2000     & 1392     & 2378     \\
+Pseudo-R2  & 0.15 & 0.01 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \\
+\bottomrule
+\end{talltblr}
+\end{table}
