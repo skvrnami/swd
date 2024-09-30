@@ -1071,6 +1071,47 @@ ggsave("output/swd_change_w1_w5_voter_type5.pdf",
 
 ![](output/swd_change_w1_w5_voter_type5.png)
 
+```{r}
+
+robust_long_w1_w5 <- long_w1_w5 %>% 
+  filter(winner == "abstainer") %>% 
+  mutate(
+    r_ptv_pavel = as.numeric(stringr::str_extract(PTV_PAVEL, "[0-9]+")),
+    r_ptv_babis = as.numeric(stringr::str_extract(PTV_BABIS, "[0-9]+")),
+    winner_robust = case_when(
+      r_ptv_pavel >= 5 & r_ptv_pavel >= r_ptv_babis ~ "Prefers winner",
+      r_ptv_babis >= 5 & r_ptv_babis >= r_ptv_pavel ~ "Prefers loser",
+      TRUE ~ "No preference"
+  ) %>% factor())
+
+robust_m2_w5 <- lmer(SWD_num ~ winner_robust * wave + (1 | RADIOMETER_ID2), 
+              data = robust_long_w1_w5, weights = weight_turnout) 
+
+robust_tmp <- ggpredict(robust_m2_w5, c("wave", "winner_robust"))
+
+p2 <- robust_tmp %>% 
+    plot() + 
+    labs(title = "", 
+         x = "Wave", 
+         y = "SWD", 
+         colour = "Abstainer type") + 
+    theme(legend.position = "top") + 
+    scale_colour_manual(name="Abstainer type",
+                        # labels=c("Full winner (A)", 
+                        #          "Sub-optimal winner (B)", 
+                        #          "Partial loser (C)", 
+                        #          "Full loser (D)", 
+                        #          "Full abstainer (E)"), 
+                        values = c("#E41A1B", "#377EB8", 
+                                   "#4EAF4A")) + 
+    guides(colour = guide_legend(nrow = 2))
+
+ggsave("output/swd_change_w1_w5_abstainer_type.pdf", 
+       width = 7, height = 5)
+
+```
+
+
 ```{r, eval=FALSE}
 ggeffect(m3_w5, c("wave", "vote_gov")) %>% 
     plot() + 
@@ -1629,6 +1670,117 @@ modelsummary(list(ce1b, ce2b),
              # output = "output/tab5_models.tex"
              )
 ```
+
+## Robust Table: Interactions of party closeness with winner
+```{r}
+r_swd1_round1 <- lm_robust(swd_diff ~ voted_1r + voted_2r + 
+                           swd_pre + female + 
+                           age +
+                    postsecondary_edu + pol_interest_num + 
+                    pol_knowledge + party_close + duty_to_vote, 
+             data = cz_2023_all_waves_resp, 
+             weights = weight_turnout, 
+          se_type = "stata")
+
+r_swd3_round1 <- lm_robust(swd_diff ~ voter_type * party_close + swd_pre + 
+                           female + age +
+                    postsecondary_edu + pol_interest_num + 
+                    pol_knowledge + duty_to_vote, 
+                  data = cz_2023_all_waves_resp, 
+                  weights = weight_turnout, 
+                  se_type = "stata")
+
+r_swd4_round1 <- lm_robust(swd_diff ~ prez_vote_type * party_close + 
+                           swd_pre + 
+                    female + age +
+                      postsecondary_edu + pol_interest_num + 
+                      pol_knowledge + duty_to_vote, 
+                  data = cz_2023_all_waves_resp, 
+                  weights = weight_turnout, 
+                  se_type = "stata")
+
+
+modelsummary(list(r_swd1_round1, r_swd3_round1, 
+                  r_swd4_round1
+                  ), 
+             stars = c("*"=.05, "**"=.01, "***"=0.001),
+             coef_rename = c(
+               "voted_1r" = "Voted (R1)",
+               "voted_2r" = "Voted (R2)",
+               "voter_typeVoted for winner" = "Winner",
+               "voter_typeVoted for loser" = "Loser",
+               "prez_vote_typefull winner" = "Full winner (A)",
+               "prez_vote_typesub-optimal winner" = "Sub-optimal winner (B)",
+               "prez_vote_typepartial loser" = "Partial loser (C)",
+               "prez_vote_typefull loser" = "Full loser (D)",
+               "stable_voter" = "Stable winner", 
+               "swd_pre" = "Pre-election SWD",
+               "female" = "Female",
+               "age" = "Age",
+               "postsecondary_edu" = "Post-secondary education",
+               "pol_interest_num" = "Pol. interest", 
+               "pol_knowledge" = "Pol. knowledge",
+               "party_close" = "Feels close to a party",
+               "duty_to_vote" = "Duty to vote",
+               "(Intercept)"="Intercept"
+             ), 
+             fmt = 2,
+             gof_map = c("nobs", "r.squared", "adj.r.squared"),
+             # notes = c("Data weighted by turnout."),
+             output = "output/app_tab4_models_party_close.tex")
+```
+
+
+```{r}
+r_ce1b <- lm_robust(swd_diff ~ voted + swd_pre + female + age +
+             postsecondary_edu + 
+             pol_interest_num + party_close + 
+             election, data = all_panels_both_waves %>% 
+               filter(!is.na(party_close)) %>% 
+               filter(!is.na(voter_type)), 
+           weights = weight_turnout, 
+           se_type = "stata") 
+r_ce2b <- lm_robust(swd_diff ~ voter_type * party_close + 
+                      swd_pre + female + age +
+             postsecondary_edu + 
+             pol_interest_num + 
+             election, data = all_panels_both_waves, 
+           weights = weight_turnout, 
+           se_type = "stata")
+
+fe_rows <- tribble(~term, ~m1, ~m2,
+                   "Country FE", "Yes", "Yes")
+fe_position <- broom::tidy(r_ce2b) %>%
+    filter(!grepl("election", term)) %>%
+    nrow()
+
+attr(fe_rows, "position") <- 25
+
+modelsummary(list(r_ce1b, r_ce2b), 
+             stars = c("*"=.05, "**"=.01, "***"=0.001),
+             coef_omit = "election[A-Za-z() ]+\\s[0-9]+$",
+             coef_rename = c(
+               "voted" = "Voted",
+               "voter_typeVoted for winner" = "Winner", 
+               "voter_typeVoted for loser" = "Loser",
+               "swd_pre" = "Pre-election SWD",
+               "female" = "Female",
+               "age" = "Age",
+               "postsecondary_edu" = "Post-secondary education",
+               "pol_interest_num" = "Pol. interest", 
+               "party_close" = "Feels close to a party",
+               "election_typepresidential" = "Presidential election", 
+               "election_typeEP election" = "EP election", 
+               "(Intercept)"="Intercept"
+             ),
+             fmt = 2,
+             add_rows = fe_rows, 
+             gof_map = c("nobs", "r.squared", "adj.r.squared"), 
+             output = "output/app_tab6_models_party_close.tex"
+)
+             
+```
+
 
 ## Table A1: Descriptive stats
 ```{r}
@@ -2727,6 +2879,18 @@ cz_2023_atrice <- cz_2023 %>%
          attrition_w4 = w4 == 0, 
          attrition_w5 = w5 == 0)
 
+cz_2023_atrice %>% 
+  summarise(
+    w1 = sum(w1), 
+    w2 = sum(w2), 
+    w3 = sum(w3), 
+    w4 = sum(w4), 
+    w5 = sum(w5)
+  ) %>% 
+  knitr::kable(., col.names = paste0("Wave ", 1:5), 
+               format = "latex") %>% 
+  writeLines("output/app_tab_atrice_descriptive.tex")
+
 atr_w2 <- glm(attrition_w2 ~ SWD_w1, data = cz_2023_atrice, 
               family = binomial("logit"))
 atr_w3 <- glm(attrition_w3 ~ SWD_w1, data = cz_2023_atrice, 
@@ -3241,5 +3405,99 @@ all_panels_both_waves %>%
                format = "latex") %>% 
   writeLines(., "output/app_tab25_ro2012_results.tex")
 
+```
+
+# ESS SWD summary
+```{r}
+library(haven)
+ess_swd <- read_sav("data/ESS/ESS1e06_7-ESS2e03_6-ESS3e03_7-ESS4e04_6-ESS5e03_5-ESS6e02_6-ESS7e02_3-ESS8e02_3-ESS9e03_2-ESS10-ESS10SC-ESS11-subset.sav")
+
+# East Europe = Albania, Bulgaria, Czech Republic, Estonia, Croatia, Hungary, Lithuania, Latvia, Montenegro, North Macedonia, Poland, Romania, Slovenia, Slovakia, Serbia, Ukraine and Kosov
+# West Europe = Austria, Belgium, Switzerland, Germany, Denmark, Spain, Finland, France, UK, Ireland, Iceland, Italy, Luxembourg, Netherlands, Norway, Portugal, Sweden, Greece, Cyprus
+# Excluded = Russia, Turkey, Israel
+
+ess_swd_mean <- ess_swd %>% 
+  mutate(
+    region = case_when(
+      cntry %in% c("AL", "BG", "CZ", "EE", "HR", "HU",
+                   "LT", "LV", "ME", "MK", "PL", "RO", "SI",
+                   "SK", "RS", "UA", "XK") ~ "East Europe",
+      cntry %in% c("AT", "BE", "CH", "DE", "DK", "ES", "FI",
+                   "FR", "GB", "IE", "IS", "IT", "LU", "NL",
+                   "NO", "PT", "SE", "GR", "CY") ~ "West Europe"
+    ), 
+    swd = as.numeric(stfdem) / 10
+  ) %>% 
+  mutate(essround = case_when(
+    essround == 1 ~ 2002,
+    essround == 2 ~ 2004,
+    essround == 3 ~ 2006,
+    essround == 4 ~ 2008,
+    essround == 5 ~ 2010,
+    essround == 6 ~ 2012,
+    essround == 7 ~ 2014,
+    essround == 8 ~ 2016,
+    essround == 9 ~ 2018,
+    essround == 10 ~ 2020,
+    essround == 11 ~ 2023
+  )) %>% 
+  filter(!is.na(swd)) %>% 
+  filter(!is.na(region)) %>% 
+  group_by(essround, cntry, region) %>% 
+  summarise(mean_swd = Hmisc::wtd.mean(swd, pspwght)) %>% 
+  filter(essround != 2023)
+
+ess_swd_mean %>% 
+  ggplot(aes(x = essround, y = mean_swd, group = cntry, 
+             colour = region)) + 
+  geom_point() + 
+  geom_line() + 
+  theme_minimal() +
+  theme(legend.position = "top") + 
+  labs(x = "ESS round", y = "Mean SWD (0-1)")
+  
+  
+ess_swd_mean %>% 
+  group_by(essround, region) %>% 
+  summarise(mean_swd = mean(mean_swd)) %>% 
+  ungroup %>% 
+  ggplot(aes(x = essround, y = mean_swd, colour = region)) + 
+  # geom_point() + 
+  geom_line() + 
+  theme_minimal() + 
+  theme(legend.position = "top") + 
+  labs(x = "ESS round", y = "Mean SWD (0-1)")
+
+ess_swd_mean %>% 
+  group_by(essround, region) %>% 
+  summarise(mean_swd = mean(mean_swd)) %>% 
+  ggplot(aes(x = essround, y = mean_swd, colour = region)) + 
+  geom_line(data = ess_swd_mean, 
+            aes(x = essround, y = mean_swd, colour = region, group = cntry), size = 0.5, alpha = 0.5) + 
+  # geom_point(data = ess_swd_mean, 
+  #           aes(x = essround, y = mean_swd, colour = region, group = cntry), size = 0.5, alpha = 0.5) + 
+  geom_line(size = 2) +
+  theme_minimal() + 
+  theme(legend.position = "top") + 
+  labs(x = "ESS round", y = "Mean SWD (0-1)")
+  
+
+ggsave("output/figX_ess_swd.pdf", width = 8, 
+       height = 4)
+
+ess_swd_mean %>% 
+  group_by(essround, region) %>% 
+  summarise(mean_swd = mean(mean_swd)) %>% 
+  ggplot(aes(x = essround, y = mean_swd, colour = region)) + 
+  geom_point(data = ess_swd_mean, 
+            aes(x = essround, y = mean_swd, colour = region, group = cntry), size = 0.5, alpha = 0.5) + 
+  geom_line(size = 2) +
+  theme_minimal() + 
+  theme(legend.position = "top") + 
+  labs(x = "ESS round", y = "Mean SWD (0-1)")
+  
+
+ggsave("output/figX2_ess_swd.pdf", width = 8, 
+       height = 4)
 ```
 
