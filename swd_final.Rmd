@@ -516,7 +516,7 @@ swd5_round1_ord <- lm_robust(swd_diff ~ pavel_decision + swd_pre +
                   se_type = "stata")
 
 modelsummary(list(swd1_round1, swd3_round1, 
-                  swd4_round1, swd5_round1
+                  swd4_round1
                   ), 
              stars = c("*"=.05, "**"=.01, "***"=0.001),
              coef_map = c(
@@ -545,7 +545,7 @@ modelsummary(list(swd1_round1, swd3_round1,
              output = "output/tab4_models.tex")
 
 modelsummary(list(swd1_round1, swd3_round1, 
-                  swd4_round1, swd5_round1
+                  swd4_round1
                   ), 
              stars = c("*"=.05, "**"=.01, "***"=0.001),
              coef_rename = c(
@@ -572,6 +572,70 @@ modelsummary(list(swd1_round1, swd3_round1,
              gof_map = c("nobs", "r.squared", "adj.r.squared"),
              notes = c("Data weighted by turnout.")
              )
+
+swd5_round1 <- lm_robust(swd_diff ~ stable_voter + swd_pre + 
+                           female + age +
+                    postsecondary_edu + pol_interest_num + 
+                    pol_knowledge + party_close + duty_to_vote, 
+                  data = pavel_voters, 
+                  weights = weight_turnout, 
+                  se_type = "stata")
+
+modelsummary(list(swd5_round1
+                  ), 
+             stars = c("*"=.05, "**"=.01, "***"=0.001),
+             coef_rename = c(
+               "voted_1r" = "Voted (R1)",
+               "voted_2r" = "Voted (R2)",
+               "voter_typeVoted for winner" = "Winner",
+               "voter_typeVoted for loser" = "Loser",
+               "prez_vote_typefull winner" = "Full winner (A)",
+               "prez_vote_typesub-optimal winner" = "Sub-optimal winner (B)",
+               "prez_vote_typepartial loser" = "Partial loser (C)",
+               "prez_vote_typefull loser" = "Full loser (D)",
+               "stable_voter" = "Stable winner", 
+               "swd_pre" = "Pre-election SWD",
+               "female" = "Female",
+               "age" = "Age",
+               "postsecondary_edu" = "Post-secondary education",
+               "pol_interest_num" = "Pol. interest", 
+               "pol_knowledge" = "Pol. knowledge",
+               "party_close" = "Feels close to a party",
+               "duty_to_vote" = "Duty to vote",
+               "(Intercept)"="Intercept"
+             ), 
+             fmt = 2,
+             gof_map = c("nobs", "r.squared", "adj.r.squared"),
+             notes = c("Data weighted by turnout.")
+             )
+
+modelsummary(list(swd5_round1), 
+             stars = c("*"=.05, "**"=.01, "***"=0.001),
+             coef_map = c(
+               "voted_1r" = "Voted (R1)",
+               "voted_2r" = "Voted (R2)",
+               "voter_typeVoted for winner" = "Winner",
+               "voter_typeVoted for loser" = "Loser",
+               "prez_vote_typefull winner" = "Full winner (A)",
+               "prez_vote_typesub-optimal winner" = "Sub-optimal winner (B)",
+               "prez_vote_typepartial loser" = "Partial loser (C)",
+               "prez_vote_typefull loser" = "Full loser (D)",
+               "stable_voter" = "Stable winner", 
+               "swd_pre" = "Pre-election SWD",
+               "female" = "Female",
+               "age" = "Age",
+               "postsecondary_edu" = "Post-secondary education",
+               "pol_interest_num" = "Pol. interest", 
+               "pol_knowledge" = "Pol. knowledge",
+               "party_close" = "Feels close to a party",
+               "duty_to_vote" = "Duty to vote",
+               "(Intercept)"="Intercept"
+             ), 
+             fmt = 2,
+             gof_map = c("nobs", "r.squared", "adj.r.squared"),
+             # notes = c("Data weighted by turnout."),
+             output = "output/app_tab31_hypothesis5.tex")
+
 ```
 
 ```{r}
@@ -2475,7 +2539,7 @@ swd5_round1_ord_e <- lm_robust(swd_diff ~ pavel_decision + swd_pre +
                   se_type = "stata")
 
 modelsummary(list(swd1_round1_e, swd3_round1_e, 
-                  swd4_round1_e, swd5_round1_e
+                  swd4_round1_e
                   ), 
              stars = c("*"=.05, "**"=.01, "***"=0.001),
              coef_map = c(
@@ -2510,7 +2574,7 @@ modelsummary(list(swd1_round1_e, swd3_round1_e,
              output = "output/app_tab4_models_precariousness.tex")
 
 modelsummary(list(swd1_round1_e, swd3_round1_e, 
-                  swd4_round1_e, swd5_round1_e
+                  swd4_round1_e
                   ), 
              stars = c("*"=.05, "**"=.01, "***"=0.001),
              coef_rename = c(
@@ -2981,7 +3045,7 @@ modelsummary(
   fmt = 2,
   gof_map = c("nobs", "r.squared", "adj.r.squared"), 
   coef_map = c("swd_pre"="Pre-election SWD",
-               "(Intercept)"="Intercept") 
+               "(Intercept)"="Intercept"),
   output = "output/app_tab18_attrition_all_panels.tex"
 )
 
@@ -3029,7 +3093,7 @@ swd5_round1_ord <- lm_robust(swd_diff ~ pavel_decision + swd_pre,
                   se_type = "stata")
 
 modelsummary(list(swd1_round1, swd3_round1, 
-                  swd4_round1, swd5_round1
+                  swd4_round1
                   ), 
              stars = c("*"=.05, "**"=.01, "***"=0.001),
              coef_map = c(
@@ -3406,6 +3470,144 @@ all_panels_both_waves %>%
   writeLines(., "output/app_tab25_ro2012_results.tex")
 
 ```
+
+## Table 4: SWD change, CZ 2023 panel ()
+```{r}
+
+cz_2023_all_waves_resp_b <- cz_2023_all_waves_resp %>% 
+  mutate(swd_diff = SWD_w4 - SWD_w2,
+         swd_pre = SWD_w2)
+
+pavel_voters_b <- cz_2023_all_waves_resp_b %>% 
+  filter(PRES2023CAND2r_w4 == "Petr Pavel")
+
+swd1_round1 <- lm_robust(swd_diff ~ voted_1r + voted_2r + 
+                           swd_pre + female + 
+                           age +
+                    postsecondary_edu + pol_interest_num + 
+                    pol_knowledge + party_close + duty_to_vote, 
+             data = cz_2023_all_waves_resp_b, 
+             weights = weight_turnout, 
+          se_type = "stata")
+
+swd1_round1b <- lm_robust(swd_diff ~ voted_1r + voted_2r +
+                            swd_pre + female + 
+                            age +
+                    postsecondary_edu + pol_interest_num + 
+                    pol_knowledge + party_close + duty_to_vote, 
+             data = cz_2023_all_waves_resp_b, 
+             weights = weight_turnout, 
+             se_type = "stata")
+
+swd3_round1 <- lm_robust(swd_diff ~ voter_type + swd_pre + 
+                           female + age +
+                    postsecondary_edu + pol_interest_num + 
+                    pol_knowledge + party_close + duty_to_vote, 
+                  data = cz_2023_all_waves_resp_b, 
+                  weights = weight_turnout, 
+                  se_type = "stata")
+
+swd4_round1 <- lm_robust(swd_diff ~ prez_vote_type + swd_pre + 
+                    female + age +
+                      postsecondary_edu + pol_interest_num + 
+                      pol_knowledge + party_close + duty_to_vote, 
+                  data = cz_2023_all_waves_resp_b, 
+                  weights = weight_turnout, 
+                  se_type = "stata")
+
+swd5_round1 <- lm_robust(swd_diff ~ stable_voter + swd_pre + 
+                           female + age +
+                    postsecondary_edu + pol_interest_num + 
+                    pol_knowledge + party_close + duty_to_vote, 
+                  data = pavel_voters_b, 
+                  weights = weight_turnout, 
+                  se_type = "stata")
+swd5_round1_ord <- lm_robust(swd_diff ~ pavel_decision + swd_pre + 
+                        female + age +
+                    postsecondary_edu + pol_interest_num + 
+                    pol_knowledge + party_close + duty_to_vote, 
+                  data = pavel_voters_b, 
+                  weights = weight_turnout, 
+                  se_type = "stata")
+
+modelsummary(list(swd1_round1, swd3_round1, 
+                  swd4_round1), 
+             stars = c("*"=.05, "**"=.01, "***"=0.001),
+             coef_map = c(
+               "voted_1r" = "Voted (R1)",
+               "voted_2r" = "Voted (R2)",
+               "voter_typeVoted for winner" = "Winner",
+               "voter_typeVoted for loser" = "Loser",
+               "prez_vote_typefull winner" = "Full winner (A)",
+               "prez_vote_typesub-optimal winner" = "Sub-optimal winner (B)",
+               "prez_vote_typepartial loser" = "Partial loser (C)",
+               "prez_vote_typefull loser" = "Full loser (D)",
+               "stable_voter" = "Stable winner", 
+               "swd_pre" = "Pre-election SWD (W2)",
+               "female" = "Female",
+               "age" = "Age",
+               "postsecondary_edu" = "Post-secondary education",
+               "pol_interest_num" = "Pol. interest", 
+               "pol_knowledge" = "Pol. knowledge",
+               "party_close" = "Feels close to a party",
+               "duty_to_vote" = "Duty to vote",
+               "(Intercept)"="Intercept"
+             ), 
+             fmt = 2,
+             gof_map = c("nobs", "r.squared", "adj.r.squared"),
+             # notes = c("Data weighted by turnout."),
+             output = "output/app_tab4_models_swd_w4_w2.tex")
+
+modelsummary(list(swd1_round1, swd3_round1, 
+                  swd4_round1), 
+             stars = c("*"=.05, "**"=.01, "***"=0.001),
+             coef_rename = c(
+               "voted_1r" = "Voted (R1)",
+               "voted_2r" = "Voted (R2)",
+               "voter_typeVoted for winner" = "Winner",
+               "voter_typeVoted for loser" = "Loser",
+               "prez_vote_typefull winner" = "Full winner (A)",
+               "prez_vote_typesub-optimal winner" = "Sub-optimal winner (B)",
+               "prez_vote_typepartial loser" = "Partial loser (C)",
+               "prez_vote_typefull loser" = "Full loser (D)",
+               "stable_voter" = "Stable winner", 
+               "swd_pre" = "Pre-election SWD (W2)",
+               "female" = "Female",
+               "age" = "Age",
+               "postsecondary_edu" = "Post-secondary education",
+               "pol_interest_num" = "Pol. interest", 
+               "pol_knowledge" = "Pol. knowledge",
+               "party_close" = "Feels close to a party",
+               "duty_to_vote" = "Duty to vote",
+               "(Intercept)"="Intercept"
+             ), 
+             fmt = 2,
+             gof_map = c("nobs", "r.squared", "adj.r.squared"),
+             notes = c("Data weighted by turnout.")
+             )
+```
+
+
+# Age difference between stable and other winners
+```{r}
+pavel_voters <- cz_2023_all_waves_resp %>% 
+  filter(PRES2023CAND2r_w4 == "Petr Pavel")
+
+cz_age <- cz_2023_models %>% 
+  select(RADIOMETER_ID2, age)
+
+winners <- pavel_voters %>% 
+  select(-age) %>% 
+  left_join(., cz_age, by = "RADIOMETER_ID2") %>% 
+  mutate(full_winner = prez_vote_type == "full winner")
+
+winners %>% 
+  group_by(stable_voter) %>% 
+  summarise(mean_age = round(mean(age), 1))
+
+t.test(age ~ stable_voter, data = winners)
+```
+
 
 # ESS SWD summary
 ```{r}
