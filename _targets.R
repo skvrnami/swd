@@ -301,8 +301,66 @@ list(
   ),
   
   tar_target(
+    cz_election_results_2023, {
+      turnout_r1 <- 0.682
+      turnout_r2 <- 0.702
+      
+      tribble(
+        ~candidate, ~PRES2023CAND1r_w3, ~PRES2023CAND2r_w4,
+        "Pavel Fischer", 6.75 * turnout_r1, NA, 
+        "Jaroslav Bašta", 4.45 * turnout_r1, NA, 
+        "Petr Pavel", 35.40 * turnout_r1, 58.32 * turnout_r2,
+        "Tomáš Zima", 0.55 * turnout_r1, NA, 
+        "Danuše Nerudová", 13.92 * turnout_r1, NA, 
+        "Andrej Babiš", 34.99 * turnout_r1, 41.67 * turnout_r2, 
+        "Karel Diviš", 1.35 * turnout_r1, NA, 
+        "Marek Hilšer", 2.56 * turnout_r1, NA, 
+        "nevolič", (1 - turnout_r1) * 100, (1 - turnout_r2) * 100
+      )
+    }
+  ),
+  
+  tar_target(
+    cz_2023_weight_results, {
+
+      n <- nrow(cz_2023_weight)
+
+      votes_freq <- cz_election_results_2023 %>%
+        mutate(across(c(PRES2023CAND1r_w3, PRES2023CAND2r_w4),
+                      ~.x / 100 * n, 
+                      .names = "{.col}_freq")) %>% 
+        select(candidate, ends_with("_freq"))
+
+      fst_round <- votes_freq %>%
+        select(PRES2023CAND1r_w3 = candidate, 
+               freq = PRES2023CAND1r_w3_freq)
+
+      snd_round <- votes_freq %>%
+        filter(!is.na(PRES2023CAND2r_w4_freq)) %>%
+        select(PRES2023CAND2r_w4 = candidate, 
+               freq = PRES2023CAND2r_w4_freq)
+
+      weighting_margins <- list(~PRES2023CAND1r_w3, ~PRES2023CAND2r_w4)
+      weighting_targets <- list(fst_round, snd_round)
+
+      svy_design <- svydesign(ids = ~1, data = cz_2023_weight)
+
+      weights <- rake(design = svy_design,
+           sample.margins = weighting_margins,
+           population.margins = weighting_targets,
+           control = list(maxit = 100000, epsilon = 1, verbose = FALSE)) %>%
+        trimWeights(rake_out, lower = 0.2, upper = 5, strict = TRUE) %>%
+        weights()
+
+      cz_2023_weight %>%
+        mutate(weight_results = weights)
+    }
+  ),
+  
+  
+  tar_target(
     cz_2023_models, {
-      cz_2023_weight %>% 
+      cz_2023_weight_results %>% 
         mutate(
           pol_knowledge_pct = pol_knowledge_pct / 100, 
           nonvoter = 1 - voted, 
@@ -370,7 +428,7 @@ list(
         )) %>% 
       ungroup %>% 
       filter(n_waves == 5) %>% 
-      left_join(., cz_2023_weight %>% select(RADIOMETER_ID2, weight_turnout), 
+      left_join(., cz_2023_weight_results %>% select(RADIOMETER_ID2, weight_turnout, weight_results), 
                 by = "RADIOMETER_ID2") %>% 
       mutate(winner_stable2 = case_when(
         winner_stable2 == "sincere winner" ~ "full winner", 
@@ -1429,10 +1487,10 @@ list(
     "weights.Rmd"
   ),
   
-  tar_render(
-    swd_final_rmd,
-    "swd_final.Rmd"
-  ),
+  # tar_render(
+  #   swd_final_rmd,
+  #   "swd_final.Rmd"
+  # ),
   
   # Data for reviewers
   tar_target(

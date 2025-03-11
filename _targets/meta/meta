@@ -4,7 +4,7 @@ all_panels|stem|a371204faeb72fdd|1d0a9376edb70014|f8d7011856d2e597|602165921||t1
 all_panels_attrition|stem|7d3e115077b73d18|85802bd018e6c401|2678b81bac555ab0|-625216677||t19925.7301625136s|1a4ee81e0ec4fe2b|149683|rds|local|vector|||0.038||
 all_panels_both_waves|stem|cddd3bbbb0321c1c|1a0fd1795bb2f6fe|1c9449e031f54825|-1870877011||t19925.7301876817s|83f823f75571c229|90716|rds|local|vector|||0.005||
 all_panels_data|stem|a371204faeb72fdd|682249e253da5c54|667be5045f54a8c4|370775353||t19925.7301886475s|50cef337ea57eee0|111889|rds|local|vector|||0.033||
-all_panels_model_data|stem|e0d1f2ac79fc7e12|8cbc2ff116201427|c58ac8c3a8c3cba0|-514738293||t19786.8366613852s|44e327d1ee1978d7|43|rds|local|vector|||0.038||
+all_panels_model_data|stem|95c869582cc88ef6|b53bcf8f3818a107|89aaa1cb3220c13b|1821262178||t20094.8450020306s|e255484007059372|43|rds|local|vector|||0.036||
 all_panels_model_data_dta|stem|cddd3bbbb0321c1c|f35b77b08bf1f44c|89aaa1cb3220c13b|753360975||t19925.7301893737s|83f823f75571c229|90716|rds|local|vector|||0.021||
 calc_weight_turnout|function|849c5d6121e21fac|||||||||||||||
 calc_weight_turnout_presidential|function|0a0334990e835f12|||||||||||||||
@@ -16,18 +16,20 @@ cz_1996|stem|37d3cb71457ac0c7|6f117aae8a2ece24|059bffdf2f740cc6|962287149||t1992
 cz_1996_final|stem|ec9be5534e3fcf1f|3f6ee122e6df257a|00ec91088e6f10a2|900923272||t19468.5553828287s|b42663120c0dc9c1|326604|rds|local|vector|||0.049||
 cz_1996_weight|stem|7d4eb28c07233056|d83b6ad6afdc09ae|1ed00740ca231a9a|401679923||t19925.3728624652s|0a66fee491d240c5|116307|rds|local|vector|||0.032|No weights or probabilities supplied, assuming equal probability. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.|
 cz_2023|stem|0346639e577ee8fc|dc0e7cc1326d49c9|2c530c1562a7fbd1|219433395||t19925.372388561s|f385b41db93f8733|1869694|rds|local|vector|||0.829||
-cz_2023_all_waves_resp|stem|47283cbfe7fc0c8d|e79b880ec40ea386|3cba79b9e5ef3297|-670873800||t19925.3760297826s|24015f6c977629a8|1629684|rds|local|vector|||0.061||
-cz_2023_long|stem|7e050e02ed15f278|7253f8745226d5ff|3d1ffeedcaac5ba6|1514080786||t19925.3728493615s|439f9f858c4c6782|1368228|rds|local|vector|||2.939||
-cz_2023_long_file|stem|95c869582cc88ef6|4b3a097859089ce5|28528f24dc965048|2063258815||t19925.3760516452s|e255484007059372|43|rds|local|vector|||0.414||
-cz_2023_long_file_dta|stem|7e050e02ed15f278|b66837b544b2d9cf|28528f24dc965048|-1388941733||t19925.3760467827s|439f9f858c4c6782|1368228|rds|local|vector|||0.89||
-cz_2023_model_data|stem|95c869582cc88ef6|222cc1cea8f29911|05aa14efa2ea0034|-814952770||t19925.3760603946s|e255484007059372|43|rds|local|vector|||0.542||
-cz_2023_model_data_dta|stem|47283cbfe7fc0c8d|eedd09156e15f375|05aa14efa2ea0034|899501715||t19925.3760765142s|24015f6c977629a8|1629684|rds|local|vector|||0.847||
-cz_2023_models|stem|adbccfcdc9f9b96c|ccd331f56883bdad|3d1ffeedcaac5ba6|-1769019735||t19925.3728102736s|c15c4de8c70081ed|1627373|rds|local|vector|||0.01||
+cz_2023_all_waves_resp|stem|01db5f66e90a7cdb|e79b880ec40ea386|c2ed17267225ebb3|-670873800||t20094.8594301232s|307945bba077eaf0|1631209|rds|local|vector|||0.069||
+cz_2023_long|stem|78479f1d73ec8926|601c7d14dd904847|10aae1e69ba3b503|1514080786||t20096.6642239465s|4ef21b14b2d13fd7|1370021|rds|local|vector|||3.017||
+cz_2023_long_file|stem|95c869582cc88ef6|4b3a097859089ce5|bc2e0ca9f199dc53|2063258815||t20096.6642286332s|e255484007059372|43|rds|local|vector|||0.392||
+cz_2023_long_file_dta|stem|78479f1d73ec8926|b66837b544b2d9cf|bc2e0ca9f199dc53|-1388941733||t20096.6642437588s|4ef21b14b2d13fd7|1370021|rds|local|vector|||0.915||
+cz_2023_model_data|stem|95c869582cc88ef6|222cc1cea8f29911|ae7d7f3dc6b5fd39|-814952770||t20094.8594539078s|e255484007059372|43|rds|local|vector|||0.534||
+cz_2023_model_data_dta|stem|01db5f66e90a7cdb|eedd09156e15f375|ae7d7f3dc6b5fd39|899501715||t20094.859447658s|307945bba077eaf0|1631209|rds|local|vector|||0.976||
+cz_2023_models|stem|e73a3a91d839afd8|204d8883adb7d8cf|10aae1e69ba3b503|-1769019735||t20094.8594230588s|a38986003e479646|1628904|rds|local|vector|||0.016||
 cz_2023_weight|stem|c96ec764f1273f01|2188aa76f9eedef9|8b040c94df5b1d25|181003628||t19925.3727058545s|b00c6c953eefb6b5|1625497|rds|local|vector|||0.495|No weights or probabilities supplied, assuming equal probability. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.|
+cz_2023_weight_results|stem|0b2d48477430e74e|4a11a06ffcd4b7c4|b4958f341048de86|-165562415||t20094.8538822677s|66bd88d7199cd3d8|1627053|rds|local|vector|||0.059|No weights or probabilities supplied, assuming equal probability. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.|
 cz_96_final|stem|4cee3d3ad2510c25|c01e8258cf6971fb|3755cab0d5abcc3a|1682770841||t19468.4983173415s|64301caf38caf595|326591|rds|local|vector|||0.049||
 cz_96_merged|stem|2232bcf89c2d75b6|dd5105da8ed5a345|97139bc3b89d489e|1984540019||t19454.8585328468s|badda8d461e9213d|316688|rds|local|vector|||0.041||
 cz_96_post|stem|bfef444f585b92a9|b8235ff4a56ef6ca|2c530c1562a7fbd1|-1343325951||t19925.3726676215s|8f570df5f6c68109|152304|rds|local|vector|||0.061||
 cz_96_pre|stem|dd972cb761b3a73c|79f2c692bd61be55|2c530c1562a7fbd1|2142287232||t19925.3726681052s|cfea398f813c8eeb|66333|rds|local|vector|||0.015||
+cz_election_results_2023|stem|60cce6c9b541eb93|39c0c4c26780f1fb|2c530c1562a7fbd1|-423854158||t20094.8450010226s|4e57ded2a1f37ba3|408|rds|local|vector|||0.694||
 de_2017_final|stem|37709c22cd8085ca|774870aa2a9d6d2f|2c530c1562a7fbd1|1476048158||t19925.3726661706s|93822ca24416560b|5011521|rds|local|vector|||14.581|There was 1 warning in mutate.ℹ In argument birth_year  case_whenbirth_year  1955 und frueher  1955,  TRUE  as.numericbirth_year.Caused by warning NAs introduced by coercion|
 de_2017_weight|stem|a978f7d21a40afad|1969fc3a36eeede8|34c5574041476154|-1969347353||t19925.3727930918s|538a4b5775e55afe|4413678|rds|local|vector|||0.247|No weights or probabilities supplied, assuming equal probability. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.|
 de_2021_final|stem|8f19161261b98ed1|12669a04a759572c|3b64f10eab32a394|-1369689812||t19925.3726937227s|26ecb8153aba0185|1050902|rds|local|vector|||0.659||
@@ -72,7 +74,7 @@ ro_2012_p2_final|stem|a6183d9f9dc87330|05111d58f4b09d6a|cf6ffefebca4139f|-163391
 ro_2012_p2v1|stem|fb4c718ebf653530|7133034532f9f4cc|2c530c1562a7fbd1|615969383||t19925.3726789618s|3433a0692bfa94c5|382273|rds|local|vector|||0.142||
 ro_2012_p2v2|stem|8182952eb5b52346|9f5a5c4a1ca5a0af|2c530c1562a7fbd1|-450898114||t19925.372682113s|a5451b974f6b5e09|343132|rds|local|vector|||0.17||
 ro_2012_weight|stem|cc999fab16423bd0|51670af5c1708fdd|9898c9fdf63bdaaf|-1045647818||t19925.3760772253s|b99eb0f22eee6ddf|24475|rds|local|vector|||0.036|No weights or probabilities supplied, assuming equal probability. Unknown or uninitialised column Freq.. Unknown or uninitialised column Freq.|
-swd_final_rmd|stem|83aa510e184285d6|d14f50d43f8ca371|a819a555f80da250|-225786810|swd_final.html*swd_final.Rmd|t19824.5221358829s||2127141|file|local|vector|||22.108||Problem while computing aesthetics.ℹ Error occurred in the 1st layer.Caused by error object conf.low not found
+swd_final_rmd|stem|83aa510e184285d6|d14f50d43f8ca371|a819a555f80da250|-225786810|swd_final.html*swd_final.Rmd|t19824.5221358829s||2127141|file|local|vector|||30.835||Problem while computing aesthetics.ℹ Error occurred in the 1st layer.Caused by error object conf.low not found
 swd_long_rmd|stem||1de22d597ffeba8d|b6c923331aeb39a3|589617560||t19615.6853152827s||0|file|local|vector|||3.178||need finite xlim values
 swd_rmd|stem|387a4e6f1df4a208|ec626d64359185b2|0541ad324224f814|-127931443|swd.html*swd.Rmd|t19615.7773572287s|14cb7a370a0ed5b6|1724405|file|local|vector|||7.777||
 swd2_rmd|stem|aae96b1d707226e1|46e3a69592d21748|e8c8bc883b335849|-674166384|swd2.html*swd2.Rmd|t19615.7772672873s|d63b6233c5808c64|1192757|file|local|vector|||12.469||

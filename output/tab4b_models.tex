@@ -1,0 +1,56 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+entry=none,label=none,
+note{}={* p < 0.05, ** p < 0.01, *** p < 0.001},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]},
+column{1}={halign=l,},
+column{2}={halign=c,},
+column{3}={halign=c,},
+column{4}={halign=c,},
+hline{36}={1,2,3,4}{solid, 0.05em, black},
+}                     %% tabularray inner close
+\toprule
+& (1) & (2) & (3) \\ \midrule %% TinyTableHeader
+Voted (R1)               & 0.01     &          &          \\
+& (0.03)   &          &          \\
+Voted (R2)               & 0.05*    &          &          \\
+& (0.03)   &          &          \\
+Winner                   &          & 0.11***  &          \\
+&          & (0.02)   &          \\
+Loser                    &          & 0.00     &          \\
+&          & (0.02)   &          \\
+Full winner (A)          &          &          & 0.11***  \\
+&          &          & (0.02)   \\
+Sub-optimal winner (B)   &          &          & 0.10***  \\
+&          &          & (0.03)   \\
+Partial loser (C)        &          &          & -0.02    \\
+&          &          & (0.03)   \\
+Full loser (D)           &          &          & -0.01    \\
+&          &          & (0.03)   \\
+Pre-election SWD         & -0.46*** & -0.51*** & -0.51*** \\
+& (0.03)   & (0.03)   & (0.03)   \\
+Female                   & 0.00     & 0.00     & 0.00     \\
+& (0.02)   & (0.02)   & (0.02)   \\
+Age                      & -0.13*** & -0.09**  & -0.09**  \\
+& (0.03)   & (0.03)   & (0.03)   \\
+Post-secondary education & 0.01     & 0.00     & 0.00     \\
+& (0.01)   & (0.01)   & (0.01)   \\
+Pol. interest            & -0.02    & -0.02    & -0.02    \\
+& (0.03)   & (0.03)   & (0.03)   \\
+Pol. knowledge           & 0.10***  & 0.08**   & 0.08**   \\
+& (0.03)   & (0.03)   & (0.03)   \\
+Feels close to a party   & 0.00     & 0.01     & 0.01     \\
+& (0.02)   & (0.02)   & (0.02)   \\
+Duty to vote             & -0.01    & 0.00     & 0.00     \\
+& (0.02)   & (0.02)   & (0.02)   \\
+Intercept                & 0.24***  & 0.24***  & 0.25***  \\
+& (0.03)   & (0.03)   & (0.04)   \\
+Num.Obs.                 & 1326     & 1326     & 1326     \\
+R2                       & 0.288    & 0.325    & 0.326    \\
+R2 Adj.                  & 0.283    & 0.320    & 0.320    \\
+\bottomrule
+\end{talltblr}
+\end{table}
