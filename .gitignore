@@ -1,6 +1,7 @@
 *.html
 .Rproj.user
 .Rprofile
+.Rhistory
 
 _targets/
 renv/
