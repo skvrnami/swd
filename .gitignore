@@ -3,7 +3,7 @@
 .Rprofile
 .Rhistory
 
-_targets/
+_targets/*
 renv/
 
 data/all_panels_merged.sav

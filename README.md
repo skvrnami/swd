@@ -1,12 +1,15 @@
 # README
 
-For replication:
-- install `renv` package by `install.packages("renv")`
-- install all required packages using `renv::restore()`, the dependencies are declared in `renv.lock`
-- run the script `run.R` (which runs all the steps for data preparation declared in `_targets.R` script)
-- run `swd_final.Rmd` for estimating models and producing tables and charts.
+Replication materials for: Kostelka, F., Linek, L., Rovný, J. and M. Škvrňák. Electoral Participation and Satisfaction with Democracy in Central and Eastern Europe. 
 
-Session info:
+For replication:  
+
+- install `renv` package by `install.packages("renv")`  
+- install all required packages using `renv::restore()`, the dependencies are declared in `renv.lock`  
+- run the script `run.R` (which runs all the steps for data preparation declared in `_targets.R` script)  
+- run `swd_final.Rmd` for estimating models and producing tables and charts   
+
+Session info:  
 ```
 R version 4.4.0 (2024-04-24)
 Platform: aarch64-apple-darwin20
