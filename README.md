@@ -4,6 +4,7 @@ Replication materials for: Kostelka, F., Linek, L., Rovný, J. and M. Škvrňák
 
 For replication:  
 
+- open `swd.Rproj` file in RStudio/your preferred IDE  
 - install `renv` package by `install.packages("renv")`  
 - install all required packages using `renv::restore()`, the dependencies are declared in `renv.lock`  
 - run the script `run.R` (which runs all the steps for data preparation declared in `_targets.R` script)  
