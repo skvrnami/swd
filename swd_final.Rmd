@@ -35,7 +35,7 @@ tar_load(cz_2023_models)
 tar_load(all_panels)
 ```
 
-# Modely do main textu
+# Models for main text
 
 ## Table 2: Descriptive stats of SWD
 ```{r, message=FALSE}
