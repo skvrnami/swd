@@ -1,6 +1,6 @@
 # README
 
-Replication materials for: Kostelka, F., Linek, L., Rovný, J. and M. Škvrňák. Electoral Participation and Satisfaction with Democracy in Central and Eastern Europe. 
+Replication materials for: Kostelka, F., Linek, L., Rovný, J. and M. Škvrňák. Electoral Participation and Satisfaction with Democracy in Central and Eastern Europe. _Political Science Research and Methods._ doi:[10.1017/psrm.2025.10028](https://www.cambridge.org/core/journals/political-science-research-and-methods/article/electoral-participation-and-satisfaction-with-democracy-in-central-and-eastern-europe/F6E33BBD14ED0286F909FA8272FFA0F8)
 
 For replication:  
 
